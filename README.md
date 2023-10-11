@@ -199,7 +199,7 @@ And upon execution our response is
 
 You can see that the output is much like the input, except we have been given `created_at` and `modified_at` data, and the `id` and `token` which should always be the same thing.  What we really care about is the `id`/`token`.  This is the value that will represent our calls to the third party oauth APIs.
 
-### Starting the authorization process.
+### Starting the authorization process
 
 To start the authorization process simply redirect the user in the browser to the Oauth API's initialize URL along with the state token.
 
@@ -210,7 +210,7 @@ To start the authorization process simply redirect the user in the browser to th
 #### Security Note (MUST READ).
 The OAuth API is called via a redirect in the browser.  It should NEVER be called in a frame or iframe element withing HTML in the browser.  Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13).  All of the providers Openbridge uses have disabled it.  Popups may work on some third parties, but it is not supported by Openbridge.
 
-Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token.  Based on the remote_identity_type_id in the state the end user will be redirected to the correct oauth provider.  In our example that is Amazon Selling Partner.  Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the openbridge database, and the end user is then redirected to the return_url that was created in the state.  In our case the blow URL along with some additional query string parameters.
+Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token.  Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider.  In our example that is Amazon Selling Partner.  Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the openbridge database, and the end user is then redirected to the return_url that was created in the state.  In our case the blow URL along with some additional query string parameters.
 
 > ```bash
 > https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=
@@ -234,7 +234,7 @@ When an identity is successfully created you can use the [identities API](#remot
 
 # APIs
 
-### Deprecated key-value pairs in requests and response.
+### Deprecated key-value pairs in requests and response
 
 In the API you will see note to items that are marked as deprecated.  You will be required to include many of them as inputs to `POST` functionality, and receive them as part of the output, but you should not rely on the output in the future, as they will be removed in the future.
 
@@ -275,7 +275,7 @@ A prerequisite to most of the Openbridge APIs is to generate a JWT from a refres
 
 
 
-## Account API.
+## Account API
 
 The openbridge Account API is a RESTFUL API, that supports.  `GET`, `POST` and `PATCH` methods.  However, while the API supports all of these methods, Openbridge customers with the `api-user` role are current restricted to only the `GET` method.  The reason is that their account and user IDs are  prerequisites for many other openbridge APIs therefore we provide `GET` functionality on the account API to fulfill those requisites.
 
@@ -341,7 +341,7 @@ A prerequisite to using the Account API is to create a Openbridge JWT using your
 >        "organization_id": null,
 >        "organization_allowed": false,
 >        "owner": {
->          "id": YYYY,
+>          "id": "YYYY",
 >          "auth0_user_id": "auth0|>636a4261738c1d3f4d57ae6f"
 >        }
 >      }
@@ -371,7 +371,7 @@ From the example response, the `accountId` is `data.id` and the `userId` is `dat
 
 The History endpoint is used for generating history requests for subscriptions where history is allowed.  Not all products can generate history requests.
 
-###### Payload Schema.
+###### Payload Schema
 
 > ```json
 > {
@@ -423,7 +423,7 @@ This example is for an Amazon Selling Partner Sales & Traffic product.
 >  curl -H "Content-Type: application/json" -X POST -d '{ "data": { type: "HistoryTransaction", "attributes": { "product_id": 64; "start_date": "2021-10-10", "end_date": "2021-10-01", "is_primary": true }}}' https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}
 > ```
 
-##### Request Max Dates.
+##### Request Max Dates
 
 Each product has a maximum amount of days that history can be requested for (ie the end date).  The maximium `end_date` is always calculated from the date that history is being requested on.
 
@@ -530,7 +530,7 @@ The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and 
 
 Understanding the response fields.
 
-##### Attribute Fields.
+##### Attribute Fields
 > | key | data type | description |
 > |-|-|-|
 > | `name` | `string` | `` |
@@ -601,7 +601,7 @@ The payload schema for creating a Pipeline Subscription is variant on the produc
 > ```
 
 
-##### Payloat Attribute Fields.
+##### Payload Attribute Fields
 
 Many of the fields below are deprecated, but must be passed into the payload to create a subscription.  Please follow the informatino in `description` on how to set them properly.
 
@@ -881,12 +881,12 @@ The response will contain many deprecated fields, and will not include the `subs
 >       "invalidated_at": null,
 >       "notified_at": null,
 >       "canonical_name": null,
->       "account_id": XXX,
+>       "account_id": "XXX",
 >       "product_id": 53,
 >       "product_plan_id": null,
->       "remote_identity_id": AAA,
->       "storage_group_id": ZZZ,
->       "user_id": YYY,
+>       "remote_identity_id": "AAA",
+>       "storage_group_id": "ZZZ",
+>       "user_id": "YYY",
 >       "history_requested": 0,
 >       "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
 >     },
@@ -1227,7 +1227,6 @@ The response includes the id/token and the timestamps the state was created at. 
 >       }
 >     }
 >   }
-> }
 > ```
 
 </details>
