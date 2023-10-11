@@ -1650,3 +1650,31 @@ In the response, you can see the list of associated markets:
   ]
 }
 ```
+
+
+# Changelog
+
+See the current [CHANGELOG](./CHANGELOG.md) for updates, fixes, and enhancements.
+
+
+
+# Docs
+For more examples on configuration, guides, and constraints please refer to the docs:
+[Openbridge Documentation](https://docs.openbridge.com/)
+
+ If you have not used Openbridge before, you can get a 30-day free trial @ the [Openbridge Website](https://www.openbridge.com). For other guides, tips, or how-to examples, visit us @ the [Openbridge Blog](https://blog.openbridge.com)
+
+# Issues
+
+If you have any problems with or questions about the API, please contact us through a GitHub issue or via the official support portal.
+
+# Contributing
+
+You are invited to contribute new features, fixes, or updates, large or small; we are always thrilled to receive requests, and do our best to process them as fast as we can.
+
+Before you start to code, we recommend discussing your plans through a GitHub issue, especially for more ambitious endeavors. This gives other contributors a chance to point you in the right direction, give you feedback on your approach, and help you find out if someone else is working on the same thing.
+
+# References
+* https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13
+* https://developer-docs.amazon.com/sp-api/
+* https://advertising.amazon.com/API/docs/en-us/
