@@ -33,13 +33,13 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 # Getting Started
 
 ## How do I get access to Openbridge APIs?
-To get access to use the Openbridge APIs requires a discussion with the Openbridge support.  Please contact us at support@openbridge.com for more details.
+To get access to use the Openbridge APIs requires a discussion with the Openbridge support.  Please contact us via the official support portal to request access.
 
 ## API User Role
 Customers who have been granted access to use the Openbridge APIs will be given the `api-user` role to the owner of the account.  Once Openbridge support has said that this role has been added to your account you will need to log out of the Openbridge app and then log back in.  This updates any cached token in the browser with a new one with the required permissions to generate a refresh token for your account.
 
 ## Refresh Token
-A refresh token is a long lived token that your application will use to generate a JWT using the openbridge authorization API.  To create a refresh token you must have been granted the `api-user` role on your account.  If you have this role, log into the Openbridge app. In the main menu and select `Account` and you will be presented with a `API Management` menu option to navigate you to the refresh token management page.  Click on the `"Create Refresh Token"` button.  A modal will present itself where you will need to choose a name for the token.  Click the `Create` button and your token will be generated, and presented to you.  It is VERY IMPORTANT that you now copy this token and store it in a text file, or in your application preferences/settings.  As a security precaution we will not present this token to you again, as it is not stored in a way we can present it to you again.  If you lose your token you will be required to generate a new one.
+A refresh token is a long lived token that your application will use to generate a JWT using the openbridge authorization API.  To create a refresh token you must have been granted the `api-user` role on your account.  If you have this role, log into the Openbridge app. In the main menu and select `Account` and you will be presented with a `API Management` menu option to navigate you to the refresh token management page.  Click on the `"Create Refresh Token"` button.  A modal will present itself where you will need to choose a name for the token.  Click the `Create` button and your token will be generated, and presented to you.  It is **VERY IMPORTANT** that you copy this token and store it in a text file, or in your application preferences/settings.  As a security precaution we will not present this token to you again, as it is not stored in a way we can present it to you again.  If you lose your token you will be required to generate a new one.
 
 
 # Identity Authorization
@@ -68,7 +68,7 @@ The schema for the state to create an identity is:
 
 #### Account and User IDs
 
-The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). The `account_id` will be the `data.id` on the response tree, and the user_id will be `data.attributes.owner.id` on the response tree.
+The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). The `account_id` will be the `data.id` on the response tree, and the `user_id` will be `data.attributes.owner.id` on the response tree.
 
 #### Region
 
@@ -208,7 +208,7 @@ To start the authorization process simply redirect the user in the browser to th
 > ```
 
 #### Security Note (MUST READ).
-The OAuth API is called via a redirect in the browser.  It should NEVER be called in a frame or iframe element withing HTML in the browser.  Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13).  All of the providers Openbridge uses have disabled it.  Popups may work on some third parties, but it is not supported by Openbridge.
+The OAuth API is called via a redirect in the browser.  It should **NEVER** be called in a frame or iframe element withing HTML in the browser.  Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13).  All of the providers Openbridge uses have disabled it.  Popups may work on some third parties, but it is **not** supported by Openbridge.
 
 Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token.  Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider.  In our example that is Amazon Selling Partner.  Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the openbridge database, and the end user is then redirected to the return_url that was created in the state.  In our case the blow URL along with some additional query string parameters.
 
@@ -528,7 +528,7 @@ The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and 
 > }
 > ```
 
-Understanding the response fields.
+### Understanding the response fields
 
 ##### Attribute Fields
 > | key | data type | description |
@@ -626,7 +626,7 @@ Many of the fields below are deprecated, but must be passed into the payload to 
 > | `unique_hash` | `string` | `Internal Use Only: This is a field our web app checks against a cached value for duplicates.  The generation of this hash is complex.  Please pass a string containing [] as the value.  This represents an empty stringified JSON array.` |
 
 ##### Subscription Product Meta
-The base object for all subscriptions are the same. This makes it easy to templatize.  Each product has different "meta" associated with it. In the call to create a subscription you must pass along the correct parameters as part of the subscription_product_meta array.  A subscription product meta object within the context of a subscription creation post has a schema that like this.
+The base object for all subscriptions are the same. This makes it easy to templatize.  Each product has different "meta" associated with it. In the call to create a subscription you must pass along the correct parameters as part of the `subscription_product_meta` array.  A subscription product meta object within the context of a subscription creation post has a schema that like this:
 
 > ```json
 > {
@@ -828,7 +828,7 @@ The response will contain many deprecated fields, and will not include the `subs
 </details>
 
 <details>
- <summary><code>GET</code> <code><b>ttps://subscriptions.api.openbridge.io/sub</b><b>/{id}</b></code></summary>
+ <summary><code>GET</code> <code><b>https://subscriptions.api.openbridge.io/sub</b><b>/{id}</b></code></summary>
 
 ##### Parameters
 
@@ -942,7 +942,7 @@ The response will contain many deprecated fields, and will not include the `subs
 </details>
 
 <details>
- <summary><code>PATCH</code> <code><b>ttps://subscriptions.api.openbridge.io/sub</b><b>/{id}</b></code></summary>
+ <summary><code>PATCH</code> <code><b>https://subscriptions.api.openbridge.io/sub</b><b>/{id}</b></code></summary>
 
  The `PATCH` method is used to update the pipeline subscription record.  The schema is similar to that of a `POST` however it must now include the `id`, and it is limited on the fields that can be updated.
 
@@ -1536,7 +1536,7 @@ In the response, you can see the list of associated markets:
       "domainName": "www.amazon.fr"
     },
     {
-      "id": "A1805IZSGTT6HS",
+      "id": "X",
       "countryCode": "NL",
       "name": "Amazon.nl",
       "defaultCurrencyCode": "EUR",
