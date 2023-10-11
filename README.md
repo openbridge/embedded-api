@@ -1513,6 +1513,7 @@ Product Id 54
   }
 ```
 
+# Frequently Asked Questions
 
 ## How do I determine if an Amazon Seller has a unified or multi-market account?
 ### GET /sp/marketplaces
@@ -1525,7 +1526,6 @@ Authorization: Bearer XXXXX
 ```
 In the response, you can see the list of associated markets:
 ```json
-Response:
 {
   "data": [
     {
