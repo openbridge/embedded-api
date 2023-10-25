@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.3] - 2023-10-11
+
+### Added
+- API endpoints for Amazon Advertising Profile lists and Amazon Advertising Profile Brand list
+
+### Fixed
+- Fixed typos and html formatting bugs.
+
 ## [0.0.2] - 2023-10-11
 
 ### Added
