@@ -370,41 +370,13 @@ From the example response, the `accountId` is `data.id` and the `userId` is `dat
 
 <details>
 
-  <summary><code>GET</code> <code><b>https://localhost:4300/api/service/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileType(s)}}</b></code></summary>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileType(s)}}</b></code></summary>
 
   The Amazon Advertising Profiles service endpoint is use to get a list of profiles based on type(s) of profile that you need.
 
-###### Payload Schema
-
-> ```json
-> {
->   data: {
->     id: number
->     type: 'AmazonAdvertisingProfile',
->     attributes: {
->       country_code: string;
->       currency_code: string,
->       daily_budget: number,
->       timezone: string,
->       account_info: {
->         id: string,
->         type: string,
->         attributes: {
->           marketplace_country: string,
->           marketplace_string_id: string,
->           name: string,
->           type: string,
->           subType: string,
->           valid_payment_method: boolean
->         }  
->       }
->     }
->   }
-> }
-> ```
 
 
-The request endpoint of the AmazonAdvertisingProfile will require the remote identity id, and the profile types you are quering.  Depending on the product you are creating a subscription for you will need to request the correct profile types.  The profile types parameter is comma separated list of valid types.  The table below will show what types for which products.
+  The request endpoint of the AmazonAdvertisingProfile will require the remote identity id, and the profile types you are quering.  Depending on the product you are creating a subscription for you will need to request the correct profile types.  The profile types parameter is comma separated list of valid types.  The table below will show what types for which products.
 
 > | product name | profile types |
 > |-|-|
@@ -437,28 +409,99 @@ The request endpoint of the AmazonAdvertisingProfile will require the remote ide
 
 ##### Example cURL
 
-This example is for an Amazon Selling Partner Sales & Traffic product.
+This example is for retrieving Amazon Advertising Profiles.
 
 > ```curl
 >  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileTypes}}
 > ```
 
+###### Example Response
+
+> ```json
+> {
+>   data: {
+>     id: number
+>     type: 'AmazonAdvertisingProfile',
+>     attributes: {
+>       country_code: string;
+>       currency_code: string,
+>       daily_budget: number,
+>       timezone: string,
+>       account_info: {
+>         id: string,
+>         type: string,
+>         attributes: {
+>           marketplace_country: string,
+>           marketplace_string_id: string,
+>           name: string,
+>           type: string,
+>           subType: string,
+>           valid_payment_method: boolean
+>         }  
+>       }
+>     }
+>   }
+> }
+> ```
+
+
 </details>
 
 ### Amazon Advertising Profile Brands
 
-<!-- https://localhost:4300/api/service/service/amzadv/profiles-only/4728?profile_types=seller,vendor -->
+<details>
 
-<!-- https://localhost:4300/api/service/service/amzadv/brands/4728?profiles=3236163806989273,3734881895130484,3194664080968175 -->
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/amzadv/brands/{{remoteIdentityId}}?profiles={{profileIds}}</b></code></summary>
+
+The Amazon Advertising Profile Brands service endpoint is use to get additional meta data about Amazon Advertising profiles.  
+
+The request endpoint of the AmazonAdvertisingProfile will require the remote identity id, and the profile types you are quering.  Depending on the product you are creating a subscription for you will need to request the correct profile types.  The profile types parameter is comma separated list of valid types.  The table below will show what types for which products.
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
 
 
+##### Parameters
+> | name | data type | description                                                           |
+> |-|-|-|
+> | profiles | string | A csv list of profile IDs valid for the provided remote identity id. 
 
 
+##### Responses
 
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
 
+##### Example cURL
 
+This example is for retrieving Amazon Advertising Profile Brands.
 
+> ```curl
+>  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/brands/{{remoteIdentityId}}?profiles={{profileIds}}
+> ```
 
+###### Example Response
+
+> ```json
+> {
+>   data: {
+>     id: number
+>     type: 'AmazonAdvertisingProfileBrand',
+>     attributes: {
+>       brand_entity_id: string;
+>       brand_registry_name: string,
+>       profile_id: string,
+>     }
+>   }
+> }
+> ```
+
+</details>
 
 ### History Transaction Creation
 
