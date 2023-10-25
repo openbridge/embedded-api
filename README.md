@@ -470,6 +470,7 @@ The request endpoint of the AmazonAdvertisingProfile will require the remote ide
 > |-|-|-|
 > | profiles | string | A csv list of profile IDs valid for the provided remote identity id. 
 
+*NOTE*: The profiles parameter is used because passing too many profiles at once can cause the upstream API to time out.  Therefore you should never send more than 5 profile IDs at one time.  This means that if you have 100 profile IDs from the Amazon Advertising Profiles endpoint you would have to loop through and call this endpoint 20 times to get all the extra meta information.
 
 ##### Responses
 
