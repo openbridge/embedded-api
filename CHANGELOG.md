@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2023-11-13
+
+### Added
+- Added sample script to request history as a reference tool.
+
 ## [0.0.4] - 2023-10-11
 
 ### Added
