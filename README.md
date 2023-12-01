@@ -31,6 +31,9 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 
  - [Product Information](#product-information)
 
+ - [Best Practices](#best-practices)
+  - [Identity Health](#identity-health)
+
 
 # Getting Started
 
@@ -605,6 +608,129 @@ The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and 
 ##### Example cURL
 
 > ```curl
+>  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/sri
+> ```
+
+The /sri endpoint is used to return a list of all identities that your account has permissions to use.  `sri` stands for `shared remote identities`.  Since there is a chance that an identity can be shared between multiple Openbridge accounts we provide an endpoint to all identities associated to your account, even if it was created by another account previously.
+
+##### Example Response
+
+Returns an array of Remote Identities
+
+> ```json
+> [{
+>   "data": {
+>     "type": "RemoteIdentity",
+>     "id": "362",
+>     "attributes": {
+>       "name": "James Andrews",
+>       "created_at": "2018-02-13T18:49:51",
+>       "modified_at": "2022-10-26T20:43:21",
+>       "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
+>       "remote_unique_id": "526589612",
+>       "account_id": 1,
+>       "user_id": 1,
+>       "notified_at": null,
+>       "invalidate_manually": 0,
+>       "invalid_identity": 0,
+>       "invalidated_at": "2019-05-11T00:05:01",
+>       "notification_counter": 0,
+>       "region": "global",
+>       "email": "thenetimp+facebook@gmail.com",
+>       "oauth_id": null
+>     },
+>     "relationships": {
+>       "remote_identity_type": {
+>         "data": {
+>           "type": "RemoteIdentityType",
+>           "id": "2"
+>         }
+>       },
+>       "account": {
+>         "data": {
+>           "type": "Account",
+>           "id": "1"
+>         }
+>       },
+>       "user": {
+>         "data": {
+>           "type": "User",
+>           "id": "1"
+>         }
+>       },
+>       "trusted_identity": {
+>         "data": null
+>       },
+>       "remote_identity_type_application": {
+>         "data": {
+>           "type": "RemoteIdentityTypeApplication",
+>           "id": "8"
+>         }
+>       },
+>       "oauth": {
+>         "data": null
+>       }
+>     }
+>   }
+> }]
+> ```
+
+### Understanding the response fields
+
+##### Attribute Fields
+> | key | data type | description |
+> |-|-|-|
+> | `name` | `string` | `` |
+> | `created_at` | `string` | `` |
+> | `modified_at` | `string` | `` |
+> | `identity_hash` | `string` | `deprecated` |
+> | `remote_unique_id` | `string` | `identifying value from the remote third party Oauth API` |
+> | `account_id` | `string` | `The id of the account that first created the identity` |
+> | `user_id` | `string` | `The id of the user that first created the identity` |
+> | `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
+> | `invalidate_manually` | `string` | `deprecated` |
+> | `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
+> | `invalidated_at` | `string` | `The datetime that the identity became invalid` |
+> | `notification_counter` | `string` | `deprecated` |
+> | `region` | `string` | `The region associated with the identity` |
+> | `email` | `string` | `The email address associated with the profile by the third party (if available)` |
+> | `oauth_id` | `string` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+
+##### Relationship Fields.
+> | key | data type | description |
+> |--|--|--|
+> | `remote_identity_type` | `object` | `Reference to the remote identity type` |
+> | `account` | `object` | `reference to the account` |
+> | `user` | `object` | `reference to the user` |
+> | `trusted_identity` | `object` | `deprecated` |
+> | `remote_identity_type_application` | `object` | `reference to an internal auth application` |
+> | `oauth` | `object` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+
+**Note**:  Identity credentials are not provided via the Remote Identity API
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/sri</b></code></summary>
+
+##### Headers
+
+> | name      |        data type               | description                                                           |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | Authorization      |  string  | Openbridge JWT, passed as a  authorization bearer type
+
+##### Parameters
+> The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `Configuration created successfully`                                |
+
+##### Example cURL
+
+> ```curl
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/identity/{id}
 > ```
 
@@ -671,33 +797,10 @@ The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and 
 ### Understanding the response fields
 
 ##### Attribute Fields
-> | key | data type | description |
-> |-|-|-|
-> | `name` | `string` | `` |
-> | `created_at` | `string` | `` |
-> | `modified_at` | `string` | `` |
-> | `identity_hash` | `string` | `deprecated` |
-> | `remote_unique_id` | `string` | `identifying value from the remote third party Oauth API` |
-> | `account_id` | `string` | `The id of the account that first created the identity` |
-> | `user_id` | `string` | `The id of the user that first created the identity` |
-> | `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
-> | `invalidate_manually` | `string` | `deprecated` |
-> | `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
-> | `invalidated_at` | `string` | `The datetime that the identity became invalid` |
-> | `notification_counter` | `string` | `deprecated` |
-> | `region` | `string` | `The region associated with the identity` |
-> | `email` | `string` | `The email address associated with the profile by the third party (if available)` |
-> | `oauth_id` | `string` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+These are the same as on a call to a single remote identity.
 
 ##### Relationship Fields.
-> | key | data type | description |
-> |--|--|--|
-> | `remote_identity_type` | `object` | `Reference to the remote identity type` |
-> | `account` | `object` | `reference to the account` |
-> | `user` | `object` | `reference to the user` |
-> | `trusted_identity` | `object` | `deprecated` |
-> | `remote_identity_type_application` | `object` | `reference to an internal auth application` |
-> | `oauth` | `object` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+These are the same as on a call to a single remote identity.
 
 **Note**:  Identity credentials are not provided via the Remote Identity API
 
@@ -1651,6 +1754,26 @@ Product Id 54
     }
   }
 ```
+
+# Best Practices
+
+## Identity Health
+Identities are the glue keeping your pipeline subscriptions running.  If an authorization attached to an identity is revoked it will cause all pipeline subscriptions attached to it to fail.  To get a better understanding of the concept of identities please read [Understnading Identities](https://docs.openbridge.com/en/articles/3673866-understanding-remote-identities).
+
+Since identiies are so important; Openbridge has a daemon that is set to check identities attached to active subscriptions every 24 hours and send notifications to the affected customers.  As an API user we would send notifications to your primary account manager.  This allows you to reauthorize the identities that lost authorization so that Openbridge can continue to process data for the affected pipelines.
+
+## Retrieving a list of valid or invalid identities
+The remote identities API allows you to filter for identities that are valid or invalid. Filters are querystring paramters that are attached to a get call.  In this case we want to filter on the `invalid_identity`.  It is a boolean and can be used as `invalid_identity=1` to get only invalid identities or `invalid_identity=0` to get all valid identities.
+
+When requesting a list of identities you should be using the 'shared remote identities' GET endpoing. 
+
+https://remote-identity.api.openbridge.io/sri?invalid_identity=1
+
+### Failures on your customer's identities
+---
+
+ This is an important feature if you are reselling Openbridge services to your own customers.  Since Openbridge has no connection to your customer when our system detects a failed identity we have no way to communicate this failure to them.  As a reseller you should have a system in place that maps an identity with the customer in your app who authorized the identity.  Periodically you should be querying for invalid identities, and when one is detected you should be communicating the failure with your customers so that they can reauthorized the identity.
+
 
 # Frequently Asked Questions
 
