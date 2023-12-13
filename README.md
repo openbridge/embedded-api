@@ -588,7 +588,7 @@ Each product has a maximum amount of days that history can be requested for (ie 
 The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and `POST` methods.  However, while the API supports all of these methods, Openbridge customers with the `api-user` role are current restricted to only the `GET` method.  Allowing a means to look up state of an identity.  Identity creation is handled through the Oauth API.
 
 <details>
- <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/identity</b><b>/{id}</b></code></summary>
+ <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/ri</b><b>/{id}</b></code></summary>
 
 ##### Headers
 
