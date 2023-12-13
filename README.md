@@ -608,7 +608,7 @@ The openbridge Remote Identity API is a RESTFUL API, that supports.  `GET`, and 
 ##### Example cURL
 
 > ```curl
->  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/sri
+>  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{remite_identity_id}
 > ```
 
 The /sri endpoint is used to return a list of all identities that your account has permissions to use.  `sri` stands for `shared remote identities`.  Since there is a chance that an identity can be shared between multiple Openbridge accounts we provide an endpoint to all identities associated to your account, even if it was created by another account previously.
