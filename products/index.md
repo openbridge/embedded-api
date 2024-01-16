@@ -1,6 +1,6 @@
 # Openbridge Products
 
-This document provides information necessary to make calls to various 3rd party APIs through the Openbridge service API for requisit information to be included when creating a subscription for an Openbridge product.
+This document provides information required when creating subscriptions for Openbridge products.
 
 - [Amazon Advertising Products](#amazon-advertising-products)
   - [Amazon Advertizing (SB/SD)](#amazon-advertizing-sbsd)
