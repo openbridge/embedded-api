@@ -53,6 +53,11 @@ This document provides information required when creating subscriptions for Open
 These products pull reports from resources attributed to the Amazon Advertising API.
 
 ### Amazon Advertizing (SB/SD)
+
+This product requires a call to the service API to get the requisit information for the subscription product meta.
+
+The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -70,6 +75,9 @@ __Required Subscription Product Meta__
 
 
 ### Amazon Advertizing (SP)
+This product requires a call to the service API to get the requisit information for the subscription product meta.
+
+The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -85,6 +93,10 @@ __Required Subscription Product Meta__
 
 ### Amazon Advertising Brand Metrics
 
+This product requires a call to the service API to get the requisit information for the subscription product meta.
+
+The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -99,6 +111,10 @@ __Required Subscription Product Meta__
 
 
 ### Amazon Attribution
+
+This product requires a call to the service API to get the requisit information for the subscription product meta.
+
+The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -134,6 +150,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Orders API
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -146,6 +164,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Finance Real-Time
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -160,6 +180,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Inbound Fulfillment
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -172,6 +194,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Settlement Reports
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -186,6 +210,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Fulfillment
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -198,6 +224,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Inventory
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -212,6 +240,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Sales Reports
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -224,6 +254,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Fees
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -238,6 +270,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Sales & Traffic
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -250,6 +284,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Seller Brand Analytics Reports
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -266,6 +302,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Vendor Retail Analytics
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -278,6 +316,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Vendor Retail Procurement
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -292,6 +332,8 @@ __Required Subscription Product Meta__
 
 ### Amazon Vendor Brand Analytics Reports
 
+This product does not require any additional calls to the openbridge service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -304,6 +346,8 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
 ### Amazon Vendor Real-time Reports
+
+This product does not require any additional calls to the openbridge service API.
 
 __Product Attributes__
 > | Key | Value |
