@@ -56,7 +56,7 @@ These products pull reports from resources attributed to the Amazon Advertising 
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](apis.md#amazon-advertising-rofiles) endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -77,7 +77,7 @@ __Required Subscription Product Meta__
 ### Amazon Advertizing (SP)
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](apis.md#amazon-advertising-rofiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](apis.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -95,7 +95,7 @@ __Required Subscription Product Meta__
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](apis.md#amazon-advertising-rofiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](apis.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -114,7 +114,7 @@ __Required Subscription Product Meta__
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the profiles endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](apis.md#amazon-advertising-rofiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](apis.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |

@@ -377,8 +377,6 @@ From the example response, the `accountId` is `data.id` and the `userId` is `dat
 
   The Amazon Advertising Profiles service endpoint is use to get a list of profiles based on type(s) of profile that you need.
 
-
-
   The request endpoint of the AmazonAdvertisingProfile will require the remote identity id, and the profile types you are quering.  Depending on the product you are creating a subscription for you will need to request the correct profile types.  The profile types parameter is comma separated list of valid types.  The table below will show what types for which products.
 
 > | product name | profile types |
