@@ -27,7 +27,11 @@ This document provides information required when creating subscriptions for Open
   - [Amazon Vendor Retail Procurement](#amazon-vendor-retail-procurement)
   - [Amazon Vendor Brand Analytics Reports](#amazon-vendor-brand-analytics-reports)
   - [Amazon Vendor Real-time Reports](#amazon-vendor-real-time-reports)
-  
+
+- [Mixed Amazon Seller and Vendor Products](#mixed-amazon-seller-and-vendor-products)
+  - [Amazon Catalog Keyword Tracker](#amazon-seller-vendor-catalog-keyword-tracker)
+  - [Amazon Catalog API](#amazon-seller-vendor-catalog-api)
+
 - [Facebook Products](#facebook-products)
 
   - [Facebook Marketing](#facebook-marketing)
@@ -360,9 +364,49 @@ __Required Subscription Product Meta__
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
+## Mixed Amazon Seller and Vendor Products 
+
+### Amazon Catalog Keyword Tracker
+
+Amazon Catalog Keyword Tracker requires no additional API lookups with the Openbridge Service API.
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 82 |
+> | Remote Identity Type ID | 17 or 18 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | keywords | `STRING` | A stringified JSON array of keywords.  The limit is 100 keywords to prevent Amazon API rate limiting.  Subscriptions with more than 100 may fail to generate reports. |
+> | subproduct_id | `STRING` | This product requires a subproduct id which will always be the string `keywords`. |
+
+### Amazon Catalog API
+
+Amazon Catalog API requires no additional API lookups with the Openbridge Service API.  However, it is recommended that when choosing the `id_type` of `ASIN` that you use the Openbridge Service API for validating `ASIN` numbers if you are not 100% sure the ASINs you are providing are correct.
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 82 |
+> | Remote Identity Type ID | 17 or 18 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | ids | `STRING` | A stringified JSON array of ids of the type defined by `id_type`.  The limit should be 100 ids to prevent Amazon API rate limiting. Subscriptions with more than 100 may fail to generate reports. |
+> | identity_type | `STRING` | `seller` or `vendor` depending if the identity type is a seller or a vendor identity. |
+> | id_type | `STRING` | The catalog API can be used to request reports on different types of identifiers.  `ASIN`,`EAN`, `GTIN`, `ISBN`, `JAN`, `MINSAN`, `SKU`, and `UPC`.  <strong>Note</strong>: that `SKU` types can not be used with `vendor` type identities due to permission restrictions. |
+> | subproduct_id | `STRING` | This product requires a subproduct id which will always be the string `identifiers`. |
+
 ## Facebook Products
 
 ### Facebook Marketing
+
+Facebook marketing requires a Facebook Ad account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Ad account IDs can be requested from the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -377,6 +421,8 @@ __Product Attributes__
 
 ### Facebook Page Insights
 
+Facebook marketing requires a Facebook Page account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Page account IDs can be requested from the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -389,6 +435,8 @@ __Product Attributes__
 > | account_id | `STRING` | Facebook page account ID. |
 
 ### Instagram Insights
+
+Instagram Insights requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested from the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -404,6 +452,9 @@ __Required Subscription Product Meta__
 > | fb_account_id | `STRING` | Facebook page account ID. |
 
 ### Instagram Stories
+
+Instagram Stories requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested from the Openbridge Service API.
+
 
 __Product Attributes__
 > | Key | Value |
@@ -422,6 +473,8 @@ __Required Subscription Product Meta__
 
 ### Google Analytics 360
 
+Google Analytics 360 requires a project ID and dataset ID associated with the remote identity attached to the subsciption.   A list of available project and dataset IDs can be requested from the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -438,6 +491,8 @@ __Required Subscription Product Meta__
 
 ### Google Campaign Manager
 
+Google Campaign Manager requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested from the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -453,6 +508,8 @@ __Required Subscription Product Meta__
 
 ### Google Search Ads 360
 
+Google Search Ads 360 requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested from the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -467,6 +524,8 @@ __Required Subscription Product Meta__
 > | advertiser_id | `STRING` | Advertiser id associated with the desired reports. |
 
 ### Google Ads
+
+Google Ads requires a manager customer ID and client customer ID associated with the remote identity attached to the subsciption.   A list of available manager customer and client customer IDs can be requested from the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -485,6 +544,8 @@ __Required Subscription Product Meta__
 
 ### Youtube Channel Insights
 
+Youtube Channel Insights requires a channgel ID associated with the remote identity attached to the subsciption.   A list of available channgel ID can be requested from the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -498,6 +559,8 @@ __Required Subscription Product Meta__
 > | channel_id | `STRING` | Youtube associated channel ID. |
 
 ### Youtube Competitor Channels
+
+Youtube Competitor Channels requires a list of channel ids as a stringified JSON array.  The Openbridge service API allows you to get youtube channel IDs based on various Youtube URLs.  You can provide a maximum of 7 IDs per subscription.
 
 __Product Attributes__
 > | Key | Value |
@@ -513,6 +576,8 @@ __Required Subscription Product Meta__
 
 ### Youtube Competitor Videos
 
+Youtube Competitor Channels requires a list of channel ids as a stringified JSON array.  The Openbridge service API allows you to get youtube channel IDs based on various Youtube URLs.  You can provide a maximum of 7 IDs per subscription.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -526,6 +591,9 @@ __Required Subscription Product Meta__
 > | channel_ids | `JSON` | Remote identity associated with the associated profile. |
 
 ### Youtube Video Insights
+
+Youtube Video Insights requires a channgel ID associated with the remote identity attached to the subsciption.   A list of available channgel ID can be requested from the Openbridge Service API.
+
 
 __Product Attributes__
 > | Key | Value |
