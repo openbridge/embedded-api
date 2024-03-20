@@ -536,6 +536,21 @@ __Required Subscription Product Meta__
 > | agency_id | `STRING` | Agency id associated with the desired reports. |
 > | advertiser_id | `STRING` | Advertiser id associated with the desired reports. |
 
+## Shopify
+
+Shopify 360 requires the shop creation date associated with the remote identity attached to the subsciption. Shopify info can be requested with the [Shopify Info](service-api.md#shopify-info) endpoint on the Openbridge Service API.
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 44 |
+> | Remote Identity Type ID | 16 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | shop_created_at | `STRING` | THe shop creation date in the format of YYYY-mm-dd example 2010-03-01 for March 1st 2010.  This information is provided by the shop info endpoint.  |
 
 ## Youtube Products
 
