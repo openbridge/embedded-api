@@ -60,7 +60,7 @@ These products pull reports from resources attributed to the Amazon Advertising 
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising) endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles) endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -81,7 +81,7 @@ __Required Subscription Product Meta__
 ### Amazon Advertizing (SP)
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -118,7 +118,7 @@ __Required Subscription Product Meta__
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-rofiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
 
 __Product Attributes__
 > | Key | Value |
@@ -364,9 +364,7 @@ __Required Subscription Product Meta__
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
-## Mixed Amazon Seller and Vendor Products 
-
-### Amazon Catalog Keyword Tracker
+#### Amazon Catalog Keyword Tracker
 
 Amazon Catalog Keyword Tracker requires no additional API lookups with the Openbridge Service API.
 
@@ -406,7 +404,7 @@ __Required Subscription Product Meta__
 
 ### Facebook Marketing
 
-Facebook marketing requires a Facebook Ad account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Ad account IDs can be requested from the Openbridge Service API.
+Facebook marketing requires a Facebook Ad account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Ad account IDs can be requested with the [Facebook Ads](service-api.md#facebook-ads) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -421,8 +419,7 @@ __Product Attributes__
 
 ### Facebook Page Insights
 
-Facebook marketing requires a Facebook Page account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Page account IDs can be requested from the Openbridge Service API.
-
+Facebook marketing requires a Facebook Page account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Page account IDs can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -436,7 +433,7 @@ __Product Attributes__
 
 ### Instagram Insights
 
-Instagram Insights requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested from the Openbridge Service API.
+Instagram Insights requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -453,7 +450,7 @@ __Required Subscription Product Meta__
 
 ### Instagram Stories
 
-Instagram Stories requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested from the Openbridge Service API.
+Instagram Stories requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
 
 
 __Product Attributes__
@@ -471,58 +468,6 @@ __Required Subscription Product Meta__
 
 ## Google Products
 
-### Google Analytics 360
-
-Google Analytics 360 requires a project ID and dataset ID associated with the remote identity attached to the subsciption.   A list of available project and dataset IDs can be requested from the Openbridge Service API.
-
-__Product Attributes__
-> | Key | Value |
-> |-|-|
-> | Product ID | 3 |
-> | Remote Identity Type ID | 1 |
-
-__Required Subscription Product Meta__
-> | Data Key | Data Format Value | Data Value |
-> |-|-|-|
-> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | project_id | `STRING` | Project ID associated with the Google BigQuery associated with the Google Analytics account. |
-> | dataset_id | `STRING` | Dataset ID associated with the Google BigQuery associated with the Google Analytics account. |
-
-
-### Google Campaign Manager
-
-Google Campaign Manager requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested from the Openbridge Service API.
-
-__Product Attributes__
-> | Key | Value |
-> |-|-|
-> | Product ID | 4 |
-> | Remote Identity Type ID | 1 |
-
-__Required Subscription Product Meta__
-> | Data Key | Data Format Value | Data Value |
-> |-|-|-|
-> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | dfa_profile_id | `STRING` | Campaign Manager profile ID. |
-> | dfa_report_id | `STRING` | Campaign report ID. |
-
-### Google Search Ads 360
-
-Google Search Ads 360 requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested from the Openbridge Service API.
-
-__Product Attributes__
-> | Key | Value |
-> |-|-|
-> | Product ID | 7 |
-> | Remote Identity Type ID | 1 |
-
-__Required Subscription Product Meta__
-> | Data Key | Data Format Value | Data Value |
-> |-|-|-|
-> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | agency_id | `STRING` | Agency id associated with the desired reports. |
-> | advertiser_id | `STRING` | Advertiser id associated with the desired reports. |
-
 ### Google Ads
 
 Google Ads requires a manager customer ID and client customer ID associated with the remote identity attached to the subsciption.   A list of available manager customer and client customer IDs can be requested from the Openbridge Service API.
@@ -539,6 +484,58 @@ __Required Subscription Product Meta__
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 > | manager_customer_id | `STRING` | The manager id that manages the client_customer_id. |
 > | client_customer_id | `STRING` | The client's customer id where the reports reside. |
+
+### Google Analytics 360
+
+Google Analytics 360 requires a project ID and dataset ID associated with the remote identity attached to the subsciption.   A list of available project and dataset IDs can be requested with the [Google Ads](service-api.md#google-ads) endpoint on the Openbridge Service API.
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 3 |
+> | Remote Identity Type ID | 1 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | project_id | `STRING` | Project ID associated with the Google BigQuery associated with the Google Analytics account. |
+> | dataset_id | `STRING` | Dataset ID associated with the Google BigQuery associated with the Google Analytics account. |
+
+### Google Campaign Manager
+
+Google Campaign Manager requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile can be requested with the [Google Campaign Manager Profiles](service-api.md#google-campaign-manager-reports) endpoint on the Openbridge Service API and report IDs can be requested with the [Google Campaign Manager Profiles](service-api.md#google-campaign-manager-reports) endpoint
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 4 |
+> | Remote Identity Type ID | 1 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | dfa_profile_id | `STRING` | Campaign Manager profile ID. |
+> | dfa_report_id | `STRING` | Campaign report ID. |
+
+### Google Search Ads 360
+
+Google Search Ads 360 requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested with the [Google Search Ads 360](service-api.md#google-search-ads-360) endpoint on the Openbridge Service API.
+
+__Product Attributes__
+> | Key | Value |
+> |-|-|
+> | Product ID | 7 |
+> | Remote Identity Type ID | 1 |
+
+__Required Subscription Product Meta__
+> | Data Key | Data Format Value | Data Value |
+> |-|-|-|
+> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
+> | agency_id | `STRING` | Agency id associated with the desired reports. |
+> | advertiser_id | `STRING` | Advertiser id associated with the desired reports. |
+
 
 ## Youtube Products
 

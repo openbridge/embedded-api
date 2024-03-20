@@ -1,15 +1,19 @@
 - [Service API](#service-api)
 	- [Third-party APIs](#third-party-apis)
 	  - [Amazon Advertising](#amazon-advertising)
-	  - [Amazon Advertising Marketing Stream](#amazon-advertising-marketing-stream)
-	  - [Facebook Ads](#facebook-ads)
-	  - [Facebook Page Insights/Instagram Insights/Instagram-stories](#facebook-page-insights-instagram-insights-instagram-stories)
-	  - [Google Ads](#google-ads)
-	  - [Google Analytics 360](#google-analytics-360)
-	  - [Google Campaign Manager](#google-campaign-manager)
-	  - [Google Search Ads 360](#google-search-ads-360)
+			- [Amazon Advertising Profiles](#amazon-advertising-profiles)
+			- [Amazon Advertising Brands](#amazon-advertising-brands)
+	  	- [Amazon Advertising Marketing Stream](#amazon-advertising-marketing-stream)
+		- [Facebook](#facebook)
+			- [Facebook Ads](#facebook-ads)
+			- [Facebook Page Insights/Instagram Insights/Instagram-stories](#facebook-page-insights-instagram-insights-instagram-stories)
+		- [Google](#google)
+			- [Google Ads](#google-ads)
+			- [Google Analytics 360](#google-analytics-360)
+			- [Google Campaign Manager](#google-campaign-manager)
+			- [Google Search Ads 360](#google-search-ads-360)
 	  - [Shopify](#shopify)
-	  - [Youtube](#shopify)
+	  - [Youtube](#youtube)
 
   - [Openbridge API Proxies](#openbridge-api-proxies)
 	  - [Healthchecks](#healthchecks)
@@ -23,6 +27,8 @@ The service API is used as a proxy for other external API calls, mostly to third
 ## Third-party APIs
 
 ### Amazon Advertising
+
+#### Amazon Advertising Profiles
 <details>
 
   <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileType(s)}}</b></code></summary>
@@ -100,6 +106,8 @@ This example is for retrieving Amazon Advertising Profiles.
 > ```
 </details>
 
+#### Amazon Advertising Brands
+
 <details>
 
   <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/amzadv/brands/{{remoteIdentityId}}?profiles={{profileIds}}</b></code></summary>
@@ -155,8 +163,92 @@ This example is for retrieving Amazon Advertising Profile Brands.
 
 </details>
 
+### Amazon Advertising Marketing Stream
 
-### Facebook Ads
+<details>
+ <summary><code>POST</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/amzadv/stream/{remote_identity_id}</b></code></summary>
+
+This endpoint is used in the creation of the Amazon Marketing stream SQS queues that are needed to collect data.
+
+##### Headers
+
+> | name      |        data type               | description                                                           |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | `Authorization` |  `string`  | `Openbridge JWT, passed as a  authorization bearer type`
+
+##### Payload
+> 
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `201`         | `application/json`        | `Success`                                |
+> | `202`         | `application/json`        | `Success`                                |
+> | `204`         | `application/json`        | `Success`                                |
+> | `400`         |         | `Bad Request`                                |
+> | `401`         |         | `Not Authorized`                                |
+> | `403`         |         | `Forbidden`                                |
+> | `404`         |         | `Not Found`                                |
+> | `409`         |         | `Conflict`                                |
+
+##### Example cURL
+
+{{ CURLEXAMPLE }}
+> ```curl
+>  curl -X POST -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/amzadv/stream/{remote_identity_id}
+> ```
+
+##### Example Response
+{{ RESPONSE }}
+
+</details>
+
+<details>
+ <summary><code>PATCH</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/amzadv/stream/{remote_identity_id}/{sub_id}</b></code></summary>
+
+This endpoint is used in the updating of the Amazon Marketing stream SQS queues that are needed to collect data.  It should only be called when new SQS queue types are available.
+
+##### Headers
+
+> | name      |        data type               | description                                                           |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | `Authorization` |  `string`  | `Openbridge JWT, passed as a  authorization bearer type`
+
+##### Payload
+> 
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `Success`                                |
+> | `400`         |         | `Bad Request`                                |
+> | `401`         |         | `Not Authorized`                                |
+> | `403`         |         | `Forbidden`                                |
+> | `404`         |         | `Not Found`                                |
+> | `409`         |         | `Conflict`                                |
+
+##### Example cURL
+
+{{ CURLEXAMPLE }}
+> ```curl
+>  curl -X PATCH -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/amzadv/stream/{remote_identity_id}/{sub_id}
+> ```
+
+##### Example Response
+{{ RESPONSE }}
+
+
+</details>
+
+
+### Amazon Pricing API and Catalog API
+
+
+### Facebook
+
+#### Facebook Ads
 <details>
  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/facebook/ads-profiles/{remote_identity_id}</b></code></summary>
 
@@ -203,7 +295,7 @@ This endpoint is used to get a list of account IDs associated with a Facebook id
 >```
 </details>
 
-### Facebook Page Insights/Instagram Insights/Instagram-stories
+#### Facebook Page Insights/Instagram Insights/Instagram-stories
 
 <details>
  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/facebook/page-profiles/{remote_identity_id}</b></code></summary>
@@ -881,4 +973,76 @@ Each product has a maximum amount of days that history can be requested for (ie 
 </details>
 
 ### Jobs API.
-Documentation coming soon.
+<details>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/jobs/jobs?subscription_ids={{subscription_id}}</b></code></summary>
+  
+The jobs endpoint will allow you to get detailed information about the current job states of a given pipeline subscription.
+
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+
+
+##### Parameters
+> | name | data type | description                                                           |
+> |-|-|-|
+> | subscription_ids | string | Accepts a comma seperated list of pipeline subscrition IDs, however we recommend doing checks one at a time. |
+> |`order_by`|`is_primary`|`orders job records primary first then history`|
+> |`page`|`number`|`paginated history page`|
+> |`page_size`|`number`|`number of records to show per page request`|
+> | `is_primary` |`boolean` | `'true' to return prumary jobs 'false' to return history jobs. Exclude for all jobs` |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+##### Example cURL
+
+This example is for retrieving Jobs records for a given pipeline.
+
+> ```curl
+>  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileTypes}}
+> ```
+
+###### Example Response
+
+> ```json
+> {
+>   "data": [
+>      {
+>       "id": "number",
+>       "type": "AmazonAdvertisingProfile",
+>       "attributes": {
+>         "country_code": "string",
+>         "currency_code": "string",
+>         "daily_budget": "number",
+>         "timezone": "string",
+>         "account_info": {
+>           "id": "string",
+>           "type": "string",
+>           "attributes": {
+>             "marketplace_country": "string",
+>             "marketplace_string_id": "string",
+>             "name": "string",
+>             "type": "string",
+>             "subType": "string",
+>             "valid_payment_method": "boolean"
+>           }  
+>         }
+>       }
+>     }
+>   ]
+> }
+> ```
+  
+  
+</details>
+
+
