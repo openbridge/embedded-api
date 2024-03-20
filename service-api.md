@@ -1068,7 +1068,6 @@ Each product has a maximum amount of days that history can be requested for (ie 
   
 The jobs endpoint will allow you to get detailed information about the current job states of a given pipeline subscription.
 
-
 ##### Headers
 
 > | name | data type | description                                                           |
