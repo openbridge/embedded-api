@@ -13,6 +13,7 @@
 			- [Google Campaign Manager](#google-campaign-manager)
 			- [Google Search Ads 360](#google-search-ads-360)
 	  - [Shopify](#shopify)
+		  - [Shopify Info](#shopify-info)
 	  - [Youtube](#youtube)
 
   - [Openbridge API Proxies](#openbridge-api-proxies)
@@ -792,6 +793,8 @@ This endpoint returns a list advertiser/agency pairs associated with an identity
 >```
 
 </details>
+
+## Shopify
 
 ### Shopify Info
 
