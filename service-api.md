@@ -70,8 +70,8 @@ The service API is used as a proxy for other external API calls, mostly to third
 ##### Example cURL
 
 This example is for retrieving Amazon Advertising Profiles.
-
 > ```curl
+
 >  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileTypes}}
 > ```
 
@@ -141,8 +141,8 @@ The request endpoint of the AmazonAdvertisingProfile will require the remote ide
 ##### Example cURL
 
 This example is for retrieving Amazon Advertising Profile Brands.
-
 > ```curl
+
 >  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/brands/{{remoteIdentityId}}?profiles={{profileIds}}
 > ```
 
@@ -195,8 +195,8 @@ This endpoint is used in the creation of the Amazon Marketing stream SQS queues 
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
+
 >  curl -X POST -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/amzadv/stream/{remote_identity_id}
 > ```
 
@@ -232,8 +232,8 @@ This endpoint is used in the updating of the Amazon Marketing stream SQS queues 
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
+
 >  curl -X PATCH -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/amzadv/stream/{remote_identity_id}/{sub_id}
 > ```
 
@@ -271,8 +271,8 @@ This endpoint is used to get a list of account IDs associated with a Facebook id
 > | `404`         |         | `Not Found`                                |
 
 ##### Example cURL
-
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/facebook/ads-profiles/{remote_identity_id}
 > ```
 
@@ -320,8 +320,8 @@ This endpoint is used to get a list of page IDs and associated Instagram busines
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/facebook/page-profiles/{remote_identity_id}
 > ```
 
@@ -402,8 +402,8 @@ This endpoint is used to get a list of customers attached to the associated iden
 > | `404`         |         | `Not Found`                                |
 
 ##### Example cURL
-
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/googleads/list-customers/{remote_identity_id}
 > ```
 
@@ -447,8 +447,8 @@ This endpoint is used to get a list of customer managed by a manager customer.  
 > | `404`         |         | `Not Found`                                |
 
 ##### Example cURL
-
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/googleads/list-managed/{remote_identity_id}/{google_ads_customer_id}
 > ```
 
@@ -476,8 +476,70 @@ This endpoint is used to get a list of customer managed by a manager customer.  
 >```
 </details>
 
-### Google Analytics 360
+## Google Analytics 360
 
+### Get Bigquery project.
+
+<details>
+ <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/bq/projects/{remote_identity_id}</b></code></summary>
+
+This endpoint provides a list of google bigquery projects associated with the identtiy.
+
+##### Headers
+
+> | name      |        data type               | description                                                           |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | `Authorization` |  `string`  | `Openbridge JWT, passed as a  authorization bearer type`
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `Success`                                |
+> | `400`         |         | `Bad Request`                                |
+> | `401`         |         | `Not Authorized`                                |
+> | `404`         |         | `Not Found`                                |
+
+##### Example cURL
+
+> ```curl
+
+>  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/bq/projects/{remote_identity_id}
+> ```
+
+</details>
+
+
+### Get Bigquery datasets.
+
+<details>
+ <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service</b><b>/service/bq/project-datasets/{remote_identity_id}?project_id={project_id}</b></code></summary>
+
+This endpoint provides a list of google bigquery project datasets associated with the identtiy.
+
+##### Headers
+
+> | name      |        data type               | description                                                           |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | `Authorization` |  `string`  | `Openbridge JWT, passed as a  authorization bearer type`
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `Success`                                |
+> | `400`         |         | `Bad Request`                                |
+> | `401`         |         | `Not Authorized`                                |
+> | `404`         |         | `Not Found`                                |
+
+##### Example cURL
+
+> ```curl
+
+>  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/bq/project-datasets/{remote_identity_id}?project_id={project_id}
+> ```
+
+</details>
 ### Google Campaign Manager
 
 <details>
@@ -502,7 +564,6 @@ This endpoint provides a list of profiles associated with a given identity.
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/gcm/profiles/{remote_identity_id}
 > ```
@@ -557,8 +618,8 @@ This endpoint provides a list of profiles associated with a given identity.
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/gcm/reports/{remote_identity_id}?profile_id={{profile_id}}
 > ```
 
@@ -758,8 +819,8 @@ This endpoint returns a list advertiser/agency pairs associated with an identity
 
 ##### Example cURL
 
-{{ CURLEXAMPLE }}
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/service/gsa/agency/{remote_identity_id}
 > ```
 
@@ -819,8 +880,8 @@ This endpoint is used to get the shopify shop meta information.
 > | `404`         |         | `Not Found`                                |
 
 ##### Example cURL
-
 > ```curl
+
 >  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://service.api.openbridge.io/service/shopify/shopify-info/{remote_identity_id}
 > ```
 
@@ -983,8 +1044,8 @@ Please note the `First`,`Last`,`Previous`, and `Next` URLs are unusable from the
 ##### Example cURL
 
 This example is for requesting one day of health check data for January 24, 2024.
-
 > ```curl
+
 >  curl -H "Content-Type: application/json" -X GET  https://service.api.openbridge.io/service/healthchecks/production/healthchecks/account/{{account_id}}?subscription_id={{subscription_ID}}&page=1&status=ERROR&page_size=10&modified_at__gte=2024-01-23%2000:00:00&modified_at__lte=2024-01-24%2023:59:59
 > ```
 
@@ -1044,8 +1105,8 @@ You may notice that both the `subscription_id` and the `product_id` are required
 ##### Example cURL
 
 This example is for an Amazon Selling Partner Sales & Traffic product.
-
 > ```curl
+
 >  curl -H "Content-Type: application/json" -X POST -d '{ "data": { type: "HistoryTransaction", "attributes": { "product_id": 64; "start_date": "2021-10-10", "end_date": "2021-10-01", "is_primary": true }}}' https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}
 > ```
 
@@ -1098,8 +1159,8 @@ The jobs endpoint will allow you to get detailed information about the current j
 ##### Example cURL
 
 This example is for retrieving Jobs records for a given pipeline.
-
 > ```curl
+
 >  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileTypes}}
 > ```
 
