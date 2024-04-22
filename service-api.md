@@ -1159,7 +1159,6 @@ The jobs endpoint will allow you to get detailed information about the current j
 
 This example is for retrieving Jobs records for a given pipeline.
 > ```curl
-
 >  curl -H "Content-Type: application/json" -X GET https://service.api.openbridge.io/service/amzadv/profiles-only/{{remoteIdentityId}}?profile_types={{profileTypes}}
 > ```
 
