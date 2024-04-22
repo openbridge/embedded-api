@@ -1106,7 +1106,6 @@ You may notice that both the `subscription_id` and the `product_id` are required
 
 This example is for an Amazon Selling Partner Sales & Traffic product.
 > ```curl
-
 >  curl -H "Content-Type: application/json" -X POST -d '{ "data": { type: "HistoryTransaction", "attributes": { "product_id": 64; "start_date": "2021-10-10", "end_date": "2021-10-01", "is_primary": true }}}' https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}
 > ```
 
