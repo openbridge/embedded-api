@@ -1,0 +1,426 @@
+[
+  {
+      "type": "destination",
+      "productId": 31,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "AWS Athena",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 46,
+      "subProductId": "default",
+      "brand": "Azure",
+      "name": "Azure Blob Storage",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 47,
+      "subProductId": "default",
+      "brand": "Azure",
+      "name": "Azure Data Lake",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 73,
+      "subProductId": "default",
+      "brand": "Databricks",
+      "name": "Databricks Lakehouse",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 37,
+      "subProductId": "default",
+      "brand": "Google",
+      "name": "Google BigQuery",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 71,
+      "subProductId": "default",
+      "brand": "MultiStorage",
+      "name": "Openbridge Multistorage",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 29,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "AWS Redshift",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 14,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "AWS Redshift Managed",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 36,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "AWS Redshift Spectrum",
+      "premium": false
+  },
+  {
+      "type": "destination",
+      "productId": 52,
+      "subProductId": "default",
+      "brand": "Snowflake",
+      "name": "Snowflake Warehouse",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 40,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Sponsored Ads (V2)",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 70,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Sponsored Ads (V3)",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 75,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Advertising Brand Metrics",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 83,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Brand Store Insights",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 76,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Advertising Marketing Stream",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 79,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Ads Recommendations",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 50,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Attribution",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 54,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "DSP",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 66,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Vendor Retail Analytics",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 67,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Vendor Retail Procurement",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 69,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Vendor Brand Analytics Reports",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 72,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Vendor Rapid Retail Analytics",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 81,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Pricing API Tracker",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 82,
+      "subProductId": "keywords",
+      "brand": "Amazon",
+      "name": "Keyword Tracker",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 82,
+      "subProductId": "identifiers",
+      "brand": "Amazon",
+      "name": "Catalog API",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 80,
+      "subProductId": "default",
+      "brand": "AWS",
+      "name": "S3 Source",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 11,
+      "subProductId": "default",
+      "brand": "Facebook",
+      "name": "Marketing",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 2,
+      "subProductId": "default",
+      "brand": "Facebook",
+      "name": "Page Insights",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 34,
+      "subProductId": "default",
+      "brand": "Instagram",
+      "name": "Insights",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 38,
+      "subProductId": "default",
+      "brand": "Instagram",
+      "name": "Stories",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 63,
+      "subProductId": "default",
+      "brand": "Google",
+      "name": "Ads",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 3,
+      "subProductId": "default",
+      "brand": "Google",
+      "name": "Analytics 360",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 4,
+      "subProductId": "default",
+      "brand": "Google",
+      "name": "Campaign Manager",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 7,
+      "subProductId": "default",
+      "brand": "Google",
+      "name": "Search Ads 360",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 53,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Orders API",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 78,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Orders API MFN",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 55,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Finance Real-Time",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 56,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Inbound Fulfillment",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 57,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Settlement Reports",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 58,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Fulfillment",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 59,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Inventory Real-Time",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 60,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Inventory",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 61,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Sales Reports",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 62,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Fees",
+      "premium": true
+  },
+  {
+      "type": "source",
+      "productId": 64,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Sales & Traffic",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 65,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "Seller Brand Analytics Reports",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 17,
+      "subProductId": "default",
+      "brand": "Youtube",
+      "name": "Channel Insights",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 18,
+      "subProductId": "default",
+      "brand": "Youtube",
+      "name": "Competitor Channels",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 26,
+      "subProductId": "default",
+      "brand": "Youtube",
+      "name": "Video Insights",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 15,
+      "subProductId": "default",
+      "brand": "Youtube",
+      "name": "Competitor Video",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 74,
+      "subProductId": "default",
+      "brand": "Amazon",
+      "name": "CSV",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 77,
+      "subProductId": "default",
+      "brand": "open-source",
+      "name": "Airbridge",
+      "premium": false
+  },
+  {
+      "type": "source",
+      "productId": 44,
+      "subProductId": "default",
+      "brand": "Shopify",
+      "name": "Insights",
+      "premium": false
+  }
+]
