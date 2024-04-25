@@ -78,6 +78,13 @@ paths:
           schema:
             type: integer
             default: 10
+        - name: status
+          in: query
+          required: false
+          description: The healthcheck status to query for..
+          schema:
+            type: string
+            enum: [ERROR, PROCESSED]
       responses:
         '200':
           description: A list of health check logs
@@ -231,7 +238,3 @@ components:
           type: integer
         account_id:
           type: integer
-
-
-
-

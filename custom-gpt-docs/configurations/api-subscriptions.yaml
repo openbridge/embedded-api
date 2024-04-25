@@ -1,0 +1,212 @@
+openapi: 3.0.0
+info:
+  title: Subscriptions API
+  version: 1.0.0
+  description: API for managing subscriptions
+servers:
+  - url: https://subscriptions.api.openbridge.io
+paths:
+  /sub:
+    get:
+      summary: List subscriptions
+      operationId: listSubscriptions
+      parameters:
+        - name: page
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+            default: 10
+            min: 10
+            max: 10
+      responses:
+        '200':
+          description: A list of subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionsResponse'
+components:
+  schemas:
+    SubscriptionsResponse:
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/Links'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        included:
+          type: array
+          items:
+            $ref: '#/components/schemas/Included'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    Links:
+      type: object
+      properties:
+        first:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+        next:
+          type: string
+          format: uri
+        prev:
+          type: string
+          format: uri
+    Subscription:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        attributes:
+          $ref: '#/components/schemas/Attributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+    Attributes:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        status:
+          type: string
+        date_start:
+          type: string
+          format: date-time
+          description: "Deprecated do not use"
+        date_end:
+          type: string
+          format: date-time
+          description: "Deprecated do not use"
+        auto_renew:
+          type: integer
+          description: "Deprecated do not use"
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+          description: "Deprecated do not use"
+        stripe_subscription_id:
+          type: string
+          description: "Deprecated do not use"
+        name:
+          type: string
+        rabbit_payload_successful:
+          type: integer
+          description: "Deprecated do not use"
+        primary_job_id:
+          type: string
+          description: "Deprecated do not use"
+        pipeline:
+          type: string
+          description: "Deprecated do not use"
+        invalid_subscription:
+          type: integer
+          description: "Deprecated do not use"
+        invalidated_at:
+          type: string
+          format: date-time
+          description: "Deprecated do not use"
+        notified_at:
+          type: string
+          format: date-time
+        canonical_name:
+          type: string
+        account_id:
+          type: integer
+        product_id:
+          type: integer
+        subproduct_id:
+          type: string
+        product_plan_id:
+          type: string
+        remote_identity_id:
+          type: integer
+        storage_group_id:
+          type: integer
+        multi_storage_parent_id:
+          type: string
+        user_id:
+          type: integer
+        history_requested:
+          type: integer
+          description: "Deprecated do not use"
+        unique_hash:
+          type: string
+    Relationships:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/RelationshipData'
+        product:
+          $ref: '#/components/schemas/RelationshipData'
+        product_plan:
+          $ref: '#/components/schemas/RelationshipData'
+        remote_identity:
+          $ref: '#/components/schemas/RelationshipData'
+        storage_group:
+          $ref: '#/components/schemas/RelationshipData'
+        user:
+          $ref: '#/components/schemas/RelationshipData'
+    RelationshipData:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+            id:
+              type: string
+    Included:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        attributes:
+          $ref: '#/components/schemas/IncludedAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+    IncludedAttributes:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        name:
+          type: string
+        key_name:
+          type: string
+    Meta:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        pages:
+          type: integer
+        count:
+          type: integer

@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Pipeline Count API
+  description: API for retrieving pipeline count data.
+  version: 1.0.0
+servers:
+  - url: https://pipeline-count.api.openbridge.io
+    description: Pipeline Count Server
+paths:
+  /count:
+    get:
+      operationId: getPipelineCounts
+      summary: Retrieves pipeline counts
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: The date for which to retrieve pipeline counts.
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          required: false
+          description: The page number of the pagination.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A list of pipeline counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                      last:
+                        type: string
+                      next:
+                        type: string
+                      prev:
+                        type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PipelineCount"
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                          pages:
+                            type: integer
+                          count:
+                            type: integer
+components:
+  schemas:
+    PipelineCount:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        attributes:
+          type: object
+          properties:
+            account_id:
+              type: integer
+            stripe_customer_id:
+              type: string
+            quantity:
+              type: integer
+            date:
+              type: string
+              format: date
+            created_at:
+              type: string
+              format: date-time
+            modified_at:
+              type: string
+              format: date-time
