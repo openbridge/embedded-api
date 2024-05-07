@@ -2,7 +2,7 @@
 <details>
   <summary><code>GET</code> <code><b>https://service.api.dev.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000</b></code></summary>
 
-  The healthchecks endpoint is used for querying information about the health of active pipelines.  Part of the URL 
+  The product payloads endpoint is used for querying information about the health of active pipelines.  Part of the URL 
 
 ##### Headers
 
@@ -75,6 +75,59 @@ This example is for requesting stage data for Amazon Orders API
 > ```
 </details>
 
+### History Max Requests
+<details>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/history/production/history/meta/max-request</b></code></summary>
+
+  The History max requests endpoint provides a list of all products that support history requests and the max number of days history can be requested for each.
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json |
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type |
+
+##### Response Codes
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+
+#### Response Example
+
+>```
+{
+>  "data": [
+>    {
+>      "id": {{PRODUCTID}},
+>      "attributes": {
+>        "max_request_time": int,
+>        "max_days_per_request": int,
+>        "base_request_start": int
+>      }
+>      ...
+>  ]
+>}
+>```
+
+
+> | Attribute | meaning |
+> |-|-|-|
+> | max_request_time | The maximum number of days in the past history can requested for. |
+> | max_days_per_request | Maximum number of days history can be requested for per request. |
+> | base_request_start | When setting up history this is the number of days from today in the past that history can most recently be requested for.  For most products the value is 1, but for some products it is higher.  For example.  Facebook Page Insights (product id 2) has a base_request_start of 5.  On Jan 20th history can only be requested up until Jan 15.  For Amazon Orders API which has a base_request_start of 1 On Jan 20th history can only be requested up until Jan 19. |
+
+
+##### Example cURL
+
+This example is for requesting product max history request data.
+
+> ```curl
+>  curl -H "Content-Type: application/json" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
+> ```
+</details>
 
 ### History
 
