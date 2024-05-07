@@ -1200,7 +1200,6 @@ This example is for requesting product max history request data.
 >       data: {
 >         type: 'HistoryTransaction',
 >         attributes: {
->           product_id: int;
 >           start_date: dateString,
 >           end_date: dateString,
 >           is_primary: boolean,
@@ -1215,14 +1214,13 @@ The request endpoint of the HistoryTransaction will require the subscription id.
 
 > | name | data type | description |
 > |-|-|-|
-> | `product_id` | int | The product id inside the subscription the history is being requested for.
 > | `start_date` | int | The start date reflects the most recent date you want to request data from the source system for. |
 > | `end_date` | int | The end date is the furthermost date from the current date that data collection will stop. |
 > | `is_primary` | booelan | Always use `false` |
 > | `stage_id` | int | (optional) The stage ID for a given product that can be found from the Product Payload request for that product. |
 > | `start_time` | string | (required if stage_id is set) UTC Datetime string of the time you want this request to first run, must be no sooner than 10 minutes from the time of request.  15 minutes or more is recommended. |
 
-You may notice that both the `subscription_id` and the `product_id` are required in the request.  The History transaction sets stages based on project and is unaware of what product a subscription is for otherwise.
+**Note**:  We have recently removed the need to add a product_id as part of the payload, as it is now inferred from the subscription.
 
 ##### Headers
 
