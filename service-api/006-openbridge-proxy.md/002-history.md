@@ -1,3 +1,134 @@
+### Product Payloads
+<details>
+  <summary><code>GET</code> <code><b>https://service.api.dev.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000</b></code></summary>
+
+  The product payloads endpoint is used for querying information about the health of active pipelines.  Part of the URL 
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json |
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type |
+
+##### Parameters
+
+> | parameter | required | description |
+> |-|-|-|
+> | product_id | `TRUE` | The id of the product you want the stage informatino for. |
+
+The GET method has the following required and optional query string parameters available. 
+
+> | parameter | required | description |
+> |-|-|-|
+> | stage_id__gte | `TRUE` | Used to retrieve all stages above 1000 for a given product.  Used for history requests. |
+
+
+##### Response Codes
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+
+#### Response Example
+
+Please note the `First`,`Last`,`Previous`, and `Next` URLs are unusable from the outside world.  You must generate the next and previous URLs based on page that you are currently on manually.
+
+>```
+>{
+>   "links": {
+>     "first": "Internal address unusable from outside world",
+>     "last": "Internal address unusable from outside world",
+>     "next": "Internal address unusable from outside world",
+>     "prev": "Internal address unusable from outside world"
+>   },
+>   "data": [
+>     {
+>       "type": "Product",
+>       "id": "{{RECORDID}}",
+>       "attributes": {
+>         "name": "{{TABLENAME}}",
+>         "created_at": "{{CREATED_AT_TIMESTAMP}}",
+>         "modified_at": "{{MODIFIED_AT_TIMESTAMP}}",
+>         "stage_id": {{STAGEID}}
+>       }
+>     },
+>     ...
+>   ],
+>   "meta": {
+>     "pagination": {
+>       "page": 1,
+>       "pages": 1,
+>       "count": 3
+>     }
+>   }
+> }
+>```
+
+##### Example cURL
+
+This example is for requesting stage data for Amazon Orders API
+
+> ```curl
+>  curl -H "Content-Type: application/json" -X GET  https://service.api.dev.openbridge.io/service/products/production/product/53/payloads?stage_id__gte=1000
+> ```
+</details>
+
+### History Max Requests
+<details>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/history/production/history/meta/max-request</b></code></summary>
+
+  The History max requests endpoint provides a list of all products that support history requests and the max number of days history can be requested for each.
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json |
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type |
+
+##### Response Codes
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+
+#### Response Example
+
+>```
+{
+>  "data": [
+>    {
+>      "id": {{PRODUCTID}},
+>      "attributes": {
+>        "max_request_time": int,
+>        "max_days_per_request": int,
+>        "base_request_start": int
+>      }
+>      ...
+>  ]
+>}
+>```
+
+
+> | Attribute | meaning |
+> |-|-|-|
+> | max_request_time | The maximum number of days in the past history can requested for. |
+> | max_days_per_request | Maximum number of days history can be requested for per request. |
+> | base_request_start | When setting up history this is the number of days from today in the past that history can most recently be requested for.  For most products the value is 1, but for some products it is higher.  For example.  Facebook Page Insights (product id 2) has a base_request_start of 5.  On Jan 20th history can only be requested up until Jan 15.  For Amazon Orders API which has a base_request_start of 1 On Jan 20th history can only be requested up until Jan 19. |
+
+
+##### Example cURL
+
+This example is for requesting product max history request data.
+
+> ```curl
+>  curl -H "Content-Type: application/json" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
+> ```
+</details>
+
 ### History
 
 <details>
@@ -15,7 +146,9 @@
 >           product_id: int;
 >           start_date: dateString,
 >           end_date: dateString,
->           is_primary: boolean
+>           is_primary: boolean,
+>           start_time?: datetimeString,
+>           stage_id?: productStageId
 >         }
 >       }
 >     }
@@ -26,9 +159,11 @@ The request endpoint of the HistoryTransaction will require the subscription id.
 > | name | data type | description |
 > |-|-|-|
 > | `product_id` | int | The product id inside the subscription the history is being requested for.
-> | `start_date` | int | The start date reflects the most recent date you want to request data from the source system for.
-> | `end_date` | int | The end date is the furthermost date from the current date that data collection will stop.
-> | `is_primary` | booelan | Always use `false`
+> | `start_date` | int | The start date reflects the most recent date you want to request data from the source system for. |
+> | `end_date` | int | The end date is the furthermost date from the current date that data collection will stop. |
+> | `is_primary` | booelan | Always use `false` |
+> | `stage_id` | int | (optional) The stage ID for a given product that can be found from the Product Payload request for that product. |
+> | `start_time` | string | (required if stage_id is set) UTC Datetime string of the time you want this request to first run, must be no sooner than 10 minutes from the time of request.  15 minutes or more is recommended. |
 
 You may notice that both the `subscription_id` and the `product_id` are required in the request.  The History transaction sets stages based on project and is unaware of what product a subscription is for otherwise.
 
@@ -36,8 +171,8 @@ You may notice that both the `subscription_id` and the `product_id` are required
 
 > | name | data type | description                                                           |
 > |-|-|-|
-> | Content-Type | string | application/json
-> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+> | Content-Type | string | application/json |
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type |
 
 
 ##### Parameters
@@ -51,24 +186,10 @@ You may notice that both the `subscription_id` and the `product_id` are required
 
 ##### Example cURL
 
-This example is for an Amazon Selling Partner Sales & Traffic product.
+This example is for requesting stage data for Amazon Orders API.
 
 > ```curl
->  curl -H "Content-Type: application/json" -X POST -d '{ "data": { type: "HistoryTransaction", "attributes": { "product_id": 64; "start_date": "2021-10-10", "end_date": "2021-10-01", "is_primary": true }}}' https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}
+>  curl -H "Content-Type: application/json" -X POST -d '{ "data": { type: "HistoryTransaction", "attributes": { "product_id": 53; "start_date": "2021-10-10", "end_date": "2021-10-01", "is_primary": true, "stage_id": 1000, "start_time": "2024-05-06 12:05:00" }}}' https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}
 > ```
-
-##### Request Max Dates
-
-Each product has a maximum amount of days that history can be requested for (ie the end date).  The maximium `end_date` is always calculated from the date that history is being requested on.
-
-> | Product Name | Product Id | Max Days |
-> |-|-|-|
-> | Amazon Sales & Traffic | 64 | 700 |
-> | Amazon Seller Brand Analytics Reports | 65 | 365 |
-> | Amazon Settlement Reports | 57 | 90 |
-> | Amazon Fulfillment | 58 | 540 |
-> | Amazon Inventory | 59 | 540 |
-> | Amazon Sales Reports | 61 | 730 |
-> | Amazon Fees | 62 | 30 |
 
 </details>
