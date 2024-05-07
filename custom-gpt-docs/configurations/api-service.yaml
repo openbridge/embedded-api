@@ -31,7 +31,6 @@ paths:
           schema:
             type: integer
             default: 10
-
       responses:
         '200':
           description: A list of jobs
@@ -78,13 +77,6 @@ paths:
           schema:
             type: integer
             default: 10
-        - name: status
-          in: query
-          required: false
-          description: The healthcheck status to query for..
-          schema:
-            type: string
-            enum: [ERROR, PROCESSED]
       responses:
         '200':
           description: A list of health check logs
@@ -101,6 +93,38 @@ paths:
                     $ref: '#/components/schemas/Meta'
                   links:
                     $ref: '#/components/schemas/Links'              
+  /service/rules/prod/v1/rules/search:
+    get:
+      summary: Get rules data for a path
+      operationId: getData
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: Search path to find rules
+          schema:
+            type: string
+        - name: latest
+          in: query
+          required: true
+          description: If "true" return the most recent version.
+          schema:
+            type: string
+            default: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DataItem'
+                  links:
+                    type: object
 components:
   schemas:
     Links:
@@ -238,3 +262,73 @@ components:
           type: integer
         account_id:
           type: integer
+    DataItem:
+      type: object
+      properties:
+        attributes:
+          type: object
+          properties:
+            account_id:
+              type: string
+            path:
+              type: string
+            rules:
+              type: object
+              properties:
+                configuration:
+                  type: object
+                  properties:
+                    load:
+                      type: object
+                      properties:
+                        prepend_headers:
+                          type: boolean
+                        schema:
+                          type: object
+                          properties:
+                            fields:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/Field'
+                destination:
+                  type: object
+                  properties:
+                    tablename:
+                      type: string
+                dialect:
+                  type: object
+                  properties:
+                    delimiter:
+                      type: string
+                    doublequote:
+                      type: boolean
+                    encoding:
+                      type: string
+                    lineterminator:
+                      type: string
+                    quotechar:
+                      type: string
+                    quoting:
+                      type: integer
+                    skipinitialspace:
+                      type: boolean
+                meta:
+                  type: object
+                  properties:
+                    creation_date:
+                      type: string
+                    version:
+                      type: integer
+        version:
+          type: integer
+    Field:
+      type: object
+      properties:
+        default:
+          type: string
+        include_in_checksum:
+          type: boolean
+        name:
+          type: string
+        type:
+          type: string

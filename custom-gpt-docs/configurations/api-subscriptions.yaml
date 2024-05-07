@@ -13,6 +13,12 @@ paths:
       parameters:
         - name: page
           in: query
+          required: false
+          description: The subscription id.
+          schema:
+            type: integer
+        - name: page
+          in: query
           required: true
           description: The page number of the pagination.
           schema:
