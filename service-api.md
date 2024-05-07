@@ -17,10 +17,10 @@
 	  - [Youtube](#youtube)
 
   - [Openbridge API Proxies](#openbridge-api-proxies)
-		- [Healthchecks](#healthchecks)
-		- [Product Payloads](#product-payloads)
-		- [History](#history-transaction-creation)
-		- [Jobs](#jobs)
+	  - [Healthchecks](#healthchecks)
+	  - [Product Payloads](#product-payloads)
+	  - [History](#history-transaction-creation)
+	  - [Jobs](#jobs)
 
 # Service API
 
