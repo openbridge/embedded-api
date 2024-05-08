@@ -276,7 +276,7 @@ Example.  You have a subscription for product 57.  Today is May 1st 2024.  Since
 
 Once you have calculated your `start_date` and your `end_date` you can build a payload for your history requeset.  Using the above as our example our payload would look something like.
 
-**NOTES** all `date` should be calculated for UTC.
+**Note:** all `date` should be calculated for UTC.
 
 > ```json
 > {
@@ -354,7 +354,7 @@ Product 57 only has one stage called sp_settlments. Generally it is not necessar
 >     }
 > ```
 
-**NOTE** All `date` and `datetime` fields should be calculated for UTC.
+**Note:** All `date` and `datetime` fields should be calculated for UTC.
 
 
 # APIs
