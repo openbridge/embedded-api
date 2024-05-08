@@ -284,14 +284,13 @@ Once you have calculated your `start_date` and your `end_date` you can build a p
 >     "type": "HistoryTransaction",
 >     "attributes": {
 >       "start_date": "2024-04-29",
->       "end_date": "2024-02-01",
->       "is_primary": false
+>       "end_date": "2024-02-01"
 >      }
 >   }
 > }
 > ```
 
-The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.  `is_primary` is set to false, this tells the system that it is a history request.  It is important not to set this to `true`.
+The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.
 
 Posting this payload to  `https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}` with the subscription ID as a parameter will create the history request.
 
@@ -337,7 +336,7 @@ Making a request to this endpoint will give you a list of stages for for a given
 >  }
 >```
 
-Product 57 only has one stage called sp_settlments. Generally it is not necessary to use make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.
+Product 57 only has one stage called sp_settlments. Generally it is not necessary to use make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.  The datetime must be a date in the future at least 15 minutes after the time of submission for history reques.
 
 > ```json
 > {
@@ -346,7 +345,6 @@ Product 57 only has one stage called sp_settlments. Generally it is not necessar
 >         "attributes": {
 >           "start_date": "2024-04-29",
 >           "end_date": "2024-02-01",
->           "is_primary": false,
 >           "stage_id": 1000,
 >           "start_time": "2024-04-29 00:00:00"
 >         }
