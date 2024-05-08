@@ -255,7 +255,7 @@ Using the request below along with your authorizatino token you will be given a 
 The response will be an array of product history meta data like below.
 
 >```
-{
+>{
 >  "data": [
 >    {
 >      "id": 57,
@@ -280,15 +280,15 @@ Once you have calculated your `start_date` and your `end_date` you can build a p
 
 > ```json
 > {
->       "data": {
->         "type": "HistoryTransaction",
->         "attributes": {
->           "start_date": "2024-04-29",
->           "end_date": "2024-02-01",
->           "is_primary": false,
->         }
->       }
->     }
+>   "data": {
+>     "type": "HistoryTransaction",
+>     "attributes": {
+>       "start_date": "2024-04-29",
+>       "end_date": "2024-02-01",
+>       "is_primary": false
+>      }
+>   }
+> }
 > ```
 
 The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.  `is_primary` is set to false, this tells the system that it is a history request.  It is important not to set this to `true`.
