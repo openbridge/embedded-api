@@ -18,6 +18,8 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
     - [Shop URL](#shop-url)
   - [Creating your first state object](#create-your-first-state-object)
   - [Starting the authorization process](#starting-the-authorization-process)
+- [Requesting History](#requesting-history)
+
 - [APIs](#apis)
   - [Authorization API](#authorization-api)
   - [Account API](#account-api)
@@ -234,6 +236,127 @@ When an identity is successfully created you can use the [identities API](#remot
 
 **Note** The process for reauthorizing an identity is exactly the same as creating one.  In the case of a reauth we return parameter `reauth` in the querystring.
 
+# Requesting History
+
+After creating a pipeline subscription you may want to back fill past history into your database.  This can be done with using the history API endpoints.  There are 3 different endpoints that are linked to history requests.  The first two provide meta data used in making the actual request. Those are the [History Max Requests]() endpoint and the [Product Payloads]() endpoint. Lastly there is the endpoint for making the request [History Request]() endpoint.
+
+## Basic History Request.
+
+Making a basic history requests uses 2 of the 3 endpoints.  The [History Max Requests]() endpoint and the [History Request]() endpoint.
+
+The purpose of the History Max Request endpoint is to provide details reguarding how far back in the past you can go to request.  This data contains a list for all products, and is slow changing.  Since it is slow changing, this is an example of a request that the data could be cached locally for short periods of time.  We recommend not caching it for more than 24hrs at a time. 
+
+Using the request below along with your authorizatino token you will be given a list of all Openbridge products that support history requests, along with meta data needed to make those history requests.
+
+> ```curl
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
+> ```
+
+The response will be an array of product history meta data like below.
+
+>```
+{
+>  "data": [
+>    {
+>      "id": 57,
+>        "attributes": {
+>        "max_request_time": 90,
+>        "max_days_per_request": 88,
+>        "base_request_start": 2
+>      }
+>    },
+>      ...
+>  ]
+>}
+>```
+
+Take the example above for product 57.  There are 3 meta attributes.  The first is **max_request_time**.  The value to this key is the maximum number of days you can request history for.  The second **max_days_per_request** is the maximum number of days you can request history for per request.  Lastly **base_request_start** is the offset in days from the time the request is being made that history can not be requested for.
+
+Example.  You have a subscription for product 57.  Today is May 1st 2024.  Since this product has a `base_request_start` of `2` it means that `start_date` in the history request can be no sooner than `2 days in the past`.  Therefore, in this instance  The `start_date` can be no sooner than April 29, 2024.  With a `max_request_time` of 90 means that the `end_date` date in the history request can be no further back than 90 days.  In our case 90 days before May 1st 2024 is February 1st 2024.  This is the last date that we can request data for if requesting it on May 1st, 2024.  This means you can request a maximum of 88 days worth of data.
+
+Once you have calculated your `start_date` and your `end_date` you can build a payload for your history requeset.  Using the above as our example our payload would look something like.
+
+**NOTES** all `date` should be calculated for UTC.
+
+> ```json
+> {
+>       "data": {
+>         "type": "HistoryTransaction",
+>         "attributes": {
+>           "start_date": "2024-04-29",
+>           "end_date": "2024-02-01",
+>           "is_primary": false,
+>         }
+>       }
+>     }
+> ```
+
+The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.  `is_primary` is set to false, this tells the system that it is a history request.  It is important not to set this to `true`.
+
+Posting this payload to  `https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}` with the subscription ID as a parameter will create the history request.
+
+
+## Advanced History Request.
+
+There is sometimes specific data that you may want to prioritize being loaded first.  The history request payload has 2 optional fields that must be used together when requesting these.  `stage_id` and `start_time`.
+
+To get a list of `stage_id`s for a given product you need to use the **Product Payloads** endpoint.
+
+> ```curl
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.dev.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000
+> ```
+
+Making a request to this endpoint will give you a list of stages for for a given product.  Some products may have only 1 stage, some 10.  Using our example for product 57.
+
+>```JSON
+>{
+>  "links": {
+>    "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+>    "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+>    "next": "",
+>    "prev": ""
+>  },
+>  "data": [
+>    {
+>      "type": "Product",
+>      "id": "2958",
+>      "attributes": {
+>        "name": "sp_settlements",
+>        "created_at": "2024-05-03T13:36:40.156426",
+>        "modified_at": "2024-05-03T13:36:40.185841",
+>        "stage_id": 1000
+>      }
+>    }
+>  ],
+>  "meta": {
+>    "pagination": {
+>      "page": 1,
+>      "pages": 1,
+>      "count": 1
+>    }
+>  }
+>```
+
+Product 57 only has one stage called sp_settlments. Generally it is not necessary to use make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.
+
+> ```json
+> {
+>       "data": {
+>         "type": "HistoryTransaction",
+>         "attributes": {
+>           "start_date": "2024-04-29",
+>           "end_date": "2024-02-01",
+>           "is_primary": false,
+>           "stage_id": 1000,
+>           "start_time": "2024-04-29 00:00:00"
+>         }
+>       }
+>     }
+> ```
+
+**NOTE** All `date` and `datetime` fields should be calculated for UTC.
+
+
 # APIs
 
 ### Deprecated key-value pairs in requests and response
@@ -274,8 +397,6 @@ A prerequisite to most of the Openbridge APIs is to generate a JWT from a refres
 > ```
 
 </details>
-
-
 
 ## Account API
 

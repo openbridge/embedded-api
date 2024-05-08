@@ -125,7 +125,7 @@ This example is for requesting stage data for Amazon Orders API
 This example is for requesting product max history request data.
 
 > ```curl
->  curl -H "Content-Type: application/json" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
 > ```
 </details>
 
