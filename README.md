@@ -18,7 +18,8 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
     - [Shop URL](#shop-url)
   - [Creating your first state object](#create-your-first-state-object)
   - [Starting the authorization process](#starting-the-authorization-process)
-- [Requesting History](#requesting-history)
+- [Requesting History](#history-requests)
+
 
 - [APIs](#apis)
   - [Authorization API](#authorization-api)
@@ -236,13 +237,13 @@ When an identity is successfully created you can use the [identities API](#remot
 
 **Note** The process for reauthorizing an identity is exactly the same as creating one.  In the case of a reauth we return parameter `reauth` in the querystring.
 
-# Requesting History
+# History Requests
 
-After creating a pipeline subscription you may want to back fill past history into your database.  This can be done with using the history API endpoints.  There are 3 different endpoints that are linked to history requests.  The first two provide meta data used in making the actual request. Those are the [History Max Requests]() endpoint and the [Product Payloads]() endpoint. Lastly there is the endpoint for making the request [History Request]() endpoint.
+After creating a pipeline subscription you may want to back fill past history into your database.  This can be done with using the history API endpoints.  There are 3 different endpoints that are linked to history requests.  The first two provide meta data used in making the actual request. Those are the [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [Product Payloads](https://github.com/openbridge/embedded-api/blob/main/service-api.md#product-payloads) endpoint. Lastly there is the endpoint for making the request [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
 
 ## Basic History Request.
 
-Making a basic history requests uses 2 of the 3 endpoints.  The [History Max Requests]() endpoint and the [History Request]() endpoint.
+Making a basic history requests uses 2 of the 3 endpoints.  The [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
 
 The purpose of the History Max Request endpoint is to provide details reguarding how far back in the past you can go to request.  This data contains a list for all products, and is slow changing.  Since it is slow changing, this is an example of a request that the data could be cached locally for short periods of time.  We recommend not caching it for more than 24hrs at a time. 
 

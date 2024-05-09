@@ -19,7 +19,7 @@
   - [Openbridge API Proxies](#openbridge-api-proxies)
 	  - [Healthchecks](#healthchecks)
 	  - [Product Payloads](#product-payloads)
-	  - [History Max Requetst](#history-max-requests)
+	  - [History Max Requests](#history-max-requests)
 	  - [History](#history-transaction-creation)
 	  - [Jobs](#jobs)
 
