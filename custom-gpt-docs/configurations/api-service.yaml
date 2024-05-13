@@ -95,13 +95,13 @@ paths:
                     $ref: '#/components/schemas/Links'              
   /service/rules/prod/v1/rules/search:
     get:
-      summary: Get rules data for a path
+      summary: Retrieve the schema of a given product table using a path key.
       operationId: getData
       parameters:
         - name: path
           in: query
           required: true
-          description: Search path to find rules
+          description: Search path to find schema
           schema:
             type: string
         - name: latest
