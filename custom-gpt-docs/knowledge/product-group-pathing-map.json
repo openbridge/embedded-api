@@ -1,37 +1,82 @@
-[
-
-  {
-    "product_group": "Amazon MWS",
-    "description": "Amazon MWS",
-    "products": [
-      {
-        "name": "Seller Central",
-        "description": "",
-        "datasets": [
-          {
-            "name": "Active Listings",
-            "description": "",
-            "path": "amazon-seller-central/mws_active_listings"         
-          },
-          {
-            "name": "All Listings",
-            "description": "",
-            "path": "amazon-seller-central/mws_all_listings"         
-          },
-          {
-            "name": "Canceled Listings",
-            "description": "",
-            "path": "amazon-seller-central/mws_canceled_listings"         
-          },
-          {
-            "name": "Selling Partner Orders",
-            "description": "Selling Partner Orders data",
-            "path": "selling-partner/reports-sales/sp_orders_report"         
-          }
-        ]
+{
+  "data": [
+    {
+      "id": 1,
+      "type": "Companies",
+      "relationshiips": {
+        "attributes": {
+          "name": "Anazon",
+          "summary": ""
+        },
+        "relationships": {
+          "product_groups": [
+            {
+              "id": 1,
+              "type": "ProductGroup",
+              "attributes": {
+                "name": "Amazon MWS",
+                "summary": ""
+              },
+              "relationshiips": {
+                "products": [
+                  {
+                    "id": 1,
+                    "type": "Product",
+                    "attributes": {
+                      "name": "Seller Central",
+                      "summary": ""
+                    },
+                    "relationshiips": {
+                      "data_schema": [
+                        {
+                          "type": "DataSchema",
+                          "attributes": {
+                            "name": "Active Listings",
+                            "description": "",
+                            "path": "amazon-seller-central/mws_active_listings"         
+                          }
+                        },
+                        {
+                          "type": "DataSchema",
+                          "attributes": {
+                            "name": "Active Listings",
+                            "description": "",
+                            "path": "amazon-seller-central/mws_active_listings"         
+                          }
+                        },
+                        {
+                          "type": "DataSchema",
+                          "attributes": {
+                            "name": "All Listings",
+                            "description": "",
+                            "path": "amazon-seller-central/mws_all_listings"         
+                          }
+                        },
+                        {
+                          "type": "DataSchema",
+                          "attributes": {
+                            "name": "Canceled Listings",
+                            "description": "",
+                            "path": "amazon-seller-central/mws_canceled_listings"         
+                          }
+                        },
+                        {
+                          "type": "DataSchema",
+                          "attributes": {
+                            "name": "Selling Partner Orders",
+                            "description": "Selling Partner Orders data",
+                            "path": "selling-partner/reports-sales/sp_orders_report"
+                          }
+                        }                                                                        
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
       }
-    ]
-  }
-]
-
-
+    }
+  ]
+}
