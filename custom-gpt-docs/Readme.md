@@ -1,12 +1,4 @@
-This directory contains documents that can be used to create a customGPT.
-
-Make something that is similar to this.  https://docs.Openbridge.com/chatgpt/expert in this file.
-
-Include different yaml files for configuration but make some clarifications.
-Break up service API config into multiple scenarios.
-
-
-# Openbridge GPT (probably have tom write something here.)
+# Openbridge GPT (probably have tom write something here current 4 paragraphs are placeholder from 3rd party site make sure to change.)
 At Openbridge, we are convinced that the true productivity of teams can only be unlocked through the flexibility of our product. Thus, we provide our API endpoints in expert mode to ensure maximum flexibility.
 
 In contrast to Openbridge's GPT in standard mode, where you have limited control over the output, in expert mode, you customize your GPT configuration and utilize Openbridge's endpoints for specific actions. You are not just limited to utilize Openbridge for actions; you can also integrate other powerful actions too, such as Zapier.
@@ -99,27 +91,21 @@ Open up your first action and click on the gear wheel in the `Authentication` fi
 ** Screen Shot goes here **
 
 
+## Giving Instructions to your GPT.
+
+Lastly it is important to give your GPT instructions on how to use the actions.  Things they should do when accessing specific APIs and how to present the data.  We have provided some starter instructions for you, but it is recommended that you build upon them to better instruct your GPT on your specific use cases.
+
+
+| GPT Type | Instruction Document|
+|-|-|
+| Helper for Openbridge Account | instucton text here |
+| Helper for querying data | instucton text here |
+| Combined | instucton text here |
+
+
+## FAQ
+
+FAQ  here...
 
 
 
-<!-- ## Step 3: Add Actions
-Assign a name to your custom GPT first. Then click on "Create new action".
-
-
-## Step 4: Import Openbridge endpoints
-Click "Import from URL" and enter (openbridge endpoint ymls)
-
-## Step 5: Configure Authentication Token
-Click the ⚙️ button in Authentication section. Then select "OAuth" in the dialog.
-
-In the Authorization URL field, type https://Openbridge.com/authorize-gpt. In the Token URL field, type https://Openbridge.com/api/oauth-exchange-token-gpt.
-
-## Step 6: Add extra custom configuration
-You can add any custom instructions and/or upload any files such as internal sales spreadsheets, inventory data, etc. Our only recommendation is to add two custom instructions here:
-
-Always calculate the date range using python to speculate user's intent. For example, if user asks for some historical data from last week, calculate that date range using python.
-Note that if the user asks for daily/weekly/quarterly/monthly metrics/breadowns, please reflect such info in the field time_granularity.
-In addition, you can add more actions in your GPT as an option. Your GPT, your rule. Once you are done with your other custom configuration, click "Save".
-
-## Congratulations
-✨Congratulations✨! You've just unlocked the power of your very own GPT. Now, you can dive into the cutting-edge world of marketing data analysis, powered by the limitless potential of generative AI. -->
