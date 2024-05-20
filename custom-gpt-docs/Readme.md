@@ -24,7 +24,7 @@ In the left window of the page, click on `Configure`.  Give a name for your GPT 
 
 The `Instructions` section will vary based on what the purpose of the GPT is.
 
-We will described 2 use cases.  As a [Helper for Openbridge Account]() and as a [helper for querying data](). 
+We will described 2 use cases.  As a [Helper for Openbridge Account](#helper-for-openbridge-account) and as a [helper for querying data](#helper-for-querying-data). 
 
 ** Screen Shot goes here **
 
@@ -41,7 +41,7 @@ For the moment ignore the `Authentication` we will come back to that afterwards.
 
 |API | Config URL|
 |-|-|
-| Pipeline Count API | config url here |
+| Pipeline Count API | [api-pipeline-count.yaml](./configurations/api-pipeline-count.yaml) |
 
 ### Step 4 Repeat creating an action for other APIs
 
@@ -49,7 +49,6 @@ Now that you created your first action back out back to the configure page and r
 
 |API | Config URL|
 |-|-|
-| Pipeline Count API | [api-pipeline-count.yaml](./configurations/api-pipeline-count.yaml) |
 | Subscription API | [api-subscriptions.yaml](./api-subscriptions.yaml) |
 | Remote Identity API | [api-remote-identity.yaml](./configurations/api-remote-identity.yaml) |
 | Service API | [api-service-helper-account.yaml](./configurations/api-service-helper-account.yaml) |
