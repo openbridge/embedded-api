@@ -1,0 +1,334 @@
+openapi: 3.0.0
+info:
+  title: Service API
+  description: An API to talk to many 3rd party APUs.
+  version: "1.0.0"
+servers:
+  - url: https://service.api.openbridge.io
+
+paths:
+  /service/jobs/jobs:
+    get:
+      summary: List all jobs
+      operationId: listJobs
+      parameters:
+        - name: subscription_ids
+          in: query
+          required: true
+          description: Subscription ID.
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: A list of jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: '#/components/schemas/Links'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Job'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+  /service/healthchecks/production/healthchecks/account/{account_id}:
+    get:
+      summary: Get healthchecks
+      operationId: getHealthchecks
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          description: Account ID.
+          schema:
+            type: integer
+        - name: subscription_ids
+          in: query
+          required: true
+          description: Subscription ID.
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          description: The page number of the pagination.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: A list of health check logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HealthCheck'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  links:
+                    $ref: '#/components/schemas/Links'              
+  /service/rules/prod/v1/rules/search:
+    get:
+      summary: Retrieve the schema of a given product table using a path key.
+      operationId: getData
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: Search path to find schema
+          schema:
+            type: string
+        - name: latest
+          in: query
+          required: true
+          description: If "true" return the most recent version.
+          schema:
+            type: string
+            default: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DataItem'
+                  links:
+                    type: object
+components:
+  schemas:
+    Links:
+      type: object
+      properties:
+        first:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+        prev:
+          type: string
+          format: uri
+          nullable: true
+        next:
+          type: string
+          format: uri
+          nullable: true
+    Job:
+      type: object
+      required:
+        - type
+        - id
+        - attributes
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        attributes:
+          $ref: '#/components/schemas/JobAttributes'
+    JobAttributes:
+      type: object
+      properties:
+        report_date:
+          type: string
+          format: date-time
+          nullable: true
+        subscription_id:
+          type: integer
+        valid_date_start:
+          type: string
+          format: date
+        valid_date_end:
+          type: string
+          format: date
+        status:
+          type: string
+        schedule:
+          type: string
+        orig_schedule:
+          type: string
+        request_start:
+          type: integer
+        request_end:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+        is_primary:
+          type: boolean
+        stage_id:
+          type: integer
+        extra_context:
+          type: string
+          nullable: true
+        product_id:
+          type: integer
+        subproduct_id:
+          type: string
+    Meta:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        pages:
+          type: integer
+        count:
+          type: integer
+    HealthCheck:
+      type: object
+      properties:
+        id:
+          type: integer
+        modified_at:
+          type: string
+          format: date-time
+        company:
+          type: string
+        email_address:
+          type: string
+        product_id:
+          type: integer
+        subproduct_id:
+          type: integer
+        product_name:
+          type: string
+        payload_name:
+          type: string
+        storage_id:
+          type: string
+        subscription_id:
+          type: integer
+        subscription_name:
+          type: string
+        hc_runtime:
+          type: string
+          format: date-time
+        status:
+          type: string
+        message:
+          type: string
+        file_path:
+          type: string
+        owner:
+          type: string
+        sender:
+          type: string
+        transaction_id:
+          type: string
+        err_msg:
+          type: string
+        error_code:
+          type: string
+        job_id:
+          type: integer
+        account_id:
+          type: integer
+    DataItem:
+      type: object
+      properties:
+        attributes:
+          type: object
+          properties:
+            account_id:
+              type: string
+            path:
+              type: string
+            rules:
+              type: object
+              properties:
+                configuration:
+                  type: object
+                  properties:
+                    load:
+                      type: object
+                      properties:
+                        prepend_headers:
+                          type: boolean
+                        schema:
+                          type: object
+                          properties:
+                            fields:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/Field'
+                destination:
+                  type: object
+                  properties:
+                    tablename:
+                      type: string
+                dialect:
+                  type: object
+                  properties:
+                    delimiter:
+                      type: string
+                    doublequote:
+                      type: boolean
+                    encoding:
+                      type: string
+                    lineterminator:
+                      type: string
+                    quotechar:
+                      type: string
+                    quoting:
+                      type: integer
+                    skipinitialspace:
+                      type: boolean
+                meta:
+                  type: object
+                  properties:
+                    creation_date:
+                      type: string
+                    version:
+                      type: integer
+        version:
+          type: integer
+    Field:
+      type: object
+      properties:
+        default:
+          type: string
+        include_in_checksum:
+          type: boolean
+        name:
+          type: string
+        type:
+          type: string

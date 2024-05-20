@@ -49,9 +49,10 @@ Now that you created your first action back out back to the configure page and r
 
 |API | Config URL|
 |-|-|
-| Subscription API | config url here |
-| Remote Identity API | config url here |
-| Service API | config url here |
+| Pipeline Count API | [api-pipeline-count.yaml](./configurations/api-pipeline-count.yaml) |
+| Subscription API | [api-subscriptions.yaml](./api-subscriptions.yaml) |
+| Remote Identity API | [api-remote-identity.yaml](./configurations/api-remote-identity.yaml) |
+| Service API | [api-service-helper-account.yaml](./configurations/api-service-helper-account.yaml) |
 
 Once you have created these proceed to the [Authentication](#authentication)
 
@@ -68,7 +69,7 @@ For the moment ignore the `Authentication` we will come back to that afterwards.
 
 |API | Config URL|
 |-|-|
-| Service API | config url here |
+| Service API | [api-service-helper-data.yaml](./configurations/api-service-helper-data.yaml) |
 
 
 ## Combined types.
@@ -76,7 +77,7 @@ If you want your GPT to both be a Helper for your openbridge account and a helpe
 
 |API | Config URL|
 |-|-|
-| Service API | config url here |
+| Service API | [api-service-combined.yaml](./configurations/api-service-combined.yaml) |
 
 
 ## Authentication
@@ -98,9 +99,9 @@ Lastly it is important to give your GPT instructions on how to use the actions. 
 
 | GPT Type | Instruction Document|
 |-|-|
-| Helper for Openbridge Account | instucton text here |
-| Helper for querying data | instucton text here |
-| Combined | instucton text here |
+| Helper for Openbridge Account | [instructions-helper-account.md](./instructions/instructions-helper-account.md) |
+| Helper for querying data | [instructions-helper-data.md](./instructions/instructions-helper-data.md) |
+| Combined | [instructions-combined.md](./instructions/instructions-combined.md) |
 
 
 ## FAQ
