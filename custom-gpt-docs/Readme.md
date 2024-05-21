@@ -44,11 +44,17 @@ Authentication to the Openbridge APIs for GPT is done through a long lived API t
 
 ### Step 4: Creating Actions
 
-At the bottom of the configuration page in the lower left you will find the "Create new action" button.  Click on this button to create our new action.  This will create a new action and open a new the Add Actions panel
+At the bottom of the configuration page in the lower left you will find the "Create new action" button.  Click on this button to create our new action.  
+
+<img src="./img/04aa-action.png">
+
+This will create a new action and open a new the Add Actions panel
+
+Click on the gear  in the `Authentication` field.
 
 <img src="./img/04a-action.png">
 
-Click on the gear  in the `Authentication` field and select `API Key`.  Then select `Bearer` as the `Auth Type`.  Paste the long lived token you retrieved above into the API Key field.  Do this for every action you created inside your GPT.
+ Select `API Key`.  Then select `Bearer` as the `Auth Type`.  Paste the long lived token you retrieved above into the API Key field.  Do this for every action you created inside your GPT.
 
 <img src="./img/04b-action.png">
 
