@@ -303,7 +303,7 @@ There is sometimes specific data that you may want to prioritize being loaded fi
 To get a list of `stage_id`s for a given product you need to use the **Product Payloads** endpoint.
 
 > ```curl
->  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.dev.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000
 > ```
 
 Making a request to this endpoint will give you a list of stages for for a given product.  Some products may have only 1 stage, some 10.  Using our example for product 57.
