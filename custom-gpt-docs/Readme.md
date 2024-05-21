@@ -22,11 +22,11 @@ Log into ChatGPT, and in the left menu choose "Explore GPTs".  Then in the right
 ### Step 2: Configure Your GPT
 In the left window of the page, click on `Configure`. 
 
-<img src="./img/02a-Configure.png">
+<img src="./img/02a-configure.png">
 
  Give a name for your GPT and a brief description.
 
-<img src="./img/02b-Configure.png">
+<img src="./img/02b-configure.png">
 
 It is important to give your GPT instructions on how to use the actions.  Things they should do when accessing specific APIs and how to present the data.  We have provided some starter instructions for you, but it is recommended that you build upon them to better instruct your GPT on your specific use cases.  Copy and paste the contents of the file linked below into the instructions box of the GPT.
 
