@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "type": "SourceProduct",
+      "attributes": {
+        "name": "Sponsored Products"
+      },
+      "relationships": {
+        "parent_upstream_source": "Amazon Advertising",
+        "query-key": "amazon-seller-central",
+        "openbridge_connector_name": "",
+        "data_schema": [
+          {
+            "type": "DataSchema",
+            "attributes": {
+              "name": "Active Listings",
+              "description": "This report provides a snapshot of all the products you have listed on Amazon at the time the report is run. This report includes all of your product listings, including those with zero (0) quantity. It also provides you with information about the products your listings are matched to on Amazon, including the product title and product identifier. In most cases, the ASIN is returned as the product-id for the listing, but the product-id may also be the industry standard identifier, such as the ISBN, UPC, or EAN. The Active Listings report includes details about each listing, including condition, item-note, and BMVD shipping settings. If you are enrolled in Fulfillment by Amazon (FBA), the report includes an additional column for the fulfillment channel: seller fulfilled or Amazon fulfilled. This report allows for easy restocking by showing SKUs with zero (0) inventory. If you continue to sell those items, you can restock your listings without resubmitting product data for the SKU or creating a new SKU. If you don't expect to offer the item again and want to eliminate the SKU from your report, you can delete it via the Manage Inventory tool or by using an inventory file upload. You can use the Active Listings report if you have up to 50,000 listings. If you have more than 50,000 listings, you must use the Inventory Report.",
+              "path": "amazon-seller-central/mws_active_listings",
+              "data_type": ["report", "snapshot"],
+              "cadence": "daily",
+              "max_history": 0
+            }
+          }          
+        ]
+      }
+    },
+    {
+      "type": "SourceProduct",
+      "attributes": {
+        "name": "Sponsored Brands"
+      },
+      "relationships": {
+        "parent_upstream_source": "Amazon Advertising",
+        "openbridge_connector_name": ""
+      }
+    },
+    {
+      "type": "SourceProduct",
+      "attributes": {
+        "name": "Sponsored Display"
+      },
+      "relationships": {
+        "parent_upstream_source": "Amazon Advertising",
+        "openbridge_connector_name": ""
+      }
+     }
+  ]
+}

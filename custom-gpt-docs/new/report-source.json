@@ -1,0 +1,65 @@
+{
+  "data": [
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Anazon Advertising",
+          "summary": "",
+          "query_key": "amazon-advertising"
+        }
+      }
+    },
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Anazon Seller Central",
+          "summary": "",
+          "keywords": ["amazon", "selling partner", "orders", "sp orders", "sp_all_orders"],
+          "query_key": "amazon-seller-central"
+        }
+      }
+    },
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Anazon Vendor Central",
+          "summary": "",
+          "query_key": "amazon-vendor-central"
+        }
+      }
+    },
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Facebook",
+          "summary": "",
+          "query_key": "facebook"
+        }
+      }
+    },
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Instagram",
+          "summary": "",
+          "query_key": "instagram"
+        }
+      }
+    },
+    {
+      "type": "UpstreamSource",
+      "relationships": {
+        "attributes": {
+          "name": "Youtube",
+          "summary": "",
+          "query_key": "youtube"
+        }
+      }
+    }    
+  ]
+}

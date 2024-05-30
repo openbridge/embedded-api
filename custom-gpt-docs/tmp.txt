@@ -1,0 +1,11 @@
+@Tell me the schema is for amazon selling partner orders.
+
+It will derive and in the background it will make this request
+
+https://myapi.com/service/gpt/upstramsource?query_key={{queryKey}}
+
+
+
+
+
+The file "product-group-pathing-map.json" will not be available to reference.  The contents of this file instead will be returned by the API endpoint "https://myapi.com/service/gpt/upstramsource?query_key={{queryKey}}".  With that in mind if I have a user who asks this question; "Tell me the schema is for amazon selling partner orders." and you needed to make a call to this API endpoint; "https://myapi.com/service/gpt/upstramsource?query_key={{queryKey}}" what would you be setting as the query_key variable based on the user's question?
