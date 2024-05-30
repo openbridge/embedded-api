@@ -13,7 +13,7 @@ Is shareable among coworkers in your organization or publicly.
 ## Your Data Analyst GPT
 
 ### Step 1: Create a GPT
-To create a custom GPT you will need to have a paid OpenAI account which will give you access to create a GPT.
+To create a custom GPT you will need to have an OpenAI account which will give you access to create a GPT.
 
 Log into ChatGPT, and in the left menu choose "Explore GPTs".  Then in the right main window in the upper right corner click the "Create" button.
 
