@@ -33,6 +33,7 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 
  - [Best Practices](#best-practices)
   - [Identity Health](#identity-health)
+ - [API Error Handling Guide](#api-error-handling-guide)
 
 
 # Getting Started
@@ -1561,12 +1562,168 @@ In the response, you can see the list of associated markets:
 }
 ```
 
+## API Error Handling Guide
+Proper error handling is essential for ensuring smooth interactions and resolving issues promptly. Please look at the following guidelines when handling errors in your application.
+
+### Error Response Structure
+Our APIs follow a RESTful standardized error response structure, utilizing HTTP status codes in the header to indicate the nature of the error. Error responses are returned in JSON format containing a list of errors encountered before the process's termination.  Typically, the JSON will include a stack trace which usually contains the problem's source, to which you can figure out how to debug the problem or contact Openbridge Support to help debug the issue.
+
+### Common Error Scenarios
+Authentication Errors
+* Bad Request (400): Invalid input parameters or request payload.
+* Unauthorized (401): Invalid or missing authentication credentials.
+* Forbidden (403): Insufficient permissions to access the requested resource.
+* Validation Errors
+* Not Found (404): This means that the resource you are looking for either never existed or may have been deleted, As in a deleted subscription or identity.
+* Too Many Requests (429 or 503): Exceeded API rate limits. Implement exponential backoff for retries.
+* Internal Server Error (500) is a generic error thrown when something uncaught or unexpected fails.  For example, a load balancer not routing requests correctly could result in a 500 error.  If you see this error consistently please contact support@openbridge.com
+
+### Handling Client Errors
+If you are creating an application or have a website that delivers services to your customers when encountering errors, ensure proper validation of input parameters and provide meaningful feedback to your users. Log error details for debugging purposes without exposing sensitive information.
+
+### Handling Server Errors
+Implement retry mechanisms with exponential backoff to handle transient server errors gracefully. Report persistent server errors to our support team for investigation at support@openbridge.com.
+
+### Request Limits and Governance for Openbridge Embedded API
+
+#### Overview
+When using the Openbridge embedded API, it is essential to understand that most requests are governed by the rate limits and policies of the upstream data sources and systems. This document outlines the impact of these limits on data retrieval speeds and provides context for the constraints you may encounter.
+
+#### Example: Amazon Seller and Vendor Reporting API Rate Limits
+The speed at which data can be retrieved from Amazon is primarily dictated by the limits imposed by the Amazon Seller and Vendor Reporting API. This API has a strict rate limit of 0.0167 requests per second, which equates to approximately 60 requests per hour. These limits are shared across all applications or developers associated with a particular seller or vendor account, including Openbridge.
+
+##### Key Points:
+- **Rate Limit**: 0.0167 requests per second (60 requests per hour)
+- **Shared Across Applications**: All requests from any application or developer for a specific seller or vendor account count against this limit.
+- **Impact on Data Retrieval**: The low limit can significantly affect the time required to retrieve large volumes of data, especially in regions like the EU where this issue is particularly critical.
+
+#### Example Scenario: Data Retrieval for Seller ACME CORP
+To illustrate the impact of these limits, consider a hypothetical seller, ACME CORP, set up on 4/23, with multiple report types requested for a 364-day history:
+
+- **Report Types Requested**:
+  - sp_ba_market_basket
+  - sp_ba_repeat_purchase
+  - sp_ba_search_terms_by_day
+  - sp_ba_search_terms_by_month
+  - sp_ba_search_terms_by_quarter
+  - sp_ba_search_terms_by_week
+
+- **Total Reports**:
+  - 2200 reports requested under the subscription 1111111.
+  - Additional requests under subscriptions 22222, 33333, 444444, 55555, and 66666, leading to a total of 2994 historical requests (jobs).
+  - Approximately 18,000 specific reports requested from the API for a 12-month period.
+
+#### Calculating Time for Data Retrieval
+Given the API's rate limits, the time to complete all requests can be substantial:
+
+- **Minimum Requests**:
+  - 18,000 requests / 60 requests per hour = 300 hours (approximately 13 days)
+
+- **Maximum Requests**:
+  - 56,000 requests / 60 requests per hour = 933 hours (approximately 39 days)
+
+These calculations assume that the application uses 100% of the API's capacity, excluding other applications. The shared rate limit of 60 requests per hour can significantly extend the time required to complete large data retrieval tasks. Always plan your data retrieval strategies with these constraints in mind to manage expectations and optimize performance. See the section on retry and backoff for strategies to deal with upstream API limits.
+
+For further assistance or inquiries about optimizing your data retrieval process, please contact our support team at support@openbridge.com.
+
+- API Backoff & Retry: Dealing With API limits, disruption, and outages (https://docs.openbridge.com/en/articles/8250517-api-backoff-retry)
+- Key Considerations For Data Source and Destination Automation Timing (https://docs.openbridge.com/en/articles/6362623-key-considerations-for-data-source-and-destination-automation-timing)
+
+- Introduction To API Throttling (https://docs.openbridge.com/en/articles/8233698-introduction-to-api-throttling)
+- Amazon Selling Partner API Data Feed Limits, Errors, And Constraints: Why NO_DATA and CANCELLED responses are sent from the Amazon Selling Partner API (https://docs.openbridge.com/en/articles/4895388-amazon-selling-partner-api-data-feed-limits-errors-and-constraints)
+
+### Best Practices
+Follow these best practices for robust error handling:
+Thoroughly test error scenarios during API integration.
+Log error details without exposing sensitive information.
+Implement retry mechanisms with exponential backoff for transient errors.
+Provide meaningful error messages for client-side validation errors.
+
+### Example Code
+Below is a reference that what is means to have an implementation that handles different types of errors including authentication errors, validation errors, and internal server errors we detailed above. This implementation includes detailed error handling and logging to manage these scenarios effectively. while the example uses Python, we strongly advise a similar conceptual approach in whatever language you are employing. This is an example, and not code meant to be copied and pasted and used as it is a generic reference.
+
+```
+import time
+import random
+import requests
+
+def retry_with_exponential_backoff(max_retries=5, initial_delay=1, backoff_factor=2, max_delay=60):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            retries = 0
+            delay = initial_delay
+            while retries < max_retries:
+                try:
+                    response = func(*args, **kwargs)
+                    if response.status_code in (429, 503):  # Too Many Requests or Service Unavailable
+                        raise Exception("Rate limit exceeded or service unavailable")
+                    return response
+                except requests.exceptions.HTTPError as http_err:
+                    status_code = http_err.response.status_code
+                    if status_code in (401, 403):
+                        print(f"Authentication error ({status_code}): {http_err.response.text}")
+                        raise
+                    elif status_code == 400:
+                        print(f"Validation error (400): {http_err.response.text}")
+                        raise
+                    elif status_code in (429, 503):
+                        retries += 1
+                        if retries >= max_retries:
+                            raise
+                        print(f"Rate limit error ({status_code}). Retrying in {delay:.2f} seconds...")
+                        time.sleep(delay)
+                        delay = min(delay * backoff_factor, max_delay) * (1 + random.uniform(-0.1, 0.1))  # adding jitter
+                    elif status_code == 500:
+                        retries += 1
+                        if retries >= max_retries:
+                            raise
+                        print(f"Internal server error (500). Retrying in {delay:.2f} seconds...")
+                        time.sleep(delay)
+                        delay = min(delay * backoff_factor, max_delay) * (1 + random.uniform(-0.1, 0.1))  # adding jitter
+                    else:
+                        print(f"HTTP error ({status_code}): {http_err.response.text}")
+                        raise
+                except Exception as e:
+                    retries += 1
+                    if retries >= max_retries:
+                        raise
+                    print(f"Error: {e}. Retrying in {delay:.2f} seconds...")
+                    time.sleep(delay)
+                    delay = min(delay * backoff_factor, max_delay) * (1 + random.uniform(-0.1, 0.1))  # adding jitter
+        return wrapper
+    return decorator
+
+@retry_with_exponential_backoff()
+def example_api_call():
+    # Replace this with your actual API call
+    print("Attempting API call...")
+    response = requests.get("https://api.example.com/endpoint")  # Simulated API endpoint
+    response.raise_for_status()  # Raise an error for bad responses
+    return response
+
+# Test the retry mechanism
+try:
+    response = example_api_call()
+    print("API call successful:", response.status_code)
+except Exception as e:
+    print(f"Final failure after retries: {e}")
+```
+
+The example call shows that when an exception occurs, it checks the status code and handles it accordingly:
+* 401 Unauthorized and 403 Forbidden: Print an authentication error message and raise the exception.
+* 400 Bad Request: Print a validation error message and raise the exception.
+* 404 Not Found: This means that the resource you are looking for either never existed or may have been deleted, As in a deleted subscription or identity.
+* 429 Too Many Requests and 503 Service Unavailable: Implement exponential backoff and retry.
+* 500 Internal Server Error: Implement exponential backoff and retry.
+* Other HTTP Errors: Print the error message and raise the exception.
+
+### Support Resources
+If you need any more help, please contact our support team at support@openbridge.com.
+
 
 # Changelog
 
 See the current [CHANGELOG](./CHANGELOG.md) for updates, fixes, and enhancements.
-
-
 
 # Docs
 For more examples on configuration, guides, and constraints please refer to the docs:
