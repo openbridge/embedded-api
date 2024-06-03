@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "relationships": {
+              "type": "object",
+              "properties": {
+                "parent_upstream_source": {
+                  "type": "string"
+                },
+                "query-key": {
+                  "type": "string"
+                },
+                "openbridge_connector_name": {
+                  "type": "string"
+                },
+                "data_schema": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "data_type": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "cadence": {
+                              "type": "string"
+                            },
+                            "max_history": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "description",
+                            "path",
+                            "data_type",
+                            "cadence",
+                            "max_history"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "attributes"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "parent_upstream_source",
+                "query-key",
+                "openbridge_connector_name",
+                "data_schema"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "attributes",
+            "relationships"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ]
+}
