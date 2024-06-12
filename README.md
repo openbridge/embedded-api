@@ -1,40 +1,8 @@
 # Openbridge API Documentation
 
-Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embedd the Openbridge API into their applications. Whether you're looking to access specific data, manage identities, or handle authorizations, you'll find detailed information and examples here.
+Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embed the Openbridge API into their applications. Included are detailed information and examples here if you're looking to access specific data, manage identities, or handle authorizations.
 
 - [Getting started](#getting-started)
-  - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
-  - [API User Role](#api-user-role)
-  - [Refresh Tokens](#refresh-tokens)
-- [Identity Authorization](#identity-authorization)
-  - [Creating your first identity](#creating-your-first-identity)
-  - [Identity State](#identity-state)
-    - [Account and User Ids](#account-and-user-ids)
-    - [Identity Types](#identity-types)
-    - [Region](#region)
-      - [Amazon Advertising Regions](#amazon-advertising-regions)
-      - [Amazon Selling Partner and Vendor Central Regions](#amazon-selling-partner--vendor-central-regions)
-    - [Redirect URL](#redirect-url)
-    - [Shop URL](#shop-url)
-  - [Creating your first state object](#create-your-first-state-object)
-  - [Starting the authorization process](#starting-the-authorization-process)
-- [Requesting History](#history-requests)
-
-
-- [APIs](#apis)
-  - [Authorization API](#authorization-api)
-  - [Account API](#account-api)
-  - [Service API](./service-api.md)
-  - [Remote Identity API](#remote-identity-api)
-  - [Subscription API](#subscription-api)
-  - [State API](#state-api)
-
- - [Product Information](./product-information.md)
-
- - [Best Practices](#best-practices)
-  - [Identity Health](#identity-health)
- - [API Error Handling Guide](#api-error-handling-guide)
-
 
 # Getting Started
 
@@ -42,331 +10,309 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 To get access to use the Openbridge APIs requires a discussion with the Openbridge support.  Please contact us via the official support portal to request access.
 
 ## API User Role
-Customers who have been granted access to use the Openbridge APIs will be given the `api-user` role to the owner of the account.  Once Openbridge support has said that this role has been added to your account you will need to log out of the Openbridge app and then log back in.  This updates any cached token in the browser with a new one with the required permissions to generate a refresh token for your account.
+Customers who have been granted access to use the Openbridge APIs will be given the `api-user` role to the owner of the account.  Once Openbridge support has said that this role has been added to your account you will need to log out of the Openbridge app and log back in.  This updates any cached token in the browser with a new one with the required permissions to generate a refresh token for your account.
 
 ## Refresh Token
-A refresh token is a long lived token that your application will use to generate a JWT using the openbridge authorization API.  To create a refresh token you must have been granted the `api-user` role on your account.  If you have this role, log into the Openbridge app. In the main menu and select `Account` and you will be presented with a `API Management` menu option to navigate you to the refresh token management page.  Click on the `"Create Refresh Token"` button.  A modal will present itself where you will need to choose a name for the token.  Click the `Create` button and your token will be generated, and presented to you.  It is **VERY IMPORTANT** that you copy this token and store it in a text file, or in your application preferences/settings.  As a security precaution we will not present this token to you again, as it is not stored in a way we can present it to you again.  If you lose your token you will be required to generate a new one.
-
+A refresh token is a long-lived token that your application will use to generate a JWT using the Openbridge authorization API.  To create a refresh token you must have been granted the `api-user` role on your account.  If you have this role, log into the Openbridge app. In the main menu select `Account` and you will be presented with an `API Management` menu option to navigate you to the refresh token management page.  Click on the `"Create Refresh Token"` button.  A modal will present itself where you will choose a name for the token.  Click the `Create` button and your token will be generated, and presented to you.  It is **VERY IMPORTANT** that you copy this token and store it securely in a password vault like 1Password, or in your application preferences/settings.  As a security precaution, we will not present this token to you again, as it is not stored in a way we can present it to you again.  If you lose your token you will be required to generate a new one.
 
 # Identity Authorization
-
-Openbridge call authorizations we have made to third party vendors identities.  In most cases these third party authorizations are created through the third party's Oauth service.  Openbridge has created our own API that manages redirecting a user to these APIs and on a successful authorization a return to a specific `return_url` with some included meta data stored in the query string.  In most cases on an error the user is also redirected back to the return_url with some meta data that specifies the error condition.  However due to the way some of the third party APIs handle errors, sometimes a user can result in being dead ended at on a page hosted by the third party.  There is unfortunately nothing that can be done in those cases, but to document it.
+Openbridge call authorizations we have made to third-party vendors' identities.  In most cases, these third-party authorizations are created through the third party's Oauth service.  Openbridge has created our own API that manages redirecting a user to these APIs and on a successful authorization a return to a specific `return_url` with some included metadata stored in the query string.  In most cases on an error, the user is also redirected back to the return_url with some metadata that specifies the error condition.  However due to the way some of the third-party APIs handle errors, sometimes a user can result in being dead-ended on a page hosted by the third party.  There is unfortunately nothing that can be done in those cases, but to document it.
 
 ## Creating your first identity
 
-
 ### Identity State
-
-The first step in creating an identity is to create a persistent state using the Openbridge [state api](#state-api).  The Oauth standard has us pass a state token at the beginning of their process.  This allows us to retain state from the beginning of the process through the end of the process as on the return the state token is given back to us.
+The first step in creating an identity is to create a persistent state using the Openbridge [state api](#state-api).  The OAuth standard has us pass a state token at the beginning of the process.  This allows us to retain the state from the beginning of the process through the end of the process as on the return the state token is given back to us.
 
 The schema for the state to create an identity is:
 
-> ```json
->  {
->     account_id: string;
->     user_id: string;,
->     region: string;
->     remote_identity_type_id: integer;
->     return_url: string;
->     shop_url: string | null;
->   }
-> ```
-
-#### Account and User IDs
+```json
+ {
+    account_id: string;
+    user_id: string;,
+    region: string;
+    remote_identity_type_id: integer;
+    return_url: string;
+    shop_url: string | null;
+   }
+ ```
 
 The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). The `account_id` will be the `data.id` on the response tree, and the `user_id` will be `data.attributes.owner.id` on the response tree.
 
-#### Region
-
-Every Oauth API is different.  For example Amazon break up their authorizations by region.  This means they have different Oauth servers in various parts of the world.  However Facebook and Google, their authorizations are `global`.  The regions are indexed below for each identity type.  
-
 #### Identity Types
-
-
+---
 Openbridge offers connections to several third parties. Internally we call these `remote identity types` and we have an id that we associate with each of them.
 
-> | id              |  provider     | region |
-> |-------------------|-----------|----------|
-> | `1` |      Google (except for Adwords) | global |
-> | `2` |      Facebook | global |
-> | `8` |      Google Adwords | global |
-> | `14` |      Amazon Advertising | [region index](#amazon-advertising-regions)  |
-> | `17` |      Amazon Selling Partner | [region index](#amazon-selling-partner--vendor-central-regions) |
-> | `18` |      Amazon Vendor Central | [region index](#amazon-selling-partner--vendor-central-regions) |
+| id              |  provider     | region |
+|-------------------|-----------|----------|
+| `1` |      Google (except for Adwords) | global |
+| `2` |      Facebook | global |
+| `8` |      Google Adwords | global |
+| `14` |      Amazon Advertising | [region index](#amazon-advertising-regions)  |
+| `17` |      Amazon Selling Partner | [region index](#amazon-selling-partner--vendor-central-regions) |
+| `18` |      Amazon Vendor Central | [region index](#amazon-selling-partner--vendor-central-regions) |
 
 
 #### Amazon Advertising Regions
 ---
-> | region identifier              |  region name |
-> |-------------------|-----------|
-> | `na` |      `North America` |
-> | `eu` |      `Europe` |
-> | `fe` |      `Far East` |
+| region identifier              |  region name |
+|-------------------|-----------|
+| `na` |      `North America` |
+| `eu` |      `Europe` |
+| `fe` |      `Far East` |
 
 
 #### Amazon Selling Partner &amp; Vendor Central Regions
 ---
-> | region identifier              |  region name |
-> |-------------------|-----------|
-> | `AU` | `Australia` |
-> | `BR` | `Brazil` |
-> | `CA` | `Canada'` |
-> | `EG` | `Egypt` |
-> | `FR` | `France` |
-> | `DE` | `Germany` |
-> | `IN` | `India` |
-> | `IT` | `Italy` |
-> | `JP` | `Japan` |
-> | `MX` | `Mexico` |
-> | `NL` | `Netherlands` |
-> | `PL` | `Poland` |
-> | `SA` | `Saudi Arabia` |
-> | `SG` | `Singapore` |
-> | `ES` | `Spain` |
-> | `SE` | `Sweden` |
-> | `TR` | `Turkey` |
-> | `UK` | `United Kingdom` |
-> | `AE` | `United Arab Emirates (U.A.E.)` |
-> | `US` | `United States` |
+| region identifier              |  region name |
+|-------------------|-----------|
+| `AU` | `Australia` |
+| `BR` | `Brazil` |
+| `CA` | `Canada'` |
+| `EG` | `Egypt` |
+| `FR` | `France` |
+| `DE` | `Germany` |
+| `IN` | `India` |
+| `IT` | `Italy` |
+| `JP` | `Japan` |
+| `MX` | `Mexico` |
+| `NL` | `Netherlands` |
+| `PL` | `Poland` |
+| `SA` | `Saudi Arabia` |
+| `SG` | `Singapore` |
+| `ES` | `Spain` |
+| `SE` | `Sweden` |
+| `TR` | `Turkey` |
+| `UK` | `United Kingdom` |
+| `AE` | `United Arab Emirates (U.A.E.)` |
+| `US` | `United States` |
 
 #### Redirect URL
-Whether the identity is created successfully, or an error happens in the process, the oauth API needs to know where to return the end user too.  We store this in the state, it allows for greater flexibility in app creation, since you aren't tied to returning a user to a single location. Openbridge for example redirects users to the wizard they started on.  We include a parameter to indicate what stage of the wizard the user was last on.
-
+---
+Whether the identity is created successfully, or an error happens in the process, the OAuth API needs to know where to return the end user too.  We store this in the state, it allows for greater flexibility in app creation since you aren't tied to returning a user to a single location. Openbridge for example redirects users to the wizard they started on.  We include a parameter to indicate what stage of the wizard the user was last on.
 
 #### Shop URL
-The `shop_url` is only used in conjunction with shopify identities.  Currently we do not support the creation of Shopify authenticated identities for our API users at this time.
-
+---
+The `shop_url` is only used in conjunction with Shopify identities.  Currently, we do not support the creation of Shopify authenticated identities for our API users at this time.
 
 ### Create your first state object
-With these in mind, let's create a state that can be used for gaining an authorization for Amazon Selling Partner API, We'll do it for account 1, that is owned by user 1.  (Don't really do this it is only for example, please use your own user and account id, you can use the [Account API](#account-api) to retrieve them.).  We will do it for the `US` region. We'll then return them to the Openbirdge wizard for the Selling Partners "Orders API" product, and we'll pass the stage parameter so we land on the identity selection page.
+---
+With these in mind, let's create a state that can be used for gaining authorization for Amazon Selling Partner API, We'll do it for account 1, which is owned by user 1.  (Don't really do this it is only for example, please use your own user and account id, you can use the [Account API](#account-api) to retrieve them.).  We will do it for the `US` region. We'll then return them to the Openbirdge wizard for the Selling Partners "Orders API" product, and we'll pass the stage parameter so we land on the identity selection page.
 
-> ```json
->  {
->     "account_id": "1";
->     "user_id": "1";,
->     "remote_identity_type_id": 17;
->     "region": "US;
->     "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity"
->     "shop_url": null;
->   }
-> ```
-
+```json
+{
+  "account_id": "1",
+  "user_id": "1",
+  "remote_identity_type_id": 17,
+  "region": "US,
+  "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+  "shop_url": null
+}
+```
 
 Now that we have the state object, we need to generate a payload for the [state API](#state-api) with it.  We add it to the payload as the `state` attribute.
 
-> ```json
-> {
-> 	"data": {
-> 		"type": "ClientState",
-> 		"attributes": {
-> 			"state": {
-> 				"account_id": "1",
-> 				"user_id": "1",
-> 				"remote_identity_type_id": 17,
-> 				"region": "US",
-> 				"return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
-> 				"shop_url": null
-> 			}
-> 		}
-> 	}
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "attributes": {
+      "state": {
+        "account_id": "1",
+        "user_id": "1",
+        "remote_identity_type_id": 17,
+        "region": "US",
+        "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+        "shop_url": null
+      }
+    }
+  }
+}
+```
 
 Our curl request for testing looks like this.
+```
+curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "1", "user_id": "1", "remote_identity_type_id": 17, "region": "US", "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity", "shop_url": null } } } }' https://state.api.openbridge.io/state/oauth
+```
 
->```
-> curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "1", "user_id": "1", "remote_identity_type_id": 17, "region": "US", "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity", "shop_url": null } } } }' https://state.api.openbridge.io/state/oauth
->```
+Which will produce the following response
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "id": "36613eebc2b09e4ec36663ebdf647658",
+    "attributes": {
+      "token": "36613eebc2b09e4ec36663ebdf647658",
+      "created_at": "2023-01-26T14:29:09.996295",
+      "modified_at": "2023-01-26T14:29:09.996327",
+      "state": {
+        "account_id": "1",
+        "user_id": "1",
+        "remote_identity_type_id": 17,
+        "region": "US",
+        "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+        "shop_url": null
+      }
+    }
+  }
+}
+```
 
-And upon execution our response is
-
-> ```json
-> {
->   "data": {
->     "type": "ClientState",
->     "id": "36613eebc2b09e4ec36663ebdf647658",
->     "attributes": {
->       "token": "36613eebc2b09e4ec36663ebdf647658",
->       "created_at": "2023-01-26T14:29:09.996295",
->       "modified_at": "2023-01-26T14:29:09.996327",
->       "state": {
->         "account_id": "1",
->         "user_id": "1",
->         "remote_identity_type_id": 17,
->         "region": "US",
->         "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
->         "shop_url": null
->       }
->     }
->   }
-> }
-> ```
-
-You can see that the output is much like the input, except we have been given `created_at` and `modified_at` data, and the `id` and `token` which should always be the same thing.  What we really care about is the `id`/`token`.  This is the value that will represent our calls to the third party oauth APIs.
+You can see that the output is much like the input, except we have been given `created_at` and `modified_at` data, and the `id` and `token` which should always be the same thing.  What we really care about is the `id`/`token`.  This is the value that will represent our calls to the third-party OAuth APIs.
 
 ### Starting the authorization process
-
+---
 To start the authorization process simply redirect the user in the browser to the Oauth API's initialize URL along with the state token.
 
-> ```bash
-> https://oauth.api.openbridge.io/oauth/initialize?state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-> ```
+```bash
+https://oauth.api.openbridge.io/oauth/initialize?state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 #### Security Note (MUST READ).
-The OAuth API is called via a redirect in the browser.  It should **NEVER** be called in a frame or iframe element withing HTML in the browser.  Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13).  All of the providers Openbridge uses have disabled it.  Popups may work on some third parties, but it is **not** supported by Openbridge.
+---
+The OAuth API is called via a redirect in the browser.  It should **NEVER** be called in a frame or iframe element within HTML in the browser.  Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13).  All of the providers Openbridge uses have disabled it.  Popups may work on some third parties, but it is **not** supported by Openbridge.
 
-Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token.  Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider.  In our example that is Amazon Selling Partner.  Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the openbridge database, and the end user is then redirected to the return_url that was created in the state.  In our case the blow URL along with some additional query string parameters.
+Once the user is directed to the Openbridge Oauth API, the state is read based on the passed-in state token.  Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider.  In our example that is Amazon Selling Partner.  Once the user completes the process they are returned back to the Openbridge Oauth API, where the identity information is stored in the openbridge database, and the end user is then redirected to the return_url that was created in the state.  In our case the blow URL along with some additional query string parameters.
 
-> ```bash
-> https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=
-> ```
+```bash
+https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 #### Additional Oauth return parameters
 ---
-> | key  |  datatype | description |
-> |-------------------|-----------|-|
-> | `state` | `string` | The state id/token we passed during the initialization process.
-> | `ri_id` | `integer` | The id of the created/reauthorized identity.
-> | `reauth` | `boolean` | Whether this is a new identity in the openbridge database or a reauthorization of an existing identity identity.  An identity can be new to a user/account but not to our database.  It is possible for 2 accounts to have the same identity associated with it.  We call these shared identities.
-> | `status` | `string` | returned when an error is present, it's value should always be `error`.
-> | `status_message` | `string` | The message related to the status, in this case it is an error message.
+| key  |  datatype | description |
+|-------------------|-----------|-|
+| `state` | `string` | The state id/token we passed during the initialization process.
+| `ri_id` | `integer` | The id of the created/reauthorized identity.
+| `reauth` | `boolean` | Whether this is a new identity in the openbridge database or a reauthorization of an existing identity identity.  An identity can be new to a user/account but not to our database.  It is possible for 2 accounts to have the same identity associated with it.  We call these shared identities.
+| `status` | `string` | returned when an error is present, it's value should always be `error`.
+| `status_message` | `string` | The message related to the status, in this case it is an error message.
 
-In the case of the `status` key, you should check for the value to be error, as in the future this field may be expanded on.  Don't rely simply on it's existence for error handling.
+In the case of the `status` key, you should check for the value to be an error, as in the future this field may be expanded on.  Don't rely simply on its existence for error handling.
 
 When an identity is successfully created you can use the [identities API](#remote-identity-api) to query it.
 
-**Note** The process for reauthorizing an identity is exactly the same as creating one.  In the case of a reauth we return parameter `reauth` in the querystring.
+**Note** The process for reauthorizing an identity is exactly the same as creating one.  In the case of a reauth, we return the parameter `reauth` in the query string.
 
 # History Requests
-
-After creating a pipeline subscription you may want to back fill past history into your database.  This can be done with using the history API endpoints.  There are 3 different endpoints that are linked to history requests.  The first two provide meta data used in making the actual request. Those are the [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [Product Payloads](https://github.com/openbridge/embedded-api/blob/main/service-api.md#product-payloads) endpoint. Lastly there is the endpoint for making the request [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
+After creating a pipeline subscription you should backfill past history into your database.  This can be done by using the history API endpoints.  3 different endpoints are linked to history requests.  The first two provide metadata used in making the actual request. Those are the [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [Product Payloads](https://github.com/openbridge/embedded-api/blob/main/service-api.md#product-payloads) endpoint. Lastly, there is the endpoint for making the request [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
 
 ## Basic History Request.
+Making a basic history request uses 2 of the 3 endpoints.  The [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
 
-Making a basic history requests uses 2 of the 3 endpoints.  The [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
+The purpose of the History Max Request endpoint is to provide details regarding how far back in the past you can go to request.  This data contains a list of all products and is slowly changing.  Since it is slow changing, this is an example of a request that the data could be cached locally for short periods.  We recommend not caching it for more than 24hrs at a time. 
 
-The purpose of the History Max Request endpoint is to provide details reguarding how far back in the past you can go to request.  This data contains a list for all products, and is slow changing.  Since it is slow changing, this is an example of a request that the data could be cached locally for short periods of time.  We recommend not caching it for more than 24hrs at a time. 
+Using the request below along with your authorization token you will be given a list of all Openbridge products that support history requests, along with metadata needed to make those requests.
 
-Using the request below along with your authorizatino token you will be given a list of all Openbridge products that support history requests, along with meta data needed to make those history requests.
-
-> ```curl
->  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
-> ```
+```curl
+curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/history/production/history/meta/max-request
+```
 
 The response will be an array of product history meta data like below.
 
->```
->{
->  "data": [
->    {
->      "id": 57,
->        "attributes": {
->        "max_request_time": 90,
->        "max_days_per_request": 88,
->        "base_request_start": 2
->      }
->    },
->      ...
->  ]
->}
->```
+```json
+{
+  "data": [
+    {
+      "id": 57,
+        "attributes": {
+        "max_request_time": 90,
+        "max_days_per_request": 88,
+        "base_request_start": 2
+      }
+    },
+    ...
+  ]
+}
+```
 
-Take the example above for product 57.  There are 3 meta attributes.  The first is **max_request_time**.  The value to this key is the maximum number of days you can request history for.  The second **max_days_per_request** is the maximum number of days you can request history for per request.  Lastly **base_request_start** is the offset in days from the time the request is being made that history can not be requested for.
+Take the example we have above for product 57.  There are 3 meta attributes.  The first is **max_request_time**.  The value to this key is the maximum number of days you can request history.  The second **max_days_per_request** is the maximum number of days you can request history per request.  Lastly **base_request_start** is the offset in days from the time the request is being made that history can not be requested for.
 
-Example.  You have a subscription for product 57.  Today is May 1st 2024.  Since this product has a `base_request_start` of `2` it means that `start_date` in the history request can be no sooner than `2 days in the past`.  Therefore, in this instance  The `start_date` can be no sooner than April 29, 2024.  With a `max_request_time` of 90 means that the `end_date` date in the history request can be no further back than 90 days.  In our case 90 days before May 1st 2024 is February 1st 2024.  This is the last date that we can request data for if requesting it on May 1st, 2024.  This means you can request a maximum of 88 days worth of data.
+Example.  You have a subscription for product 57.  Today is May 1st, 2024.  Since this product has a `base_request_start` of `2` it means that `start_date` in the history request can be no sooner than `2 days in the past`.  Therefore, in this instance, The `start_date` can be no sooner than April 29, 2024.  With a `max_request_time` of 90 means that the `end_date` date in the history request can be no further back than 90 days.  In our case 90 days before May 1st, 2024 is February 1st, 2024.  This is the last date that we can request data for if requesting it on May 1st, 2024.  This means you can request a maximum of 88 days' worth of data.
 
-Once you have calculated your `start_date` and your `end_date` you can build a payload for your history requeset.  Using the above as our example our payload would look something like.
+Once you have calculated your `start_date` and  `end_date` you can build a payload for your history request.  Using the above as our example our payload would look something like this.
 
-**Note:** all `date` should be calculated for UTC.
+**Note:** All `date` should be calculated for UTC.
 
-> ```json
-> {
->   "data": {
->     "type": "HistoryTransaction",
->     "attributes": {
->       "start_date": "2024-04-29",
->       "end_date": "2024-02-01"
->      }
->   }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "HistoryTransaction",
+    "attributes": {
+      "start_date": "2024-04-29",
+      "end_date": "2024-02-01"
+     }
+  }
+}
+```
 
-The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.
+The `start_date` is the date closest to the date you are making your request, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.
 
 Posting this payload to  `https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}` with the subscription ID as a parameter will create the history request.
 
-
 ## Advanced History Request.
-
 There is sometimes specific data that you may want to prioritize being loaded first.  The history request payload has 2 optional fields that must be used together when requesting these.  `stage_id` and `start_time`.
 
 To get a list of `stage_id`s for a given product you need to use the **Product Payloads** endpoint.
 
-> ```curl
->  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000
-> ```
+```curl
+curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000
+```
 
-Making a request to this endpoint will give you a list of stages for for a given product.  Some products may have only 1 stage, some 10.  Using our example for product 57.
+Making a request to this endpoint will give you a list of stages for a given product.  Some products may have only 1 stage, some 10.  Using our example for product 57.
 
->```JSON
->{
->  "links": {
->    "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
->    "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
->    "next": "",
->    "prev": ""
->  },
->  "data": [
->    {
->      "type": "Product",
->      "id": "2958",
->      "attributes": {
->        "name": "sp_settlements",
->        "created_at": "2024-05-03T13:36:40.156426",
->        "modified_at": "2024-05-03T13:36:40.185841",
->        "stage_id": 1000
->      }
->    }
->  ],
->  "meta": {
->    "pagination": {
->      "page": 1,
->      "pages": 1,
->      "count": 1
->    }
->  }
->```
+```json
+{
+  "links": {
+    "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "next": "",
+    "prev": ""
+  },
+  "data": [
+    {
+      "type": "Product",
+      "id": "2958",
+      "attributes": {
+        "name": "sp_settlements",
+        "created_at": "2024-05-03T13:36:40.156426",
+        "modified_at": "2024-05-03T13:36:40.185841",
+        "stage_id": 1000
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 1
+    }
+  }
+```
 
-Product 57 only has one stage called sp_settlments. Generally it is not necessary to use make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.  The datetime must be a date in the future at least 15 minutes after the time of submission for history reques.
+Product 57 only has one stage called sp_settlments. Generally, it is not necessary to make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.  The datetime must be a date in the future at least 15 minutes after the time of submission for history request.
 
-> ```json
-> {
->       "data": {
->         "type": "HistoryTransaction",
->         "attributes": {
->           "start_date": "2024-04-29",
->           "end_date": "2024-02-01",
->           "stage_id": 1000,
->           "start_time": "2024-04-29 00:00:00"
->         }
->       }
->     }
-> ```
+```json
+{
+  "data": {
+    "type": "HistoryTransaction",
+    "attributes": {
+      "start_date": "2024-04-29",
+      "end_date": "2024-02-01",
+      "stage_id": 1000,
+      "start_time": "2024-04-29 00:00:00"
+    }
+  }
+}
+```
 
 **Note:** All `date` and `datetime` fields should be calculated for UTC.
-
 
 # APIs
 
 ### Deprecated key-value pairs in requests and response
-
-In the API you will see note to items that are marked as deprecated.  You will be required to include many of them as inputs to `POST` functionality, and receive them as part of the output, but you should not rely on the output in the future, as they will be removed in the future.
-
+In the API you will see notes to items that are marked as deprecated.  You will be required to include many of them as inputs to `POST` functionality and receive them as part of the output, but you should not rely on the output in the future, as they will be removed in the future.
 
 ## Authorization API
-
-A prerequisite to most of the Openbridge APIs is to generate a JWT from a refresh token using the Openbridge Authorization API.
 
 <details>
  <summary><code>POST</code> <code><b>https://authentication.api.openbridge.io/auth/api/ref</b></code></summary>
