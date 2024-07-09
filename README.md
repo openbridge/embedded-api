@@ -6,6 +6,7 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
   - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
   - [API User Role](#api-user-role)
   - [Refresh Tokens](#refresh-tokens)
+- [Destinations](#destinations)
 - [Identity Authorization](#identity-authorization)
   - [Creating your first identity](#creating-your-first-identity)
   - [Identity State](#identity-state)
@@ -47,6 +48,9 @@ Customers who have been granted access to use the Openbridge APIs will be given 
 ## Refresh Token
 A refresh token is a long lived token that your application will use to generate a JWT using the openbridge authorization API.  To create a refresh token you must have been granted the `api-user` role on your account.  If you have this role, log into the Openbridge app. In the main menu and select `Account` and you will be presented with a `API Management` menu option to navigate you to the refresh token management page.  Click on the `"Create Refresh Token"` button.  A modal will present itself where you will need to choose a name for the token.  Click the `Create` button and your token will be generated, and presented to you.  It is **VERY IMPORTANT** that you copy this token and store it in a text file, or in your application preferences/settings.  As a security precaution we will not present this token to you again, as it is not stored in a way we can present it to you again.  If you lose your token you will be required to generate a new one.
 
+# Destinations
+
+Before you can start collecting data through Openbridge you must have configured a destination.  Destinations can only be configured through the Openbridge app, we currently do not support destination configuration through the API.  Check out our [Destination FAQ](https://docs.openbridge.com/en/articles/5163160-data-destination-faqs) for more information on destinations.
 
 # Identity Authorization
 
