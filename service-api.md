@@ -982,10 +982,10 @@ The GET method has the following required and optional query string parameters a
 
 > | parameter | required | description |
 > |-|-|-|
-> | subscription_id | `TRUE` | Pipeline Subscription ID you want health informatino for. |
-> | modified_at__gte | `TRUE` | Modified date greater than evaluator. |
-> | modified_at__lte | `TRUE` | Modified date less than evaluator.. |
-> | page | `TRUE` | Paginated page number for the over all query. |
+> | subscription_id | `FALSE` | Pipeline Subscription ID you want health informatino for. |
+> | modified_at__gte | `FALSE` | Modified date greater than evaluator. |
+> | modified_at__lte | `FALSE` | Modified date less than evaluator.. |
+> | page | `FALSE` | Paginated page number for the over all query. |
 > | page_size | `FALSE` | Result count per page, should not exceed 100. |
 > | status | `TRUE` | Should be set to `ERROR` to find pipeline subscription errors. |
 
