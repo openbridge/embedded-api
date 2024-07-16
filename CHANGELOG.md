@@ -3,13 +3,10 @@
 All notable changes to this project will be documented in this file.
 ## [0.0.6] - 2023-07-17
 
-Updated docs to make it easier to understand the parts of the pipeline creation process.
-Started FAQ at bottom of the Readme.
-
-## [0.0.6] - 2024-07-16
-
 ### Added
 - Added additional information about Openbridge to help get someone started.
+- Updated docs to make it easier to understand the parts of the pipeline creation process.
+- Started FAQ at bottom of the Readme.
 
 ## [0.0.5] - 2023-11-13
 
