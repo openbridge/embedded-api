@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2024-07-16
+
+### Added
+- Added additional information about Openbridge to help get someone started.
+
 ## [0.0.5] - 2023-11-13
 
 ### Added
