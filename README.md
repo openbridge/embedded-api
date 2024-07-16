@@ -34,10 +34,11 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
   - [Subscription API](#subscription-api)
   - [State API](#state-api)
 
-- [Best Practices](#best-practices)
-- [Identity Health](#identity-health)
-- [API Error Handling Guide](#api-error-handling-guide)
+ - [Product Information](./product-information.md)
 
+ - [Best Practices](#best-practices)
+  - [Identity Health](#identity-health)
+ - [API Error Handling Guide](#api-error-handling-guide)
 
 # Getting Started
 
