@@ -1,6 +1,6 @@
 # Openbridge API Documentation
 
-Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embedd the Openbridge API into their applications. Whether you're looking to access specific data, manage identities, or handle authorizations, you'll find detailed information and examples here.
+Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embed the Openbridge API into their applications. Included are detailed information and examples here if you're looking to access specific data, manage identities, or handle authorizations.
 
 - [Getting started](#getting-started)
   - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
@@ -23,7 +23,9 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
   - [Creating your first state object](#create-your-first-state-object)
   - [Starting the authorization process](#starting-the-authorization-process)
 - [Pipeline Subscription Configuration](#pipeline-configuration)
-  - [Source Product Information](./product-information.md)
+  - [Create Pipeline Subscription](#create-pipeline-subscription)
+  - [Pausing / Cancelling Subscription Pipeline](#pausing--cancelling-subscription-pipeline)
+  - [Deleting subscription pipeline](#deleting-subscription-pipeline)
 - [Requesting History](#history-requests)
 
 - [APIs](#apis)
@@ -38,7 +40,11 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - [Identity Health](#identity-health)
 - [API Error Handling Guide](#api-error-handling-guide)
 - [Frequently Asked Questions](#frequently-asked-questions)
+- [Product Information](./product-information.md)
 
+ - [Best Practices](#best-practices)
+  - [Identity Health](#identity-health)
+ - [API Error Handling Guide](#api-error-handling-guide)
 
 # Getting Started
 
@@ -73,35 +79,26 @@ Openbridge call authorizations we have made to third party vendors identities. I
 
 ## Creating your first identity
 
-
 ### Identity State
-
-The first step in creating an identity is to create a persistent state using the Openbridge [state api](#state-api). The Oauth standard has us pass a state token at the beginning of their process. This allows us to retain state from the beginning of the process through the end of the process as on the return the state token is given back to us.
+The first step in creating an identity is to create a persistent state using the Openbridge [state api](#state-api).  The OAuth standard has us pass a state token at the beginning of the process.  This allows us to retain the state from the beginning of the process through the end of the process as on the return the state token is given back to us.
 
 The schema for the state to create an identity is:
 
-> ```json
-> {
->  account_id: string;
->  user_id: string;,
->  region: string;
->  remote_identity_type_id: integer;
->  return_url: string;
->  shop_url: string | null;
-> }
-> ```
-
-#### Account and User IDs
+```json
+ {
+    account_id: string;
+    user_id: string;,
+    region: string;
+    remote_identity_type_id: integer;
+    return_url: string;
+    shop_url: string | null;
+   }
+ ```
 
 The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). The `account_id` will be the `data.id` on the response tree, and the `user_id` will be `data.attributes.owner.id` on the response tree.
 
-#### Region
-
-Every Oauth API is different. For example Amazon break up their authorizations by region. This means they have different Oauth servers in various parts of the world. However Facebook and Google, their authorizations are `global`. The regions are indexed below for each identity type. 
-
 #### Identity Types
-
-
+---
 Openbridge offers connections to several third parties. Internally we call these `remote identity types` and we have an id that we associate with each of them.
 
 > | id    | provider  | region |
@@ -170,76 +167,83 @@ With these in mind, let's create a state that can be used for gaining an authori
 > }
 > ```
 
+```json
+{
+  "account_id": "1",
+  "user_id": "1",
+  "remote_identity_type_id": 17,
+  "region": "US,
+  "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+  "shop_url": null
+}
+```
 
 Now that we have the state object, we need to generate a payload for the [state API](#state-api) with it. We add it to the payload as the `state` attribute.
 
-> ```json
-> {
-> 	"data": {
-> 		"type": "ClientState",
-> 		"attributes": {
-> 			"state": {
-> 				"account_id": "1",
-> 				"user_id": "1",
-> 				"remote_identity_type_id": 17,
-> 				"region": "US",
-> 				"return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
-> 				"shop_url": null
-> 			}
-> 		}
-> 	}
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "attributes": {
+      "state": {
+        "account_id": "1",
+        "user_id": "1",
+        "remote_identity_type_id": 17,
+        "region": "US",
+        "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+        "shop_url": null
+      }
+    }
+  }
+}
+```
 
 Our curl request for testing looks like this.
+```
+curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "1", "user_id": "1", "remote_identity_type_id": 17, "region": "US", "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity", "shop_url": null } } } }' https://state.api.openbridge.io/state/oauth
+```
 
->```
-> curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "1", "user_id": "1", "remote_identity_type_id": 17, "region": "US", "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity", "shop_url": null } } } }' https://state.api.openbridge.io/state/oauth
->```
+Which will produce the following response
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "id": "36613eebc2b09e4ec36663ebdf647658",
+    "attributes": {
+      "token": "36613eebc2b09e4ec36663ebdf647658",
+      "created_at": "2023-01-26T14:29:09.996295",
+      "modified_at": "2023-01-26T14:29:09.996327",
+      "state": {
+        "account_id": "1",
+        "user_id": "1",
+        "remote_identity_type_id": 17,
+        "region": "US",
+        "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
+        "shop_url": null
+      }
+    }
+  }
+}
+```
 
-And upon execution our response is
-
-> ```json
-> {
-> "data": {
->  "type": "ClientState",
->  "id": "36613eebc2b09e4ec36663ebdf647658",
->  "attributes": {
->  "token": "36613eebc2b09e4ec36663ebdf647658",
->  "created_at": "2023-01-26T14:29:09.996295",
->  "modified_at": "2023-01-26T14:29:09.996327",
->  "state": {
->   "account_id": "1",
->   "user_id": "1",
->   "remote_identity_type_id": 17,
->   "region": "US",
->   "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity",
->   "shop_url": null
->  }
->  }
-> }
-> }
-> ```
-
-You can see that the output is much like the input, except we have been given `created_at` and `modified_at` data, and the `id` and `token` which should always be the same thing. What we really care about is the `id`/`token`. This is the value that will represent our calls to the third party oauth APIs.
+You can see that the output is much like the input, except we have been given `created_at` and `modified_at` data, and the `id` and `token` which should always be the same thing.  What we really care about is the `id`/`token`.  This is the value that will represent our calls to the third-party OAuth APIs.
 
 ### Starting the authorization process
-
+---
 To start the authorization process simply redirect the user in the browser to the Oauth API's initialize URL along with the state token.
 
-> ```bash
-> https://oauth.api.openbridge.io/oauth/initialize?state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-> ```
+```bash
+https://oauth.api.openbridge.io/oauth/initialize?state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 #### Security Note (MUST READ).
 The OAuth API is called via a redirect in the browser. It should **NEVER** be called in a frame or iframe element withing HTML in the browser. Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13). All of the providers Openbridge uses have disabled it. Popups may work on some third parties, but it is **not** supported by Openbridge.
 
 Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token. Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider. In our example that is Amazon Selling Partner. Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the Openbridge database, and the end user is then redirected to the return_url that was created in the state. In our case the blow URL along with some additional query string parameters.
 
-> ```bash
-> https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=
-> ```
+```bash
+https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 #### Additional Oauth return parameters
 ---
@@ -259,7 +263,201 @@ When an identity is successfully created you can use the [identities API](#remot
 
 # Pipeline Subscription Configuration
 
-Openbridge offers the ability to collect data from many third-party APIs.  This means that the processes for configuring a pipeline may vary depending on the product.  Our [product information](./product-information.md) document describes what meta information is needed for each product with information on what service API calls may need be called to get additional data required to configure a pipeline subscription for a desired source product.  With that in mind all products follow a standarized format which is described in the [Subscription API](#subscription-api) documentation.
+## Create Pipeline Subscription
+
+The process for creating a pipeline subscription is similar for every openbridge product.  Most products require an asscociated identity record.  Most products also require some information from third party APIs such as Amazon or Facebook.  This is why our wizards will always ask for them in that order.
+
+The first step is to decide which product you want to create a pipeline subscription for.  We provide [Comprehensive List](./product-information.md) of products and their associated attributes for this reason.
+
+Some products require information from a third-party API, and others do not.  This needs to be taken into consideration when building a system to create pipeline subscriptions.
+
+An example of a product that doesn't require third-party API calls is the [Amazon Orders API](./product-information.md#amazon-orders-api) product. The reason for this is that Seller Central Identities are a one-to-one relationship with the Amazon Seller account.  
+
+An example of a product that does require a third-party API call would be [Amazon Sponsored Brands](./product-information.md#amazon-advertizing-sbsd).  The reason for this is that Amazon Advertising identities are a one-to-many relationship.  You can have many profiles for one Amazon Advertising Account authentication.  Which means that in order for Openbridge to process data we'd need to know what account profiles to process the data.
+
+Let's build out the payloads for the 2 above products to see how it's done.  We'll need the [Subscription API](./README.md#subscription-api) documentation for reference and grab the base payload.
+
+```json
+{
+  data: {
+    type: string,
+    attributes: {
+      account: integer,
+      user: integer,
+      product: integer,
+      name: string,
+      status: string,
+      subscription_product_meta_attributes: array,
+      remote_identity_id: integer,
+      unique_hash: string,
+      storage_group: integer,
+      quantity: integer,
+      price: double,
+      auto_renew: integer,
+      date_start: DatetimeString,
+      date_end: DatetimeString,
+      invalid_subscription: integer,
+      rabbit_payload_successful: integer,
+      stripe_subscription_id: string
+    }
+  }
+}
+```
+
+**Note**: Some of the parameters are depricated but require, please reference the API documentation on what default values to set for these fields.
+
+For the 2 examples we will set both `account` and `user` to the value of `1`. This is the `user id` and `account id` the pipeline subscription will be associated with.  Please make sure to use the `user id` and `account id` associated with your account and user, and we'll also set `storage_group` to `1` as that is going to be the `storage group id` for our subscriptions.  The storage group is a reference destination that your data will be stored in.
+
+### Example 1
+
+We will create a payload to create a `Orders API` source pipeline.  Referencing [Amazon Orders API](./product-information.md#amazon-orders-api) in the documentation we see this is product id `53`.  
+
+We can also see that the `Remote Identity Type ID` is `17`.  Use the [Remote Identity API](./README.md#remote-identity-api) to search for the identity you want to associate with your pipeline subscription.  For this example we'll use identity id `1`.  You should use one assocated with your account.
+
+We need to give it a unique `name`.  The `status` must be defined as `active` (all lowercase characters).
+
+Unique Hash should always be a string with the value of `[]`.
+
+Fields after `unique_hash` are deprecated fields.  Reference the [Payload Attribute Fields](./README.md#payload-attribute-fields) for their defaults.
+
+
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "attributes": {
+      "account": 1,
+      "user": 1,
+      "product": 53,
+      "name": "My Orders API Subscription",
+      "status": "active",
+      "subscription_product_meta_attributes": [],
+      "remote_identity_id": 1,
+      "unique_hash": "[]",
+      "storage_group": 1,
+      "quantity": 1,
+      "price": 0,
+      "auto_renew": 1,
+      "date_start": "2024-06-01 00:00:00",
+      "date_end":  "2024-06-01 00:00:00",
+      "invalid_subscription": 0,
+      "rabbit_payload_successful": 0,
+      "stripe_subscription_id": ""
+    }
+  }
+}
+```
+
+`subscription_product_meta_attributes` is an array of meta attributes required for the subscription to be processed. It will contain an array of objects that with the below schema
+
+```json
+{
+  "data_key": string,
+  "data_value": string,
+  "data_format": string,
+  "data_id": number,
+}
+```
+
+Each product will have a different number of objects needed in this array, containing the different information required for them.  In this case we can see from [Amazon Orders API](./product-information.md#amazon-orders-api) that we only need one with the remote identity ID.
+
+
+```json
+{
+  "data_key": "remote_identity_id",
+  "data_value": "1",
+  "data_format": "STRING",
+  "data_id": "0",
+}
+```
+
+**Note**: `data_id` will always be `0` as it is a deprecated field.
+
+The final payload would look like this.
+
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "attributes": {
+      "account": 1,
+      "user": 1,
+      "product": 53,
+      "name": "My Orders API Subscription",
+      "status": "active",
+      "subscription_product_meta_attributes": [
+        {
+          "data_key": "remote_identity_id",
+          "data_value": "1",
+          "data_format": "STRING",
+          "data_id": "0",
+        }        
+      ],
+      "remote_identity_id": 1,
+      "unique_hash": "[]",
+      "storage_group": 1,
+      "quantity": 1,
+      "price": 0,
+      "auto_renew": 1,
+      "date_start": "2024-06-01 00:00:00",
+      "date_end":  "2024-06-01 00:00:00",
+      "invalid_subscription": 0,
+      "rabbit_payload_successful": 0,
+      "stripe_subscription_id": ""
+    }
+  }
+}
+```
+
+### Example 2
+
+We will create a payload to create a `Amazon Advertising Sponsored Ads (v3)` source pipeline.  Referencing [Amazon Orders API](./product-information.md#amazon-orders-api) in the documentation we see this is product id `70`.  
+
+We can also see that the `Remote Identity Type ID` is `14`.  Use the [Remote Identity API](./README.md#remote-identity-api) to search for the identity you want to associate with your pipeline subscription.  For this example we'll use identity id `2`.  You should use one assocated with your account.
+
+Following what we did for `Example 1` will give us the following base payload.
+
+
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "attributes": {
+      "account": 1,
+      "user": 1,
+      "product": 70,
+      "name": "My Sponsored Ads V3 Subscription",
+      "status": "active",
+      "subscription_product_meta_attributes": [
+      ],
+      "remote_identity_id": 2,
+      "unique_hash": "[]",
+      "storage_group": 1,
+      "quantity": 1,
+      "price": 0,
+      "auto_renew": 1,
+      "date_start": "2024-06-01 00:00:00",
+      "date_end":  "2024-06-01 00:00:00",
+      "invalid_subscription": 0,
+      "rabbit_payload_successful": 0,
+      "stripe_subscription_id": ""
+    }
+  }
+}
+```
+
+Now to build out the meta attributes in [Sponsored Ads (v3)](./product-information.md#amazon-sponsored-ads-v3) section.  You will see that we need a `remote_identity_id` and a `profile_id` which is an `Amazon Advertising` profile id.
+
+[Sponsored Ads (v3)](./product-information.md#amazon-sponsored-ads-v3) has instructions and links to the API documentation on what endpoint to use to get this value.
+
+
+## Pausing / Cancelling Subscription Pipeline.
+
+If you want to turn off a pipeline either permentantly or temporarily you need change the status of the record on file.  This is done with a patch request. Through the [Subscription API](#subscription-api) and is described in our API documentation.
+
+## Deleting Subscription Pipeline.
+
+Pipeline Subscriptions are not deletable through the API.  Nor are they deletable through the Openbridge App.  Instead you must use the `PATCH` functionality to mark their status as `invalid`.  Once they are marked as `invalid` you will no longer see them in the Openbridge app interface. Pipeline subscriptions marked as `invalid` can be set to `active` or `cancelled` as long as there are no duplicate subscriptions that are in an `active` or `cancelled` status.
 
 # History Requests
 After creating a pipeline subscription you may want to back fill past history into your database. This can be done with using the history API endpoints. There are 3 different endpoints that are linked to history requests. The first two provide meta data used in making the actual request. Those are the [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [Product Payloads](https://github.com/openbridge/embedded-api/blob/main/service-api.md#product-payloads) endpoint. Lastly there is the endpoint for making the request [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
@@ -299,84 +497,81 @@ Example. You have a subscription for product 57. Today is May 1st 2024. Since th
 
 Once you have calculated your `start_date` and your `end_date` you can build a payload for your history requeset. Using the above as our example our payload would look something like.
 
-**Note:** all `date` should be calculated for UTC.
+**Note:** All `date` should be calculated for UTC.
 
-> ```json
-> {
-> "data": {
->  "type": "HistoryTransaction",
->  "attributes": {
->  "start_date": "2024-04-29",
->  "end_date": "2024-02-01"
->  }
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "HistoryTransaction",
+    "attributes": {
+      "start_date": "2024-04-29",
+      "end_date": "2024-02-01"
+     }
+  }
+}
+```
 
-The `start_date` is the date closest to the date you are making your request on, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.
+The `start_date` is the date closest to the date you are making your request, and the `end_date` is the calculated date in the past X number of days, in our case 88 days.
 
 Posting this payload to `https://service.api.openbridge.io/service/history/production/history/{{subscriptionId}}` with the subscription ID as a parameter will create the history request.
 
-
 ## Advanced History Request.
-
-There is sometimes specific data that you may want to prioritize being loaded first. The history request payload has 2 optional fields that must be used together when requesting these. `stage_id` and `start_time`.
+There is sometimes specific data that you may want to prioritize being loaded first.  The history request payload has 2 optional fields that must be used together when requesting these.  `stage_id` and `start_time`.
 
 To get a list of `stage_id`s for a given product you need to use the **Product Payloads** endpoint.
 
-> ```curl
-> curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000
-> ```
+```curl
+curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET  https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000
+```
 
-Making a request to this endpoint will give you a list of stages for for a given product. Some products may have only 1 stage, some 10. Using our example for product 57.
+Making a request to this endpoint will give you a list of stages for a given product.  Some products may have only 1 stage, some 10.  Using our example for product 57.
 
->```JSON
->{
-> "links": {
-> "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
-> "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
-> "next": "",
-> "prev": ""
-> },
-> "data": [
-> {
->  "type": "Product",
->  "id": "2958",
->  "attributes": {
->  "name": "sp_settlements",
->  "created_at": "2024-05-03T13:36:40.156426",
->  "modified_at": "2024-05-03T13:36:40.185841",
->  "stage_id": 1000
->  }
-> }
-> ],
-> "meta": {
-> "pagination": {
->  "page": 1,
->  "pages": 1,
->  "count": 1
-> }
-> }
->```
+```json
+{
+  "links": {
+    "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "next": "",
+    "prev": ""
+  },
+  "data": [
+    {
+      "type": "Product",
+      "id": "2958",
+      "attributes": {
+        "name": "sp_settlements",
+        "created_at": "2024-05-03T13:36:40.156426",
+        "modified_at": "2024-05-03T13:36:40.185841",
+        "stage_id": 1000
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 1
+    }
+  }
+```
 
-Product 57 only has one stage called sp_settlments. Generally it is not necessary to use make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product. Taking our payload from the basic history request above we will add the 2 fields needed. The datetime must be a date in the future at least 15 minutes after the time of submission for history reques.
+Product 57 only has one stage called sp_settlments. Generally, it is not necessary to make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.  The datetime must be a date in the future at least 15 minutes after the time of submission for history request.
 
-> ```json
-> {
->  "data": {
->   "type": "HistoryTransaction",
->   "attributes": {
->   "start_date": "2024-04-29",
->   "end_date": "2024-02-01",
->   "stage_id": 1000,
->   "start_time": "2024-04-29 00:00:00"
->   }
->  }
->  }
-> ```
+```json
+{
+  "data": {
+    "type": "HistoryTransaction",
+    "attributes": {
+      "start_date": "2024-04-29",
+      "end_date": "2024-02-01",
+      "stage_id": 1000,
+      "start_time": "2024-04-29 00:00:00"
+    }
+  }
+}
+```
 
 **Note:** All `date` and `datetime` fields should be calculated for UTC.
-
 
 # APIs
 
@@ -386,8 +581,6 @@ In the API you will see note to items that are marked as deprecated. You will be
 
 
 ## Authorization API
-
-A prerequisite to most of the Openbridge APIs is to generate a JWT from a refresh token using the Openbridge Authorization API.
 
 <details>
  <summary><code>POST</code> <code><b>https://authentication.api.openbridge.io/auth/api/ref</b></code></summary>
@@ -400,22 +593,22 @@ A prerequisite to most of the Openbridge APIs is to generate a JWT from a refres
 
 ##### Example cURL
 
-> ```
-> curl --request POST -d '{"data": {"type": "APIAuth","attributes": {"refresh_token": "REFRESH_TOKEN"}}}' https://authentication.api.openbridge.io/auth/api/ref
-> ```
+```
+curl --request POST -d '{"data": {"type": "APIAuth","attributes": {"refresh_token": "REFRESH_TOKEN"}}}' https://authentication.api.openbridge.io/auth/api/ref
+```
 
 ##### Example Response
 
-> ```json
-> {
-> "data": {
->  "attributes": {
->  "token": "eyXXXXXXXXXXXXXXXXXXXXX",
->  "expires_at": 1674576819.8652437
->  }
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "attributes": {
+      "token": "eyXXXXXXXXXXXXXXXXXXXXX",
+      "expires_at": 1674576819.8652437
+    }
+  }
+}
+```
 
 </details>
 
@@ -432,74 +625,74 @@ A prerequisite to using the Account API is to create a Openbridge JWT using your
 
 > | name  |  data type    | description               |
 > |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type
+> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
 
 ##### Parameters
-> The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
+The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
 
 ##### Responses
 
-> | http code  | content-type      | response               |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`   | `application/json`  | `Configuration created successfully`        |
+| http code     | content-type                      | response                                                            |
+|---------------|-----------------------------------|---------------------------------------------------------------------|
+| `200`         | `application/json`        | `Configuration created successfully`                                |
 
 ##### Example cURL
 
-> ```curl
-> curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://account.api.openbridge.io/account
-> ```
+```curl
+ curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://account.api.openbridge.io/account
+```
 
 ##### Example Response
 
-> ```json
-> {
-> "links": {
-> "first": "https://account.api.openbridge.io/account?page=1",
-> "last": "https://account.api.openbridge.io/account?page=1",
-> "next": "",
-> "prev": ""
-> },
-> "data": [
-> {
->  "type": "Account",
->  "id": "XXXXX",
->  "attributes": {
->  "account_status": 1,
->  "stripe_customer_id": "cus_XXXXXXXXXXXX",
->  "company": "",
->  "created_at": "20XX-XX-XXTXX:XX:XX",
->  "modified_at": "20XX-XX-XXTXX:XX:XX",
->  "free_subscription_limit": 0,
->  "free_subscriptions": 0,
->  "is_branded": 0,
->  "stripe_subscription_id": "sub_XXXXXXXXXXXX",
->  "in_trial": 1,
->  "renews_at_period_end": 0,
->  "period_ends_at": "20XX-XX-XXTXX:XX:XX",
->  "deactivate_at": "20XX-XX-XXTXX:XX:XX",
->  "account_type_id": 13,
->  "country_id": null,
->  "primary_account_address_id": null,
->  "primary_account_card_id": null,
->  "extended_trial": 0,
->  "organization_id": null,
->  "organization_allowed": false,
->  "owner": {
->   "id": "YYYY",
->   "auth0_user_id": "auth0|>636a4261738c1d3f4d57ae6f"
->  }
->  }
-> }
-> ],
-> "meta": {
-> "pagination": {
->  "page": 1,
->  "pages": 1,
->  "count": 1
-> }
-> }
+```json
+{
+ "links": {
+   "first": "https://account.api.openbridge.io/account?page=1",
+   "last": "https://account.api.openbridge.io/account?page=1",
+   "next": "",
+   "prev": ""
+ },
+ "data": [
+   {
+     "type": "Account",
+     "id": "XXXXX",
+     "attributes": {
+       "account_status": 1,
+       "stripe_customer_id": "cus_XXXXXXXXXXXX",
+       "company": "",
+       "created_at": "20XX-XX-XXTXX:XX:XX",
+       "modified_at": "20XX-XX-XXTXX:XX:XX",
+       "free_subscription_limit": 0,
+       "free_subscriptions": 0,
+       "is_branded": 0,
+       "stripe_subscription_id": "sub_XXXXXXXXXXXX",
+       "in_trial": 1,
+       "renews_at_period_end": 0,
+       "period_ends_at": "20XX-XX-XXTXX:XX:XX",
+       "deactivate_at": "20XX-XX-XXTXX:XX:XX",
+       "account_type_id": 13,
+       "country_id": null,
+       "primary_account_address_id": null,
+       "primary_account_card_id": null,
+       "extended_trial": 0,
+       "organization_id": null,
+       "organization_allowed": false,
+       "owner": {
+         "id": "YYYY",
+         "auth0_user_id": "auth0|>636a4261738c1d3f4d57ae6f"
+       }
+     }
+   }
+ ],
+ "meta": {
+   "pagination": {
+     "page": 1,
+     "pages": 1,
+     "count": 1
+   }
+ }
 >}
-> ```
+```
 
 From the example response, the `accountId` is `data.id` and the `userId` is `data.attributes.owner.id` 
 
@@ -515,10 +708,10 @@ The Openbridge Remote Identity API is a RESTFUL API, that supports. `GET`, and `
 
 > | name  |  data type    | description               |
 > |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type
+> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
 
 ##### Parameters
-> The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
+The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
 
 ##### Responses
 
@@ -538,94 +731,94 @@ The /sri endpoint is used to return a list of all identities that your account h
 
 Returns an array of Remote Identities
 
-> ```json
-> [{
-> "data": {
->  "type": "RemoteIdentity",
->  "id": "362",
->  "attributes": {
->  "name": "James Andrews",
->  "created_at": "2018-02-13T18:49:51",
->  "modified_at": "2022-10-26T20:43:21",
->  "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
->  "remote_unique_id": "526589612",
->  "account_id": 1,
->  "user_id": 1,
->  "notified_at": null,
->  "invalidate_manually": 0,
->  "invalid_identity": 0,
->  "invalidated_at": "2019-05-11T00:05:01",
->  "notification_counter": 0,
->  "region": "global",
->  "email": "thenetimp+facebook@gmail.com",
->  "oauth_id": null
->  },
->  "relationships": {
->  "remote_identity_type": {
->   "data": {
->   "type": "RemoteIdentityType",
->   "id": "2"
->   }
->  },
->  "account": {
->   "data": {
->   "type": "Account",
->   "id": "1"
->   }
->  },
->  "user": {
->   "data": {
->   "type": "User",
->   "id": "1"
->   }
->  },
->  "trusted_identity": {
->   "data": null
->  },
->  "remote_identity_type_application": {
->   "data": {
->   "type": "RemoteIdentityTypeApplication",
->   "id": "8"
->   }
->  },
->  "oauth": {
->   "data": null
->  }
->  }
-> }
-> }]
-> ```
+```json
+[{
+  "data": {
+    "type": "RemoteIdentity",
+    "id": "362",
+    "attributes": {
+      "name": "James Andrews",
+      "created_at": "2018-02-13T18:49:51",
+      "modified_at": "2022-10-26T20:43:21",
+      "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
+      "remote_unique_id": "526589612",
+      "account_id": 1,
+      "user_id": 1,
+      "notified_at": null,
+      "invalidate_manually": 0,
+      "invalid_identity": 0,
+      "invalidated_at": "2019-05-11T00:05:01",
+      "notification_counter": 0,
+      "region": "global",
+      "email": "thenetimp+facebook@gmail.com",
+      "oauth_id": null
+    },
+    "relationships": {
+      "remote_identity_type": {
+        "data": {
+          "type": "RemoteIdentityType",
+          "id": "2"
+        }
+      },
+      "account": {
+        "data": {
+          "type": "Account",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      },
+      "trusted_identity": {
+        "data": null
+      },
+      "remote_identity_type_application": {
+        "data": {
+          "type": "RemoteIdentityTypeApplication",
+          "id": "8"
+        }
+      },
+      "oauth": {
+        "data": null
+      }
+    }
+  }
+}]
+```
 
 ### Understanding the response fields
 
 ##### Attribute Fields
-> | key | data type | description |
-> |-|-|-|
-> | `name` | `string` | `` |
-> | `created_at` | `string` | `` |
-> | `modified_at` | `string` | `` |
-> | `identity_hash` | `string` | `deprecated` |
-> | `remote_unique_id` | `string` | `identifying value from the remote third party Oauth API` |
-> | `account_id` | `string` | `The id of the account that first created the identity` |
-> | `user_id` | `string` | `The id of the user that first created the identity` |
-> | `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
-> | `invalidate_manually` | `string` | `deprecated` |
-> | `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
-> | `invalidated_at` | `string` | `The datetime that the identity became invalid` |
-> | `notification_counter` | `string` | `deprecated` |
-> | `region` | `string` | `The region associated with the identity` |
-> | `email` | `string` | `The email address associated with the profile by the third party (if available)` |
-> | `oauth_id` | `string` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+| key | data type | description |
+|-|-|-|
+| `name` | `string` | `` |
+| `created_at` | `string` | `` |
+| `modified_at` | `string` | `` |
+| `identity_hash` | `string` | `deprecated` |
+| `remote_unique_id` | `string` | `identifying value from the remote third party Oauth API` |
+| `account_id` | `string` | `The id of the account that first created the identity` |
+| `user_id` | `string` | `The id of the user that first created the identity` |
+| `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
+| `invalidate_manually` | `string` | `deprecated` |
+| `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
+| `invalidated_at` | `string` | `The datetime that the identity became invalid` |
+| `notification_counter` | `string` | `deprecated` |
+| `region` | `string` | `The region associated with the identity` |
+| `email` | `string` | `The email address associated with the profile by the third party (if available)` |
+| `oauth_id` | `string` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
 
 ##### Relationship Fields.
-> | key | data type | description |
-> |--|--|--|
-> | `remote_identity_type` | `object` | `Reference to the remote identity type` |
-> | `account` | `object` | `reference to the account` |
-> | `user` | `object` | `reference to the user` |
-> | `trusted_identity` | `object` | `deprecated` |
-> | `remote_identity_type_application` | `object` | `reference to an internal auth application` |
-> | `oauth` | `object` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
+| key | data type | description |
+|--|--|--|
+| `remote_identity_type` | `object` | `Reference to the remote identity type` |
+| `account` | `object` | `reference to the account` |
+| `user` | `object` | `reference to the user` |
+| `trusted_identity` | `object` | `deprecated` |
+| `remote_identity_type_application` | `object` | `reference to an internal auth application` |
+| `oauth` | `object` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
 
 **Note**: Identity credentials are not provided via the Remote Identity API
 
@@ -638,82 +831,82 @@ Returns an array of Remote Identities
 
 > | name  |  data type    | description               |
 > |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type
+> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
 
 ##### Parameters
-> The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
+The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
 
 ##### Responses
 
-> | http code  | content-type      | response               |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`   | `application/json`  | `Configuration created successfully`        |
+| http code     | content-type                      | response                                                            |
+|---------------|-----------------------------------|---------------------------------------------------------------------|
+| `200`         | `application/json`        | `Configuration created successfully`                                |
 
 ##### Example cURL
 
-> ```curl
-> curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/identity/{id}
-> ```
+```curl
+ curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/identity/{id}
+```
 
 ##### Example Response
 
-> ```json
-> {
-> "data": {
->  "type": "RemoteIdentity",
->  "id": "362",
->  "attributes": {
->  "name": "James Andrews",
->  "created_at": "2018-02-13T18:49:51",
->  "modified_at": "2022-10-26T20:43:21",
->  "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
->  "remote_unique_id": "526589612",
->  "account_id": 1,
->  "user_id": 1,
->  "notified_at": null,
->  "invalidate_manually": 0,
->  "invalid_identity": 0,
->  "invalidated_at": "2019-05-11T00:05:01",
->  "notification_counter": 0,
->  "region": "global",
->  "email": "thenetimp+facebook@gmail.com",
->  "oauth_id": null
->  },
->  "relationships": {
->  "remote_identity_type": {
->   "data": {
->   "type": "RemoteIdentityType",
->   "id": "2"
->   }
->  },
->  "account": {
->   "data": {
->   "type": "Account",
->   "id": "1"
->   }
->  },
->  "user": {
->   "data": {
->   "type": "User",
->   "id": "1"
->   }
->  },
->  "trusted_identity": {
->   "data": null
->  },
->  "remote_identity_type_application": {
->   "data": {
->   "type": "RemoteIdentityTypeApplication",
->   "id": "8"
->   }
->  },
->  "oauth": {
->   "data": null
->  }
->  }
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "RemoteIdentity",
+    "id": "362",
+    "attributes": {
+      "name": "James Andrews",
+      "created_at": "2018-02-13T18:49:51",
+      "modified_at": "2022-10-26T20:43:21",
+      "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
+      "remote_unique_id": "526589612",
+      "account_id": 1,
+      "user_id": 1,
+      "notified_at": null,
+      "invalidate_manually": 0,
+      "invalid_identity": 0,
+      "invalidated_at": "2019-05-11T00:05:01",
+      "notification_counter": 0,
+      "region": "global",
+      "email": "thenetimp+facebook@gmail.com",
+      "oauth_id": null
+    },
+    "relationships": {
+      "remote_identity_type": {
+        "data": {
+          "type": "RemoteIdentityType",
+          "id": "2"
+        }
+      },
+      "account": {
+        "data": {
+          "type": "Account",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      },
+      "trusted_identity": {
+        "data": null
+      },
+      "remote_identity_type_application": {
+        "data": {
+          "type": "RemoteIdentityTypeApplication",
+          "id": "8"
+        }
+      },
+      "oauth": {
+        "data": null
+      }
+    }
+  }
+}
+```
 
 ### Understanding the response fields
 
@@ -734,10 +927,10 @@ These are the same as on a call to a single remote identity.
 
 > | name  |  data type    | description               |
 > |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type
+> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
 
 ##### Parameters
-> The DELETE method requires the remote identity ID as part of the reuqest string.
+The DELETE method requires the remote identity ID as part of the reuqest string.
 
 Identities can be shared between more than one Openbridge account. The DELETE call will remove any association between the calling account and the identity. If the identity only belongs to the one account it will also delete the identity and any credentials associated with it.
 
@@ -768,31 +961,30 @@ The payload schema for creating a Pipeline Subscription is variant on the produc
 
 ###### Payload Schema.
 
-> ```json
- >{
- > data: {
- > type: string,
- > attributes: {
- >  account: integer,
- >  user: integer,
- >  product: integer,
- >  name: string,
- >  status: string,
- >  subscription_product_meta_attributes: array,
- >  storage_group: integer
- >  quantity: integer,
- >  price: double,
- >  auto_renew: integer,
- >  date_start: DatetimeString,
- >  date_end: DatetimeString,
- >  invalid_subscription: integer,
- >  rabbit_payload_successful: integer,
- >  stripe_subscription_id: string
- > }
- > }
- >}
-> ```
-
+```json
+{
+  data: {
+    type: string,
+    attributes: {
+      account: integer,
+      user: integer,
+      product: integer,
+      name: string,
+      status: string,
+      subscription_product_meta_attributes: array,
+      storage_group: integer
+      quantity: integer,
+      price: double,
+      auto_renew: integer,
+      date_start: DatetimeString,
+      date_end: DatetimeString,
+      invalid_subscription: integer,
+      rabbit_payload_successful: integer,
+      stripe_subscription_id: string
+    }
+  }
+}
+```
 
 ##### Payload Attribute Fields
 
@@ -821,33 +1013,33 @@ Many of the fields below are deprecated, but must be passed into the payload to 
 ##### Subscription Product Meta
 The base object for all subscriptions are the same. This makes it easy to templatize. Each product has different "meta" associated with it. In the call to create a subscription you must pass along the correct parameters as part of the `subscription_product_meta` array. A subscription product meta object within the context of a subscription creation post has a schema that like this:
 
-> ```json
-> {
-> data_id: 0,
-> data_key: 'remote_identity_id',
-> data_value: configState.remoteIdentityId,
-> data_format: 'STRING',
-> product: productId
-> }
-> ```
+```json
+{
+  data_id: 0,
+  data_key: 'remote_identity_id',
+  data_value: configState.remoteIdentityId,
+  data_format: 'STRING',
+  product: productId
+}
+```
 
-> | key | data type | description |
-> |-|-|-|
-> | `data_id` | `integer` | `deprecated: must always pass '0'` |
-> | `data_key` | `string` | `The key part of the key value pair` |
-> | `data_value` | `string` | `The value part of the key value pair` |
-> | `data_format` | `string` | `Used to tell the processor what is in data_value. Accepted values are 'STRING', 'ENCRYPTED_STRING', 'JSON', 'ENCRYPTED_JSON'` |
-> | `product` | `integer` | `The product id, should be the same as the subscription product id.` |
+| key | data type | description |
+|-|-|-|
+| `data_id` | `integer` | `deprecated: must always pass '0'` |
+| `data_key` | `string` | `The key part of the key value pair` |
+| `data_value` | `string` | `The value part of the key value pair` |
+| `data_format` | `string` | `Used to tell the processor what is in data_value.  Accepted values are 'STRING', 'ENCRYPTED_STRING', 'JSON', 'ENCRYPTED_JSON'` |
+| `product` | `integer` | `The product id, should be the same as the subscription product id.` |
 
 ##### Headers
 
-> | name  |  data type    | description               |
-> |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Content-Type  | string | application/json
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type
+| name      |        data type               | description                                                           |
+|-----------|------------------------------------|-----------------------------------------------------------------------|
+| Content-Type      |  string  | application/json |
+| Authorization      |  string  | Openbridge JWT, passed as a  authorization bearer type |
 
 ##### Parameters
-> The POST method does not require any parameters. 
+The POST method does not require any parameters. 
 
 ##### Responses
 
@@ -859,163 +1051,163 @@ The base object for all subscriptions are the same. This makes it easy to templa
 
 This is an example for creating a Selling Partner Orders API subscription.
 
-> ```json
-> {
-> "data": {
->  "type": "Subscription",
->  "attributes": {
->  "account": XXXXX,
->  "user": YYYYY,
->  "product": 53,
->  "name": "My unique subscription name",
->  "status": "active",
->  "quantity": 1,
->  "price": 0,
->  "auto_renew": 1,
->  "date_start": "2023-02-01 00:00:01",
->  "date_end": "2023-02-01 00:00:01",
->  "invalid_subscription": 0,
->  "rabbit_payload_successful": 0,
->  "stripe_subscription_id": "",
->  "storage_group": ZZZZ,
->  "remote_identity": AAAA,
->  "unique_hash": "[\"XXXXXXXXXXXXXXXXXXXXXXX\"]",
->  "subscription_product_meta_attributes": [
->   {
->   "data_key": "remote_identity_id",
->   "data_value": "AAAA",
->   "data_id": 0,
->   "data_format": "STRING",
->   "product": 53,
->   }
->  ]
->  }
-> }
-> }
-> ```
+```json
+ {
+   "data": {
+     "type": "Subscription",
+     "attributes": {
+       "account": XXXXX,
+       "user": YYYYY,
+       "product": 53,
+       "name": "My unique subscription name",
+       "status": "active",
+       "quantity": 1,
+       "price": 0,
+       "auto_renew": 1,
+       "date_start": "2023-02-01 00:00:01",
+       "date_end": "2023-02-01 00:00:01",
+       "invalid_subscription": 0,
+       "rabbit_payload_successful": 0,
+       "stripe_subscription_id": "",
+       "storage_group": ZZZZ,
+       "remote_identity": AAAA,
+       "unique_hash": "[\"XXXXXXXXXXXXXXXXXXXXXXX\"]",
+       "subscription_product_meta_attributes": [
+         {
+           "data_key": "remote_identity_id",
+           "data_value": "AAAA",
+           "data_id": 0,
+           "data_format": "STRING",
+           "product": 53,
+         }
+       ]
+     }
+   }
+ }
+```
 
 It only requires one `subscription_product_meta` object and that is the `remote_identity_id`. You may ask, why is it being passed as both an spm and in the main body of the subscription. This is due to legacy constraints of the processing system, and some requirements of another internal system.
 
 
-> ```curl
-> curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X POST -d '{ "data": { "type": "Subscription", "attributes": { "account": XXXXX, "user": YYYYY, "product": 53, "name": "My unique subscription name", "status": "active", "quantity": 1, "price": 0, "auto_renew": 1, "date_start": "2023-02-01 00:00:01", "date_end": "2023-02-01 00:00:01", "invalid_subscription": 0, "rabbit_payload_successful": 0, "stripe_subscription_id": "", "storage_group": ZZZZ, "remote_identity": AAAA, "unique_hash": "[\"20230201000000\"]", "subscription_product_meta_attributes": [ { "data_key": "remote_identity_id", "data_value": "AAAA", "data_id": 0, "product": 53 }]}}}' https://subscriptions.api.openbridge.io/sub
-> ```
+```curl
+ curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX"  -X POST -d '{ "data": { "type": "Subscription", "attributes": { "account": XXXXX, "user": YYYYY, "product": 53, "name": "My unique subscription name", "status": "active", "quantity": 1, "price": 0, "auto_renew": 1, "date_start": "2023-02-01 00:00:01", "date_end": "2023-02-01 00:00:01", "invalid_subscription": 0, "rabbit_payload_successful": 0, "stripe_subscription_id": "", "storage_group": ZZZZ, "remote_identity": AAAA, "unique_hash": "[\"20230201000000\"]", "subscription_product_meta_attributes": [ { "data_key": "remote_identity_id", "data_value": "AAAA", "data_id": 0, "product": 53 }]}}}' https://subscriptions.api.openbridge.io/sub
+```
 
 ##### Example Response
 
 The response will contain many deprecated fields, and will not include the `subscription_product_meta` array. There will be a list of deprecated fields after the example
 
-> ```json
-> {
-> "data": {
->  "type": "Subscription",
->  "id": "XXXXX",
->  "attributes": {
->  "price": 0.0,
->  "status": "active",
->  "date_start": "2023-01-31T11:54:45",
->  "date_end": "2023-01-31T11:54:45",
->  "auto_renew": 1,
->  "created_at": "2023-01-31T11:54:48.889618",
->  "modified_at": "2023-01-31T11:54:48.889633",
->  "quantity": 1,
->  "stripe_subscription_id": "",
->  "name": "Openbridge Orders ",
->  "rabbit_payload_successful": 0,
->  "primary_job_id": null,
->  "pipeline": null,
->  "invalid_subscription": 0,
->  "invalidated_at": null,
->  "notified_at": null,
->  "canonical_name": null,
->  "account_id": XXX,
->  "product_id": 53,
->  "product_plan_id": null,
->  "remote_identity_id": AAA,
->  "storage_group_id": ZZZ,
->  "user_id": YYY,
->  "history_requested": 0,
->  "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
->  },
->  "relationships": {
->  "account": {
->   "data": {
->   "type": "Account",
->   "id": "342"
->   }
->  },
->  "product": {
->   "data": {
->   "type": "Product",
->   "id": "2"
->   }
->  },
->  "product_plan": {
->   "data": null
->  },
->  "remote_identity": {
->   "data": {
->   "type": "RemoteIdentity",
->   "id": "364"
->   }
->  },
->  "storage_group": {
->   "data": {
->   "type": "StorageGroup",
->   "id": "245"
->   }
->  },
->  "user": {
->   "data": {
->   "type": "User",
->   "id": "309"
->   }
->  }
->  }
-> },
-> "included": [
->  {
->  "type": "StorageGroup",
->  "id": "245",
->  "attributes": {
->   "product_id": 37,
->   "name": "asdfasdfads",
->   "key_name": "984e7c5f47fea2a0-asdfasdfads"
->  }
->  }
-> ]
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "id": "XXXXX",
+    "attributes": {
+      "price": 0.0,
+      "status": "active",
+      "date_start": "2023-01-31T11:54:45",
+      "date_end": "2023-01-31T11:54:45",
+      "auto_renew": 1,
+      "created_at": "2023-01-31T11:54:48.889618",
+      "modified_at": "2023-01-31T11:54:48.889633",
+      "quantity": 1,
+      "stripe_subscription_id": "",
+      "name": "Openbridge Orders ",
+      "rabbit_payload_successful": 0,
+      "primary_job_id": null,
+      "pipeline": null,
+      "invalid_subscription": 0,
+      "invalidated_at": null,
+      "notified_at": null,
+      "canonical_name": null,
+      "account_id": XXX,
+      "product_id": 53,
+      "product_plan_id": null,
+      "remote_identity_id": AAA,
+      "storage_group_id": ZZZ,
+      "user_id": YYY,
+      "history_requested": 0,
+      "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
+    },
+    "relationships": {
+      "account": {
+        "data": {
+          "type": "Account",
+          "id": "342"
+        }
+      },
+      "product": {
+        "data": {
+          "type": "Product",
+          "id": "2"
+        }
+      },
+      "product_plan": {
+        "data": null
+      },
+      "remote_identity": {
+        "data": {
+          "type": "RemoteIdentity",
+          "id": "364"
+        }
+      },
+      "storage_group": {
+        "data": {
+          "type": "StorageGroup",
+          "id": "245"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "309"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "StorageGroup",
+      "id": "245",
+      "attributes": {
+        "product_id": 37,
+        "name": "asdfasdfads",
+        "key_name": "984e7c5f47fea2a0-asdfasdfads"
+      }
+    }
+  ]
+}
+```
 
 ###### Attribute Keys
 
-> | name | data type | description |
-> |-|-|-|
-> | `price` | `double` | `` |
-> | `status` | `string` | `` |
-> | `date_start` | `datetime string` | `` |
-> | `date_end` | `datetime string` | `` |
-> | `auto_renew` | `booelean integer` | `depricated` |
-> | `created_at` | `string` | `Datetime the pipeline was created` |
-> | `modified_at` | `string` | `Datetime the pipeline was last modified` |
-> | `quantity` | `integer` | `deprecated` |
-> | `stripe_subscription_id` | `string` | `` |
-> | `name` | `string` | `string` |
-> | `rabbit_payload_successful` | `integer` | `Deprecated` |
-> | `primary_job_id` | `integer` | `Deprecated` |
-> | `pipeline` | `string` or `null` | `Deprecated` |
-> | `invalid_subscription` | `null` | `Deprecated` |
-> | `invalidated_at` | `null` | `Deprecated` |
-> | `notified_at` | `null` | `Deprecated` |
-> | `canonical_name` | `string` | `Deprecated` |
-> | `account_id` | `integer` | `Account id the pipeline subscription is associated with` |
-> | `product_id` | `integer` | `Product id the pipeline subscription is associated with` |
-> | `product_plan_id` | `integer` | `Deprecated` |
-> | `remote_identity_id` | `integer` or `null` | `The remote identity id the pipeline subscription is associated with` |
-> | `storage_group_id` | `integer` | `The storage group id where the collected data is stored.` |
-> | `user_id` | `string` | `The user id that the subscription pipeline is associated with` |
-> | `history_requested` | `string` | `Deprecated` |
-> | `unique_hash` | `string` | `A required unique hash of the subscription product meta key value pairs` |
+| name | data type | description |
+|-|-|-|
+| `price` | `double` | `` |
+| `status` | `string` | `` |
+| `date_start` | `datetime string` | `` |
+| `date_end` | `datetime string` | `` |
+| `auto_renew` | `booelean integer` | `depricated` |
+| `created_at` | `string` | `Datetime the pipeline was created` |
+| `modified_at` | `string` | `Datetime the pipeline was last modified` |
+| `quantity` | `integer` | `deprecated` |
+| `stripe_subscription_id` | `string` | `` |
+| `name` | `string` | `string` |
+| `rabbit_payload_successful` | `integer` | `Deprecated` |
+| `primary_job_id` | `integer` | `Deprecated` |
+| `pipeline` | `string` or `null` | `Deprecated` |
+| `invalid_subscription` | `null` | `Deprecated` |
+| `invalidated_at` | `null` | `Deprecated` |
+| `notified_at` | `null` | `Deprecated` |
+| `canonical_name` | `string` | `Deprecated` |
+| `account_id` | `integer` | `Account id the pipeline subscription is associated with` |
+| `product_id` | `integer` | `Product id the pipeline subscription is associated with` |
+| `product_plan_id` | `integer` | `Deprecated` |
+| `remote_identity_id` | `integer` or `null` | `The remote identity id the pipeline subscription is associated with` |
+| `storage_group_id` | `integer` | `The storage group id where the collected data is stored.` |
+| `user_id` | `string` | `The user id that the subscription pipeline is associated with` |
+| `history_requested` | `string` | `Deprecated` |
+| `unique_hash` | `string` | `A required unique hash of the subscription product meta key value pairs` |
 
 
 </details>
@@ -1039,9 +1231,9 @@ The response will contain many deprecated fields, and will not include the `subs
 
 This example holds the state that is needed during the Oauth request for a Facebook identity
 
-> ```curl
-> curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://subscriptions.api.openbridge.io/sub/{id}'
-> ```
+```curl
+ curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://subscriptions.api.openbridge.io/sub/{id}'
+```
 
 ##### Example Response
 
@@ -1051,87 +1243,87 @@ The response includes the id/token and the timestamps the state was created at. 
 
 The response will contain many deprecated fields, and will not include the `subscription_product_meta` array. 
 
-> ```json
-> {
-> "data": {
->  "type": "Subscription",
->  "id": "XXXXX",
->  "attributes": {
->  "price": 0.0,
->  "status": "active",
->  "date_start": "2023-01-31T11:54:45",
->  "date_end": "2023-01-31T11:54:45",
->  "auto_renew": 1,
->  "created_at": "2023-01-31T11:54:48.889618",
->  "modified_at": "2023-01-31T11:54:48.889633",
->  "quantity": 1,
->  "stripe_subscription_id": "",
->  "name": "Openbridge Orders ",
->  "rabbit_payload_successful": 0,
->  "primary_job_id": null,
->  "pipeline": null,
->  "invalid_subscription": 0,
->  "invalidated_at": null,
->  "notified_at": null,
->  "canonical_name": null,
->  "account_id": "XXX",
->  "product_id": 53,
->  "product_plan_id": null,
->  "remote_identity_id": "AAA",
->  "storage_group_id": "ZZZ",
->  "user_id": "YYY",
->  "history_requested": 0,
->  "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
->  },
->  "relationships": {
->  "account": {
->   "data": {
->   "type": "Account",
->   "id": "342"
->   }
->  },
->  "product": {
->   "data": {
->   "type": "Product",
->   "id": "2"
->   }
->  },
->  "product_plan": {
->   "data": null
->  },
->  "remote_identity": {
->   "data": {
->   "type": "RemoteIdentity",
->   "id": "364"
->   }
->  },
->  "storage_group": {
->   "data": {
->   "type": "StorageGroup",
->   "id": "245"
->   }
->  },
->  "user": {
->   "data": {
->   "type": "User",
->   "id": "309"
->   }
->  }
->  }
-> },
-> "included": [
->  {
->  "type": "StorageGroup",
->  "id": "245",
->  "attributes": {
->   "product_id": 37,
->   "name": "asdfasdfads",
->   "key_name": "984e7c5f47fea2a0-asdfasdfads"
->  }
->  }
-> ]
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "id": "XXXXX",
+    "attributes": {
+      "price": 0.0,
+      "status": "active",
+      "date_start": "2023-01-31T11:54:45",
+      "date_end": "2023-01-31T11:54:45",
+      "auto_renew": 1,
+      "created_at": "2023-01-31T11:54:48.889618",
+      "modified_at": "2023-01-31T11:54:48.889633",
+      "quantity": 1,
+      "stripe_subscription_id": "",
+      "name": "Openbridge Orders ",
+      "rabbit_payload_successful": 0,
+      "primary_job_id": null,
+      "pipeline": null,
+      "invalid_subscription": 0,
+      "invalidated_at": null,
+      "notified_at": null,
+      "canonical_name": null,
+      "account_id": "XXX",
+      "product_id": 53,
+      "product_plan_id": null,
+      "remote_identity_id": "AAA",
+      "storage_group_id": "ZZZ",
+      "user_id": "YYY",
+      "history_requested": 0,
+      "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
+    },
+    "relationships": {
+      "account": {
+        "data": {
+          "type": "Account",
+          "id": "342"
+        }
+      },
+      "product": {
+        "data": {
+          "type": "Product",
+          "id": "2"
+        }
+      },
+      "product_plan": {
+        "data": null
+      },
+      "remote_identity": {
+        "data": {
+          "type": "RemoteIdentity",
+          "id": "364"
+        }
+      },
+      "storage_group": {
+        "data": {
+          "type": "StorageGroup",
+          "id": "245"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "309"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "StorageGroup",
+      "id": "245",
+      "attributes": {
+        "product_id": 37,
+        "name": "asdfasdfads",
+        "key_name": "984e7c5f47fea2a0-asdfasdfads"
+      }
+    }
+  ]
+}
+```
 </details>
 
 <details>
@@ -1150,23 +1342,23 @@ The rules for these fields are the same as in the `POST` method.
 
 ##### Example Payload
 
-> ```json
-> {
-> "data": {
->  "type": "Subscription",
->  "id": "XXXXX",
->  "attributes": {
->  "status": "active"
->  }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "id": "XXXXX",
+    "attributes": {
+      "status": "active"
+    }
+ }
+```
 
 ##### Headers
 
-> | name | data type | description |
-> |-|-|-|
-> | `Authorization` | `string` | `Openbridge JWT, passed as a authorization bearer type`
-> | `Content-Type` | `string` | `application/json`
+| name | data type | description |
+|-|-|-|
+| `Authorization` | `string` | `Openbridge JWT, passed as a  authorization bearer type`
+| `Content-Type` | `string` | `application/json`
 
 
 ##### Parameter
@@ -1177,103 +1369,103 @@ The rules for these fields are the same as in the `POST` method.
 
 ##### Response
 
-> | http code | content-type | response |
-> |-|-|-|
-> | `200` | `application/json` | `OK` |
+| http code | content-type | response |
+|-|-|-|
+| `200` | `application/json` | `OK` |
 
 ##### Example cURL
 
 This example holds the subscription patch object to update the status to `cancelled`
 
-> ```curl
-> curl -H "Content-Type: application/json" -H "authorization: Bearer eyJh..." -X PATCH -d '{"data": { "type": "Subscription", "id": "XXXXXXXX", "attributes": { "status": "cancelled" }}}' https://subscriptions.api.openbridge.io/sub/XXXXXXXX
-> ```
+```curl
+ curl -H "Content-Type: application/json" -H "authorization: Bearer eyJh..."  -X PATCH -d '{"data": { "type": "Subscription", "id": "XXXXXXXX", "attributes": { "status": "cancelled" }}}' https://subscriptions.api.openbridge.io/sub/XXXXXXXX
+```
 
 ##### Example Response
 
 The response is the same as in the `POST` method, with the patched field updated to the new value.
 
-> ```json
-> {
-> "data": {
->  "type": "Subscription",
->  "id": "XXXXX",
->  "attributes": {
->  "price": 0.0,
->  "status": "cancelled",
->  "date_start": "2023-01-31T11:54:45",
->  "date_end": "2023-01-31T11:54:45",
->  "auto_renew": 1,
->  "created_at": "2023-01-31T11:54:48.889618",
->  "modified_at": "2023-01-31T11:54:48.889633",
->  "quantity": 1,
->  "stripe_subscription_id": "",
->  "name": "Openbridge Orders ",
->  "rabbit_payload_successful": 0,
->  "primary_job_id": null,
->  "pipeline": null,
->  "invalid_subscription": 0,
->  "invalidated_at": null,
->  "notified_at": null,
->  "canonical_name": null,
->  "account_id": XXX,
->  "product_id": 53,
->  "product_plan_id": null,
->  "remote_identity_id": AAA,
->  "storage_group_id": ZZZ,
->  "user_id": YYY,
->  "history_requested": 0,
->  "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
->  },
->  "relationships": {
->  "account": {
->   "data": {
->   "type": "Account",
->   "id": "342"
->   }
->  },
->  "product": {
->   "data": {
->   "type": "Product",
->   "id": "2"
->   }
->  },
->  "product_plan": {
->   "data": null
->  },
->  "remote_identity": {
->   "data": {
->   "type": "RemoteIdentity",
->   "id": "364"
->   }
->  },
->  "storage_group": {
->   "data": {
->   "type": "StorageGroup",
->   "id": "245"
->   }
->  },
->  "user": {
->   "data": {
->   "type": "User",
->   "id": "309"
->   }
->  }
->  }
-> },
-> "included": [
->  {
->  "type": "StorageGroup",
->  "id": "245",
->  "attributes": {
->   "product_id": 37,
->   "name": "asdfasdfads",
->   "key_name": "984e7c5f47fea2a0-asdfasdfads"
->  }
->  }
-> ]
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "Subscription",
+    "id": "XXXXX",
+    "attributes": {
+      "price": 0.0,
+      "status": "cancelled",
+      "date_start": "2023-01-31T11:54:45",
+      "date_end": "2023-01-31T11:54:45",
+      "auto_renew": 1,
+      "created_at": "2023-01-31T11:54:48.889618",
+      "modified_at": "2023-01-31T11:54:48.889633",
+      "quantity": 1,
+      "stripe_subscription_id": "",
+      "name": "Openbridge Orders ",
+      "rabbit_payload_successful": 0,
+      "primary_job_id": null,
+      "pipeline": null,
+      "invalid_subscription": 0,
+      "invalidated_at": null,
+      "notified_at": null,
+      "canonical_name": null,
+      "account_id": XXX,
+      "product_id": 53,
+      "product_plan_id": null,
+      "remote_identity_id": AAA,
+      "storage_group_id": ZZZ,
+      "user_id": YYY,
+      "history_requested": 0,
+      "unique_hash": "[\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"]"
+    },
+    "relationships": {
+      "account": {
+        "data": {
+          "type": "Account",
+          "id": "342"
+        }
+      },
+      "product": {
+        "data": {
+          "type": "Product",
+          "id": "2"
+        }
+      },
+      "product_plan": {
+        "data": null
+      },
+      "remote_identity": {
+        "data": {
+          "type": "RemoteIdentity",
+          "id": "364"
+        }
+      },
+      "storage_group": {
+        "data": {
+          "type": "StorageGroup",
+          "id": "245"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "309"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "StorageGroup",
+      "id": "245",
+      "attributes": {
+        "product_id": 37,
+        "name": "asdfasdfads",
+        "key_name": "984e7c5f47fea2a0-asdfasdfads"
+      }
+    }
+  ]
+}
+```
 
 </details>
 
@@ -1282,19 +1474,19 @@ The response is the same as in the `POST` method, with the patched field updated
 ---
 Openbridge's Selling Partner products all use the same payload, the difference is product ID sent in the subscription object, and in the subscription_product_meta array objects,
 
-> | id | product name |
-> |-|-|
-> | `53` | `Orders API` |
-> | `55` | `Finance Real-Time` |
-> | `56` | `Inbound Fulfillment` |
-> | `57` | `Settlement Reports` |
-> | `58` | `Fulfillment` |
-> | `59` | `Inventory Real-Time` |
-> | `60` | `Inventory` |
-> | `61` | `Sales Reports` |
-> | `62` | `Fees` |
-> | `64` | `Sales & Traffic` |
-> | `65` | `Seller Brand Analytics Reports` |
+| id | product name |
+|-|-|
+| `53` | `Orders API` |
+| `55` | `Finance Real-Time` |
+| `56` | `Inbound Fulfillment` |
+| `57` | `Settlement Reports` |
+| `58` | `Fulfillment` |
+| `59` | `Inventory Real-Time` |
+| `60` | `Inventory` |
+| `61` | `Sales Reports` |
+| `62` | `Fees` |
+| `64` | `Sales & Traffic` |
+| `65` | `Seller Brand Analytics Reports` |
 
 ## State API.
 
@@ -1307,25 +1499,25 @@ The payload schema for creating a state token. The `type` is always `ClientState
 
 ###### Payload Schema.
 
-> ```json
-> {
-> data: {
-> type: string;
-> attributes: {
->  state: object
-> }
-> }
-> }
-> ```
+```json
+{
+ data: {
+   type: string;
+   attributes: {
+     state: object
+   }
+ }
+}
+```
 
 ##### Headers
 
-> | name  |  data type    | description               |
-> |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Content-Type  | string | application/json
+| name | data type | description |
+|-----------|------------------------------------|-----------------------------------------------------------------------|
+| Content-Type | string  | application/json |
 
 ##### Parameters
-> The POST method does not require any parameters. 
+The POST method does not require any parameters. 
 
 ##### Responses
 
@@ -1337,9 +1529,9 @@ The payload schema for creating a state token. The `type` is always `ClientState
 
 This example holds the state that is needed during the Oauth request for a Facebook identity
 
-> ```curl
-> curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "XXX", "user_id": "YYY", "remote_identity_type_id": 2, "region": "global", "return_url": "https://app.openbridge.com/wizards/facebook-page-insights", "shop_url": null }}}}' https://state.api.openbridge.io/state/oauth
-> ```
+```curl
+ curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "XXX", "user_id": "YYY", "remote_identity_type_id": 2, "region": "global", "return_url": "https://app.openbridge.com/wizards/facebook-page-insights", "shop_url": null }}}}' https://state.api.openbridge.io/state/oauth
+```
 
 **Note**: The example payload contains information required by the Openbridge Oauth API to start and manage a Facebook Authorization, but it is not restricted to only those key/value pairs. You could for example include your own key/value pair to help with maintaining the state of your application through the identity process.
 
@@ -1347,27 +1539,27 @@ This example holds the state that is needed during the Oauth request for a Faceb
 
 The response includes the id/token and the timestamps the state was created at.
 
-> ```json
-> {
-> "data": {
->  "type": "ClientState",
->  "id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
->  "attributes": {
->  "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
->  "created_at": "2023-01-26T11:01:03.918717",
->  "modified_at": "2023-01-26T11:01:03.918793",
->  "state": {
->   "account_id": "XXX",
->   "user_id": "XXX",
->   "remote_identity_type_id": 2,
->   "region": "global",
->   "return_url": "https://app.openbridge.com/wizards/facebook-page-insights",
->   "shop_url": null
->  }
->  }
-> }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "attributes": {
+      "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "created_at": "2023-01-26T11:01:03.918717",
+      "modified_at": "2023-01-26T11:01:03.918793",
+      "state": {
+        "account_id": "XXX",
+        "user_id": "XXX",
+        "remote_identity_type_id": 2,
+        "region": "global",
+        "return_url": "https://app.openbridge.com/wizards/facebook-page-insights",
+        "shop_url": null
+      }
+    }
+  }
+}
+```
 
 **Note**: From the response the id and Token will always be the same.
 
@@ -1378,49 +1570,49 @@ The response includes the id/token and the timestamps the state was created at.
 
 ##### Parameters
 
-> | name    | required  | data type  | description       |
-> |-------------------|-----------|----------------|-------------------------------------|
-> | `id/token` | `yes` | `string` | `The id/token of the desired state record` |
+| name              |  required     | data type      | description                         |
+|-------------------|-----------|----------------|-------------------------------------|
+| `id/token` |  `yes` | `string`   | `The id/token of the desired state record`    |
 
 ##### Responses
 
-> | http code  | content-type      | response               |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`   | `application/json`  | `OK`        |
+| http code     | content-type                      | response                                                            |
+|---------------|-----------------------------------|---------------------------------------------------------------------|
+| `200`         | `application/json`        | `OK`                                |
 
 ##### Example cURL
 
 This example holds the state that is needed during the Oauth request for a Facebook identity
 
-> ```curl
-> curl -X GET https://state.api.openbridge.io/state/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+```curl
+ curl -X GET https://state.api.openbridge.io/state/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
-> ```
+```
 
 ##### Example Response
 
 The response includes the id/token and the timestamps the state was created at. This is the same as the response received from a POST call above. Assuming we requested it's token. The response is that of a state that holds an object used to create a Facebook identity.
 
-> ``````json
-> {
-> "data": {
->  "type": "ClientState",
->  "id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
->  "attributes": {
->  "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
->  "created_at": "2023-01-26T11:01:03.918717",
->  "modified_at": "2023-01-26T11:01:03.918793",
->  "state": { }
->   "account_id": "XXX",
->   "user_id": "XXX",
->   "remote_identity_type_id": 2,
->   "region": "global",
->   "return_url": "https://app.openbridge.com/wizards/facebook-page-insights",
->   "shop_url": null
->  }
->  }
-> }
-> ```
+```json
+{
+  "data": {
+    "type": "ClientState",
+    "id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "attributes": {
+      "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "created_at": "2023-01-26T11:01:03.918717",
+      "modified_at": "2023-01-26T11:01:03.918793",
+      "state": { }
+        "account_id": "XXX",
+        "user_id": "XXX",
+        "remote_identity_type_id": 2,
+        "region": "global",
+        "return_url": "https://app.openbridge.com/wizards/facebook-page-insights",
+        "shop_url": null
+      }
+    }
+  }
+```
 
 </details>
 
