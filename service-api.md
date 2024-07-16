@@ -961,8 +961,11 @@ This endpoint is used to get the shopify shop meta information.
   <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/healthchecks/production/healthchecks/account/{{account_id}}</b></code></summary>
 
   The healthchecks endpoint is used for querying information about the health of active pipelines.
-  
-  **Note**: An important note is that Openbridge only updates healthcheck data once every four hours, therefore, API users should not query healthcheck data on a given subscription more than once every 4 hours. 
+
+  **Note**: Calling this endpoint without a subscription ID will result in a return for all active subscriptions on the associated account.
+
+  **Important Note**: Please note is that Openbridge only updates healthcheck data once every four hours, therefore, API users should not query healthcheck data more than once every 4 hours.
+
 
 ##### Headers
 
