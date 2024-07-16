@@ -37,6 +37,7 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - [Best Practices](#best-practices)
 - [Identity Health](#identity-health)
 - [API Error Handling Guide](#api-error-handling-guide)
+- [Frequently Asked Questions](#frequently-asked-questions)
 
 
 # Getting Started
@@ -1765,3 +1766,8 @@ Before you start to code, we recommend discussing your plans through a GitHub is
 * https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13
 * https://developer-docs.amazon.com/sp-api/
 * https://advertising.amazon.com/API/docs/en-us/
+
+# Frequently Asked Questions
+
+## How do I get profile information associated with a remote identity.
+Openbridge does not store profile tied to remote identities.  Instead during the creation process we query third-party APIs through our service API based on a product. If you need to know what remote identity is tied to a third-party profile. The remote identity id can be found in the subscription pipeline record tied to that third-party profile.
