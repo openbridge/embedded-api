@@ -3,8 +3,8 @@
 This document provides information required when creating subscriptions for Openbridge products.
 
 - [Amazon Advertising Products](#amazon-advertising-products)
-  - [Amazon Advertizing (SB/SD)](#amazon-advertizing-sbsd)
-  - [Amazon Advertizing (SP)](#amazon-advertizing-sp)
+  - [Amazon	Sponsored Ads (V2)](#amazon-sponsored-ads-v2)
+  - [Amazon	Sponsored Ads (V3)](#amazon-sponsored-ads-v3)
   - [Amazon Advertising Brand Metrics](#amazon-advertising-brand-metrics)
   - [Amazon Attribution](#amazon-attribution)
   - [Amazon DSP](#amazon-dsp)
@@ -56,7 +56,7 @@ This document provides information required when creating subscriptions for Open
 
 These products pull reports from resources attributed to the Amazon Advertising API.
 
-### Amazon Advertizing (SB/SD)
+### Amazon	Sponsored Ads (V2)
 
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
@@ -78,7 +78,7 @@ __Required Subscription Product Meta__
 > | type | `STRING` | The Amazon Advertising account type associated with the profile. |
 
 
-### Amazon Advertizing (SP)
+### Amazon	Sponsored Ads (V3)
 This product requires a call to the service API to get the requisit information for the subscription product meta.
 
 The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
