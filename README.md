@@ -1638,8 +1638,8 @@ https://remote-identity.api.openbridge.io/sri?invalid_identity=1
 
 # Frequently Asked Questions
 
-## How do I determine if an Amazon Seller has a unified or multi-market account?
-### GET /sp/marketplaces
+### How do I determine if an Amazon Seller has a unified or multi-market account?
+#### GET /sp/marketplaces
 To determine if a Seller has a unified account, you can call the API with the remote identity in question. If you get a list of more than one market returned, it is almost certainly a unified/multi-market account. In this case, rather than setting up a subscription for each country, you just needed one for that identity. We are still making a request for each country, but doing so under the unified account.
 
 Here is an example request:
@@ -1774,6 +1774,11 @@ In the response, you can see the list of associated markets:
  ]
 }
 ```
+
+### How do I get profile information associated with a remote identity.
+Openbridge does not store profile tied to remote identities.  Instead during the creation process we query third-party APIs through our service API based on a product. If you need to know what remote identity is tied to a third-party profile. The remote identity id can be found in the subscription pipeline record tied to that third-party profile.
+
+
 
 ## API Error Handling Guide
 Proper error handling is essential for ensuring smooth interactions and resolving issues promptly. Please look at the following guidelines when handling errors in your application.
@@ -1958,8 +1963,3 @@ Before you start to code, we recommend discussing your plans through a GitHub is
 * https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13
 * https://developer-docs.amazon.com/sp-api/
 * https://advertising.amazon.com/API/docs/en-us/
-
-# Frequently Asked Questions
-
-## How do I get profile information associated with a remote identity.
-Openbridge does not store profile tied to remote identities.  Instead during the creation process we query third-party APIs through our service API based on a product. If you need to know what remote identity is tied to a third-party profile. The remote identity id can be found in the subscription pipeline record tied to that third-party profile.
