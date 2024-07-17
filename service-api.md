@@ -1059,7 +1059,7 @@ This example is for requesting one day of health check data for January 24, 2024
 
 ### Product Payloads
 <details>
-  <summary><code>GET</code> <code><b>https://service.api.dev.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000</b></code></summary>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/products/production/product/{{product_id}}/payloads?stage_id__gte=1000</b></code></summary>
 
   The healthchecks endpoint is used for querying information about the health of active pipelines.  Part of the URL 
 
@@ -1130,7 +1130,7 @@ Please note the `First`,`Last`,`Previous`, and `Next` URLs are unusable from the
 This example is for requesting stage data for Amazon Orders API
 
 > ```curl
->  curl -H "Content-Type: application/json" -X GET  https://service.api.dev.openbridge.io/service/products/production/product/53/payloads?stage_id__gte=1000
+>  curl -H "Content-Type: application/json" -X GET  https://service.api.openbridge.io/service/products/production/product/53/payloads?stage_id__gte=1000
 > ```
 </details>
 
