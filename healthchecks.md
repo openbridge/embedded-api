@@ -18,11 +18,10 @@ ob_access_token = "YOUR_ACCESS_TOKEN"  # This should be the token used to access
 account_id = "YOUR_ACCOUNT_ID"
 
 # Request only healthchecks from the last 24 hours
-yesterday = datetime.now() - timedelta(days=1)
-yesterday = yesterday.strftime("%Y-%m-%d %H:%M:%S")
+yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 
 headers = {"Authorization": "Bearer " + ob_access_token}
-resp = requests.get(f"https://service.api.openbridge.io/service/healthchecks/production/healthchecks/account/{account_id}?status=ERROR&modified_at__gte={yesterday}", headers=headers)
+resp = requests.get(f"https://service.api.openbridge.io/service/healthchecks/production/healthchecks/account/{account_id}?status=ERROR&page_size=100&modified_at__gte={yesterday}", headers=headers)
 resp.raise_for_status()
 response_body = resp.json()
 healthchecks = response_body['results']
@@ -34,12 +33,11 @@ while response_body['links']['next']:
 	healthchecks.extend(response_body.get('results', []))
 
 # Split healthchecks by subscription ID
-grouped_alerts = {}
+healthchecks_by_sub = {}
 for subscription_id, results in groupby(healthchecks, key=lambda x: x['subscription_id']):
-    grouped_healthchecks[subscription_id] = list(results)
+    healthchecks_by_sub[subscription_id] = list(results)
 
-# grouped_healthchecks is now a simple JSON object split by subscription ID
-
+# healthchecks_by_sub is now a simple JSON object split by subscription ID
 ```
 
-From this point, any number of actions can be taken using the `grouped_healthchecks` object. One option is to cache the results so they can be retrieved at will during the four hour window before healthchecks are updated again.
+From this point, any number of actions can be taken using the `healthchecks_by_sub` object. One option is to cache the results so they can be retrieved at will during the four hour window before healthchecks are updated again.
