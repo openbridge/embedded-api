@@ -16,11 +16,11 @@ from itertools import groupby
 
 ob_access_token = "YOUR_ACCESS_TOKEN"  # This should be the token used to access our APIs
 account_id = "YOUR_ACCOUNT_ID"
+yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 hc_url = f"https://service.api.openbridge.io/service/healthchecks/production/healthchecks/account/{account_id}"
 query_string = f"?status=ERROR&page_size=100&modified_at__gte={yesterday}"  # This can be modified to your needs
 
 # Request only healthchecks from the last 24 hours
-yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 headers = {"Authorization": "Bearer " + ob_access_token}
 resp = requests.get(hc_url + query_string, headers=headers)
 resp.raise_for_status()
@@ -33,6 +33,7 @@ while response_body['links']['next']:
 	resp.raise_for_status()
 	response_body = resp.json()
 	healthchecks.extend(response_body.get('results', []))
+    
 
 # Split healthchecks by subscription ID
 healthchecks_by_sub = {}
