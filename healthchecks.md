@@ -29,10 +29,10 @@ healthchecks = response_body['results']
 
 # Paginate through any remaining healthchecks
 while response_body['links']['next']:
-	resp = requests.get(response_body['links']['next'], headers=headers)
-	resp.raise_for_status()
-	response_body = resp.json()
-	healthchecks.extend(response_body.get('results', []))
+    resp = requests.get(response_body['links']['next'], headers=headers)
+    resp.raise_for_status()
+    response_body = resp.json()
+    healthchecks.extend(response_body.get('results', []))
     
 
 # Split healthchecks by subscription ID
