@@ -306,7 +306,9 @@ Let's build out the payloads for the 2 above products to see how it's done.  We'
 
 **Note**: Some of the parameters are depricated but require, please reference the API documentation on what default values to set for these fields.
 
-For the 2 examples we will set both `account` and `user` to the value of `1`. This is the `user id` and `account id` the pipeline subscription will be associated with.  Please make sure to use the `user id` and `account id` associated with your account and user, and we'll also set `storage_group` to `1` as that is going to be the `storage group id` for our subscriptions.  The storage group is a reference destination that your data will be stored in.
+For the 2 examples we will set both `account` and `user` to the value of `1`. This is the `user id` and `account id` the pipeline subscription will be associated with.  Please make sure to use the `user id` and `account id` associated with your account and user, and we'll also set `storage_group` to `1` as that is going to be the `storage group id` for our subscriptions.  The storage group is a reference destination that your data will be stored in.  In order to get the `storage_group_id` associated with your destinatino you should first query the [subscription API](https://github.com/openbridge/embedded-api/blob/main/README.md#subscription-api) with the subscription ID of the subscription of your destination.
+
+If the subscription ID for your destination was `1000`, then you would do an HTTP get request for that subscription.  Inside the payload is the `storage_group_id`.  Use that for all sources that you want to go to this particular destination. 
 
 ### Example 1
 
