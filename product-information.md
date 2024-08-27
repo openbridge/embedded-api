@@ -3,7 +3,6 @@
 This document provides information required when creating subscriptions for Openbridge products.
 
 - [Amazon Advertising Products](#amazon-advertising-products)
-  - [Amazon	Sponsored Ads (V2)](#amazon-sponsored-ads-v2)
   - [Amazon	Sponsored Ads (V3)](#amazon-sponsored-ads-v3)
   - [Amazon Advertising Brand Metrics](#amazon-advertising-brand-metrics)
   - [Amazon Attribution](#amazon-attribution)
@@ -55,28 +54,6 @@ This document provides information required when creating subscriptions for Open
 ## Amazon Advertising Products
 
 These products pull reports from resources attributed to the Amazon Advertising API.
-
-### Amazon	Sponsored Ads (V2)
-
-This product requires a call to the service API to get the requisit information for the subscription product meta.
-
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles) endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `marketplace`, and `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the brand endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
-
-__Product Attributes__
-> | Key | Value |
-> |-|-|
-> | Product ID | 40 |
-> | Remote Identity Type ID | 14 |
-
-__Required Subscription Product Meta__
-> | Data Key | Data Format Value | Data Value |
-> |-|-|-|
-> | kdp_state | `STRING` | Value is always `default`, |
-> | marketplace | `STRING` | Value is country code from the associated profile. |
-> | profile_id | `STRING` | Associated profile ID. |
-> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | type | `STRING` | The Amazon Advertising account type associated with the profile. |
-
 
 ### Amazon	Sponsored Ads (V3)
 This product requires a call to the service API to get the requisit information for the subscription product meta.
