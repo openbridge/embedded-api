@@ -954,7 +954,68 @@ This endpoint is used to get the shopify shop meta information.
 >```
 </details>
 
-## Openbridge API Proxies
+## Openbridge
+
+### Product Stage ID
+<details>
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/products/product/{{product_id}}/payloads?stage_id__gte=1000</b></code></summary>
+
+  Stage IDs are used to manage what kind of data comes through on a given subscription.  Some users may want all data from all datasets, while others may only need a subset of data.  Limiting to a subset of data can reduce the chances of getting rate limited by a third party API.
+
+  ##### Headers
+
+  > | name | data type | description                                                           |
+  > |-|-|-|
+  > | Content-Type | string | application/json
+  > | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+
+  ##### Parameters
+
+  > | parameter | required | description |
+  > |-|-|-|
+  > | stage_id__gte | `TRUE` | This parameter is required and must be set to a value of 1000
+
+  > | http code | content-type | response |
+  > |-|-|-|
+  > | `200` | `application/json` | `OK` |
+
+  #### Response Example
+
+  Please note the `First`,`Last`,`Previous`, and `Next` URLs are unusable from the outside world.  You must generate the next and previous URLs based on page that you are currently on manually.
+
+  
+
+  ```
+{
+  "links": {
+    "first": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "last": "https://55anmbidzh.execute-api.us-east-1.amazonaws.com/product/57/payloads?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Credential=ASIAVIA2REQV3GMWZ76G%2F20240508%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20240508T132023Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIBaDZdHncY%2FxMZm1mUMmR2hxr4j9YepYeqb8EcTOXOM8AiAZc%2FdNPaXzuy5WQTxaqp5M5Tiaabg%2FpwKuHBMmsx787ir7Agjt%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDM2MDgzMjkwMjE4NyIMjGVeYVqEeH5RgvvtKs8CZKysCemifK0yFjaBQDoUB1vRwGfhV5qb9iCtQ2rF9ruoho%2FlViIZHIHeqd9uV%2BMEChB7kTa9%2Bi5UR%2B5xu4YQQL6el6dcz6%2Fn6mNtQIrtqZMVFWrB6c68u%2BYh3ggUKnx6UZSdU0zWkCQJ7%2BCWZI1q8Q3%2BUyMv6j4WdANf9tzfDGCQ7yxdbkBRS8JcrgQ8sfBOBXmhcIHGlHYma1dQRGPDOxAaxshEEgoQWgr3y6CZ3NKHJq0UssKqmsPO7cQIzvvrxZU2wiEApWx8ABNtRcv0cgNUqclvGKiCI0rknkv6jdCK%2BYk4Q%2BmPpxEPr8G0ZoqImD4QhkpPgtA1Iv17aFrwSZ0%2Fgm457yo5KY9zw1gqauEf1TErx3vJjSDyzT%2FUewT0wn%2BNbLtej2vdGBSEQubuooCFu8bBU1xk%2BPz8ePU3P0skVUBcvgUU%2FX44JQod4Nswqc3tsQY6nwFli4si8b1ZOl0Cnc9xMmGZYt8gytcPAir9890jXFAfoz4t4yPyNMZ0eJu%2BUOc1t7yHOGXFL2SvIsvgWA00bBLPIXyMb4IYqXygGWguni1nnr72Gn%2BmG7tMzZGYt4PIwNby%2FSAUCEzEDnpfpztvZ3Bls%2FeGHOmLx%2FcI%2FP0GR8zIk7MpocVvtNiKuv0AJwfZIUX69uZwmfc1320Yu4ZGh1E%3D&X-Amz-Signature=b6b1759feb329196244134b9acfb5bef944f951aa1771243a9ac989b6411d18d&X-Amz-SignedHeaders=host&page=1&stage_id__gte=1000",
+    "next": "",
+    "prev": ""
+  },
+  "data": [
+    {
+      "type": "Product",
+      "id": "2958",
+      "attributes": {
+        "name": "sp_settlements", // the name of the dataset
+        "created_at": "2024-05-03T13:36:40.156426",
+        "modified_at": "2024-05-03T13:36:40.185841",
+        "stage_id": 1000 // the stage id associated with the dataset
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 1
+    }
+  }
+  ```
+</details>
+
+
 
 ### Healthchecks Query
 <details>
@@ -963,7 +1024,6 @@ This endpoint is used to get the shopify shop meta information.
   The healthchecks endpoint is used for querying information about the health of active pipelines.
 
   **Important Note**: Please note is that Openbridge only updates healthcheck data once every four hours, therefore, API users should not query healthcheck data more than once every 4 hours.
-
 
 ##### Headers
 
