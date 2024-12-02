@@ -983,8 +983,6 @@ This endpoint is used to get the shopify shop meta information.
 
   Please note the `First`,`Last`,`Previous`, and `Next` URLs are unusable from the outside world.  You must generate the next and previous URLs based on page that you are currently on manually.
 
-  
-
   ```
 {
   "links": {
