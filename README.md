@@ -475,7 +475,7 @@ If you want to turn off a pipeline either permentantly or temporarily you need c
 Pipeline Subscriptions are not deletable through the API.  Nor are they deletable through the Openbridge App.  Instead you must use the `PATCH` functionality to mark their status as `invalid`.  Once they are marked as `invalid` you will no longer see them in the Openbridge app interface. Pipeline subscriptions marked as `invalid` can be set to `active` or `cancelled` as long as there are no duplicate subscriptions that are in an `active` or `cancelled` status.
 
 ## Updating Subscriptions
-If you want to update an attribute of a pipeline subscriptionyou can use a PATCH request. Through the [Subscription API](#subscription-api) and is described in our API documentation.  It is important to note that when sending a PATCH request to the subscription API update that you always include the `status` field as part of the PATCH request.  Even if the `status` isn't changing.
+If you want to update an attribute of a pipeline subscription, you can use a PATCH request using the [Subscription API](#subscription-api) as described in our API documentation.  It is important to note that when sending a PATCH request to the subscription API update that you always include the `status` field as part of the PATCH request.  Even if the `status` isn't changing.
 
 For example if you want to update the `stage_ids` subscription_product_meta attribute to limit or increase the data you are receiving  the payload would be as below.
 
