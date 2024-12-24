@@ -1424,12 +1424,7 @@ The response will contain many deprecated fields, and will not include the `subs
 
 ##### Patchable Fields
 
-> | name | data type | description |
-> |-|-|-|
-> | `name` | `string` | `The name of the pipeline subscription record` |
-> | `status` | `string` | `The status of the pipeline subscription record` |
-
-The rules for these fields are the same as in the `POST` method.
+You can `PATCH` any of the fields that are submitted as part of a subscription `POST` request.  The rules for these fields are the same as in the `POST` method.  However, on a `PATCH` you must always include the `status` field even if the value isn't changed.  This tells our scheduler to reprocess the subscription with it's new values so the changes will take affect.
 
 ##### Example Payload
 
