@@ -10,6 +10,11 @@
 
 The Amazon Advertising DSP v3 pipeline subscription creation path is unique in that you can configure one of 2 different types of Ads acounts.  The first are DSP Ads accounts that are manage by the account holder.  We call these `Self-serve Ads Acccounts`.  The second are accounts that are managed entirely by Amazon.  We call these `Managed Ads Accounts`.  Their subscription payloads are similar, but the way to obtain the values for them require different calls to our Service API.
 
+## Product Meta
+|Name|Value|
+|-|-|
+|Product Id|85|
+|Remote Identity Type ID|14|
 
 ## Self-serve Ads Accounts
 
