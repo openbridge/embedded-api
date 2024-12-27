@@ -3,6 +3,7 @@
 Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embed the Openbridge API into their applications. Included are detailed information and examples here if you're looking to access specific data, manage identities, or handle authorizations.
 
 - [Getting started](#getting-started)
+  - [API support help]()
   - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
   - [API User Role](#api-user-role)
   - [Refresh Tokens](#refresh-tokens)
@@ -26,13 +27,16 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - [Identity Health](#identity-health)
 - [API Error Handling Guide](#api-error-handling-guide)
 - [Frequently Asked Questions](#frequently-asked-questions)
-- [Product Information](./product-information.md)
+- [Product Overview](./products/product-overview.md)
 
  - [Best Practices](#best-practices)
   - [Identity Health](#identity-health)
  - [API Error Handling Guide](#api-error-handling-guide)
 
 # Getting Started
+
+## API Support help.
+Have a problem with an API call or don't understand something with the documentation.  You can create a Github Issue in this repository for support.
 
 ## How do I get access to Openbridge APIs?
 To get access to use the Openbridge APIs requires a discussion with the Openbridge support. Please contact us via the official support portal to request access.
