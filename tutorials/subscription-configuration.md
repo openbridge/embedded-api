@@ -1,5 +1,17 @@
 # Pipeline Subscription Configuration
 
+## Table of contents
+- [Create Piepline Subscription](#create-pipeline-subscription)
+- [Limiting collected datasets in subscription](#limiting-collected-datasets-in-subscription)
+- [Pausing/Cancelling Pipeline Subscription](#pausing--cancelling-subscription-pipeline)
+- [Deleting Pipeline Subscription](#deleting-pipeline-subscription)
+- [Updating Pipeline Subscriptions](#updating-pipeline-subscriptions)
+
+<br>
+<br>
+<br>
+<br>
+
 ## Create Pipeline Subscription
 
 The process for creating a pipeline subscription is similar for every openbridge product.  Most products require an asscociated identity record.  Most products also require some information from third party APIs such as Amazon or Facebook.  This is why our wizards will always ask for them in that order.
@@ -201,39 +213,6 @@ Now to build out the meta attributes in [Sponsored Ads (v3)](./product-informati
 
 [Sponsored Ads (v3)](./product-information.md#amazon-sponsored-ads-v3) has instructions and links to the API documentation on what endpoint to use to get this value.
 
-## Pausing / Cancelling Subscription Pipeline.
-
-If you want to turn off a pipeline either permentantly or temporarily you need change the status of the record on file.  This is done with a patch request. Through the [Subscription API](#subscription-api) and is described in our API documentation.
-
-## Deleting Subscription Pipeline.
-
-Pipeline Subscriptions are not deletable through the API.  Nor are they deletable through the Openbridge App.  Instead you must use the `PATCH` functionality to mark their status as `invalid`.  Once they are marked as `invalid` you will no longer see them in the Openbridge app interface. Pipeline subscriptions marked as `invalid` can be set to `active` or `cancelled` as long as there are no duplicate subscriptions that are in an `active` or `cancelled` status.
-
-## Updating Subscriptions
-If you want to update an attribute of a pipeline subscription, you can use a PATCH request using the [Subscription API](#subscription-api) as described in our API documentation.  It is important to note that when sending a PATCH request to the subscription API update that you always include the `status` field as part of the PATCH request.  Even if the `status` isn't changing.
-
-For example if you want to update the `stage_ids` subscription_product_meta attribute to limit or increase the data you are receiving  the payload would be as below.
-
-```
-{
-  "data": {
-     "id": "XXXX"
-     "type": "Subscription",
-     "attributes": {
-       "status": "active",
-       "subscription_product_meta_attributes": [
-        {
-          "data_key": "stage_ids",
-          "data_value": "\[\"XXXX\",\"YYYY\",\"ZZZZZ\"\]",
-          "data_format": "STRING",
-          "data_id": "0",
-        }
-       ]
-     }
-  }
-}
-```
-
 ## Limiting collected datasets in subscription.
 
 You might find a need to limit what datasets you are collecting.  You may only need the data in one dataset, or you may be hitting API rate limits from one of the third party APIs used to collect data.  The method to limit what data is collected you must first use the service API to find out what `stages` are available for products from the [Service API Product Stage ID endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#product-stage-id).
@@ -282,4 +261,37 @@ Let's revisit example 1 from the creation process.  To limit the stages we add i
 }
 ```
 
-This tells the task manager what datasets to collect.  If you have older subscriptions that don't have stage_ids in the SPM, you can retroactively go back and edit them and add the stage_ids you want to collect for.
+This tells the task manager what datasets to collect. If you have older subscriptions that don't have stage_ids in the SPM, you can retroactively go back and edit them and add the stage_ids you want to collect for.
+
+## Pausing/Cancelling Pipeline Subscription
+
+If you want to turn off a pipeline either permentantly or temporarily you need change the status of the record on file.  This is done with a patch request. Through the [Subscription API](#subscription-api) and is described in our API documentation.
+
+## Deleting Pipeline Subscription.
+
+Pipeline Subscriptions are not deletable through the API.  Nor are they deletable through the Openbridge App.  Instead you must use the `PATCH` functionality to mark their status as `invalid`.  Once they are marked as `invalid` you will no longer see them in the Openbridge app interface. Pipeline subscriptions marked as `invalid` can be set to `active` or `cancelled` as long as there are no duplicate subscriptions that are in an `active` or `cancelled` status.
+
+## Updating Pipeline Subscriptions
+If you want to update an attribute of a pipeline subscription, you can use a PATCH request using the [Subscription API](#subscription-api) as described in our API documentation.  It is important to note that when sending a PATCH request to the subscription API update that you always include the `status` field as part of the PATCH request.  Even if the `status` isn't changing.
+
+For example if you want to update the `stage_ids` subscription_product_meta attribute to limit or increase the data you are receiving  the payload would be as below.
+
+```
+{
+  "data": {
+     "id": "XXXX"
+     "type": "Subscription",
+     "attributes": {
+       "status": "active",
+       "subscription_product_meta_attributes": [
+        {
+          "data_key": "stage_ids",
+          "data_value": "\[\"XXXX\",\"YYYY\",\"ZZZZZ\"\]",
+          "data_format": "STRING",
+          "data_id": "0",
+        }
+       ]
+     }
+  }
+}
+```

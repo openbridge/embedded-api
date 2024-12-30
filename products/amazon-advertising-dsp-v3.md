@@ -1,14 +1,14 @@
-
-- [Amazon Advertising DSP](#amazon-advertising-dsp)
-  - [Self-serve Ads Account](#self-serve-ads-accounts)
-    - [Self-serve example payload](#self-serve-example-payload)
-  - [Managed Ads Account](#managed-ads-accounts)
-    - [Managed example payload](#managed-example-payload)
-  - [Subscription Product Meta Attributes definitions](#subscription-product-meta-attributes-definitions)
-
 # Amazon Advertising DSP
-
 The Amazon Advertising DSP v3 pipeline subscription creation path is unique in that you can configure one of 2 different types of Ads acounts.  The first are DSP Ads accounts that are manage by the account holder.  We call these `Self-serve Ads Acccounts`.  The second are accounts that are managed entirely by Amazon.  We call these `Managed Ads Accounts`.  Their subscription payloads are similar, but the way to obtain the values for them require different calls to our Service API.
+
+
+## Table of contents
+
+- [Self-serve Ads Account](#self-serve-ads-accounts)
+  - [Self-serve example payload](#self-serve-example-payload)
+- [Managed Ads Account](#managed-ads-accounts)
+  - [Managed example payload](#managed-example-payload)
+- [Subscription Product Meta Attributes definitions](#subscription-product-meta-attributes-definitions)
 
 ## Product Meta
 |Name|Value|
@@ -190,42 +190,67 @@ The Managed Ads accounts require the following subscription_product_meta_attribu
 
 `remote_identity_id`: The remote identity associated with the DSP profile and accounts.
 
-`profile_id`: For `managed` DSP accounts this field should always be set to `NOT APPLICABLE`.  For `self-served` DSP accounts, this will be the Amazon advertising profile associated with the DSP ads account. To retrieve this value a request to the Serive API must be made.
+`profile_id`: For `managed` DSP accounts this field should always be set to `NOT APPLICABLE`.  For `self-served` DSP accounts, this will be the Amazon advertising profile associated with the DSP ads account. To retrieve this value a request to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With profile_types parameter set to `dsp`. 
 
-`account_id`: The DSP account ID. This value requires
+`account_id`: The DSP account ID. This value required for both types.
+  * For Managed accounts a call a request to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With `profile_types` parameter set to `dsp` and the `managed` parameter set to `true`. The `account_id` in the response is is labled `dsp_advertiser_id`.
+
+  ```
+  [
+    {
+        "id": "ENTITYXXXXXXXX",
+        "type": "AmazonAdvertisingAccount",
+        "attributes": {
+            "marketplace_id": "YYYYYYYYYYYY",
+            "name": "Advertiser Name",
+            "type": "DSP_ADVERTISING_ACCOUNT",
+            "profile_id": "",
+            "dsp_advertiser_id": "XXXXXXXXXXXXX"
+        }
+    },
+    ...
+  ]
+  ```
+
+  * For `self served` accounts, a call to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With `profile_types` parameter set to `dsp`.  The output response will provide both the `profile_id` as the `id` and the `account_id` as  the `account_info.id`.s
+
+  ```
+  {
+      "data": [
+          {
+              "id": XXXXXXXXXXXXX,
+              "type": "AmazonAdvertisingProfile",
+              "attributes": {
+                  "country_code": "US",
+                  "currency_code": "USD",
+                  "daily_budget": "",
+                  "timezone": "America/Los_Angeles",
+                  "account_info": {
+                      "id": "ENTITYXXXXXXXXXXX",
+                      "type": "AmazonAdvertisingProfileAccountInfo",
+                      "attributes": {
+                          "marketplace_country": "US",
+                          "marketplace_string_id": "XXXXXXXXXXXXX",
+                          "name": "Profile name",
+                          "type": "agency",
+                          "subType": "",
+                          "valid_payment_method": ""
+                      }
+                  }
+              }
+          }
+      ]
+  }
+  ```
 
 `managed`: This is a boolean value in string format.  For `managed` accounts the value should be `true`.  For `self-serve` it should be `false`.
 
 `advertiser_ids`: A list of advertiser IDS to collect data for.  The value is a stringified JSON array.  A `self-serve` account can collect data for multiple advertiser IDS.  However a `managed` account can only collect data for that managed account.
 
+  * For `self-served` accounts, a call to the []() endpoint on the service API will provide a list of available `advertiser_ids` associated with the given profile.
+
 `stage_ids`: Stage IDs define what metrics will be collected with the pipeline.  For Amazon Advertising DSP there are over 500 different combinations.  For this reason we provide two endpoints to sort out what data to collect.
 
-  * The first endpoint contains a map of the metric categories and their associated metrics.  You can use this map to build out interfaces to let your customers choose the metrics they desire.
+  * The [first service api endpoint](../service-api.md) contains a map of the metric categories and their associated metrics.  You can use this map to build out interfaces to let your customers choose the metrics they desire.
 
-  * The second endpoint contains a map of of catagory metrics to stage IDS.  Based on the desired metrics for a given category you can find the stage ID that is associated with that report. 
-
-# Below stuff...
-
-### Remote Identity
-The remote identity id, is a reference to the identity that has authentication credentials for the Amazon DSP account that the pipeline subscription is being created for.
-
-### Managed
-Amazon DSP is unique in that it can either be Amazon managed or not.  FOr self-managed the value should be `false`.
-
-### Profile ID
-For self managed advertiser accounts a profile ID must be provided.  To request a list of DSP profiles you need to make a call to an Openbridge Service API endpoint with the remote_identity_id as part of the endpoint request.
-
-https://service.api.openbridge.io/service/amzadv/profiles-only/{remote_identity_id}?profile_types=dsp
-
-FOr more information please check the information in the [Service API Documentation](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles)
-
-### Account ID
-
-### Advertiser IDS
-A stringified array of advertiser IDs.  Self managed acounts can have many advertiser IDs associated with it.  You can provide n number of advertiser IDs.  Amazon Managed IDs only have a single advertiser ID, but it still needs to be strigified array.
-
-### Get Managed Advertiser profile
-https://service.api.openbridge.io/service/amzadv/profiles-only/3175?profile_types=dsp&is_manager=true
-
-### Get Non Managed Advertisers
-https://service.api.openbridge.io/service/amzadv/list-adv/3175/693136736383016
+  * The [second service api endpoint](../service-api.md) contains a map of of catagory metrics to stage IDS.  Based on the desired metrics for a given category you can find the stage ID that is associated with that report. 

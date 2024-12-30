@@ -2,6 +2,7 @@
 	- [Third-party APIs](#third-party-apis)
 	  - [Amazon Advertising](#amazon-advertising)
 			- [Amazon Advertising Profiles](#amazon-advertising-profiles)
+      - [Amazon Advertising DSP Advertisers](#amazon-advertising-dsp-advertisers)
 			- [Amazon Advertising Brands](#amazon-advertising-brands)
 	  	- [Amazon Advertising Marketing Stream](#amazon-advertising-marketing-stream)
 		- [Facebook](#facebook)
@@ -107,6 +108,67 @@ This example is for retrieving Amazon Advertising Profiles.
 >   ]
 > }
 > ```
+</details>
+
+
+#### Amazon Advertising DSP Advertisers
+<details>
+
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/service/amzadv/list-adv/{{remote_identity_id}}/{{profile_id}}</b></code></summary>
+
+The Amazon Advertising DSP Advertiser ID service endpoint is use to get a lost of advertiser IDs for `self serve` DSP accounts..  
+
+The request endpoint of the AmazonAdvertisingProfile will require the remote identity id, and the profile id.
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+
+
+##### Parameters
+> | name | data type | description                                                           |
+> |-|-|-|
+> | remote_identity_id | string | The remote identity associated with the profile containing the advertiser IDs. 
+> | profile_id | string | The profile ID that contains the advertisers that contain the desired data. 
+
+##### Responses
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+##### Example cURL
+
+This example is for retrieving Amazon Advertising Profile Brands.
+> ```curl
+
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET https://service.api.openbridge.io/service/amzadv/list-adv/{{remote_identity_id}}/{{profile_id}}
+> ```
+
+###### Example Response
+
+```json
+{
+  "data": [
+    {
+      "id": "5772769000301",
+      "attributes": {
+        "advertiserId": "5772769000301",
+        "name": "Advertiser Name",
+        "currency": "USD",
+        "url": "https://exampleurl.com/",
+        "country": "US",
+        "timezone": "America/New_York"
+      }
+    },
+    ...
+  ]
+}
+```
+
 </details>
 
 #### Amazon Advertising Brands

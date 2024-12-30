@@ -12,7 +12,7 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
   - [Remote Identities](#remote-identities)
   - [Source Pipelines](#source-pipelines)
 - Tutorials
-  - [Identity Creation](./tutorials/identity-creation.md)
+  - [Identity Creation](./tutorials/identity-configuration.md)
   - [Subscription Configuration](./tutorials/subscription-configuration.md)
 - [Requesting History](#history-requests)
 - [APIs](#apis)
