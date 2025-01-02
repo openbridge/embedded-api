@@ -3,7 +3,7 @@
 Welcome to the Openbridge API documentation. This guide is designed to help developers understand, integrate, and embed the Openbridge API into their applications. Included are detailed information and examples here if you're looking to access specific data, manage identities, or handle authorizations.
 
 - [Getting started](#getting-started)
-  - [API support help]()
+  - [API support help](#api-support-help)
   - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
   - [API User Role](#api-user-role)
   - [Refresh Tokens](#refresh-tokens)
