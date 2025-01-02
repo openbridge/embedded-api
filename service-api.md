@@ -3,6 +3,8 @@
 	  - [Amazon Advertising](#amazon-advertising)
 			- [Amazon Advertising Profiles](#amazon-advertising-profiles)
       - [Amazon Advertising DSP Advertisers](#amazon-advertising-dsp-advertisers)
+      - [Amazon Advertising DSP Category to Metrics Map](#amazon-advertising-dsp-category-to-metrics-map)
+      - [Amazon Advertising DSP Metric Map Reports](#amazon-advertising-dsp-metric-map-reports)
 			- [Amazon Advertising Brands](#amazon-advertising-brands)
 	  	- [Amazon Advertising Marketing Stream](#amazon-advertising-marketing-stream)
 		- [Facebook](#facebook)
@@ -169,6 +171,131 @@ This example is for retrieving Amazon Advertising Profile Brands.
 }
 ```
 
+</details>
+
+#### Amazon Advertising DSP Category to Metrics Map
+
+<details>
+
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/amzadv/dsp/meta/metrics</b></code></summary>
+
+  Amazon Advertising DSP Category to Metrics Map endpoint returns a map of Amazon Advertising DSP categories, and their available child metrics
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+
+##### Responses
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+##### Example cURL
+
+This example is for retrieving Amazon Advertising Profile Brands.
+> ```curl
+
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET https://service.api.openbridge.io/amzadv/dsp/meta/metrics
+> ```
+
+###### Example Response
+
+```json
+{
+  "data": [
+    {
+      "reportType": "audience",
+      "reportTypeName": "Audience",
+      "reportTypeLabel": "",
+      "dimensions": [
+        {
+          "dimension": "order",
+          "dimensionName": "Order",
+          "dimensionLabel": ""
+        },
+        {
+          "dimension": "lineItem",
+          "dimensionName": "Line Item",
+          "dimensionLabel": ""
+        }
+      ]
+    },
+    ...
+  ]
+}
+```
+
+</details>
+
+#### Amazon Advertising DSP Metric Map Reports.
+
+<details>
+
+  <summary><code>GET</code> <code><b>https://service.api.openbridge.io/amzadv/dsp/meta/metrics</b></code></summary>
+
+  Amazon Advertising DSP Category to Metrics Map endpoint returns a map of Amazon Advertising DSP categories, and their available child metrics
+
+##### Headers
+
+> | name | data type | description                                                           |
+> |-|-|-|
+> | Content-Type | string | application/json
+> | Authorization | string | Openbridge JWT, passed as a  authorization bearer type
+
+##### Responses
+
+> | http code | content-type | response |
+> |-|-|-|
+> | `200` | `application/json` | `OK` |
+
+##### Example cURL
+
+This example is for retrieving Amazon Advertising Profile Brands.
+> ```curl
+
+>  curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET https://service.api.openbridge.io/amzadv/dsp/meta/metrics
+> ```
+
+###### Example Response
+
+```json
+{
+  "data": [
+    {
+      "report_type": "audience",
+      "reports": [
+        {
+          "id": 0,
+          "dimensions": [
+            "order"
+          ],
+          "alias": "audience_70a17ffa722a3985b86d30b034ad06d7"
+        },
+        {
+          "id": 1,
+          "dimensions": [
+            "lineItem"
+          ],
+          "alias": "audience_867cf1ff92974922abc5d5b045b4a2d8"
+        },
+        {
+          "id": 2,
+          "dimensions": [
+            "order",
+            "lineItem"
+          ],
+          "alias": "audience_8d7cecaece9ed583d9854d1891aede73"
+        }
+      ]
+    },
+    ...
+  ]
+}
+```
 </details>
 
 #### Amazon Advertising Brands
