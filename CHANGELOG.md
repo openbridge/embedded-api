@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [0.0.7] - 2024-12-27
+## [0.0.7] - 2025-01-02
 
 ### Added
  - Added new documentation to suplicment creating DSP subscriptions
