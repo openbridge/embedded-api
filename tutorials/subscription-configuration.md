@@ -274,7 +274,9 @@ Pipeline Subscriptions are not deletable through the API.  Nor are they deletabl
 ## Updating Pipeline Subscriptions
 If you want to update an attribute of a pipeline subscription, you can use a PATCH request using the [Subscription API](#subscription-api) as described in our API documentation.  It is important to note that when sending a PATCH request to the subscription API update that you always include the `status` field as part of the PATCH request.  Even if the `status` isn't changing.
 
-For example if you want to update the `stage_ids` subscription_product_meta attribute to limit or increase the data you are receiving  the payload would be as below.
+For example if you want to update the `stage_ids` subscription_product_meta attribute to limit or increase the data you are receiving the payload would be as below.
+
+Make sure the XX is the product ID of the product used in the subscription.
 
 ```
 {
@@ -286,6 +288,7 @@ For example if you want to update the `stage_ids` subscription_product_meta attr
        "subscription_product_meta_attributes": [
         {
           "data_key": "stage_ids",
+          "product_id": "XX"
           "data_value": "\[\"XXXX\",\"YYYY\",\"ZZZZZ\"\]",
           "data_format": "STRING",
           "data_id": "0",
