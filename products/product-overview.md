@@ -6,7 +6,7 @@ This document provides information required when creating subscriptions for Open
   - [Amazon	Sponsored Ads (V3)](#amazon-sponsored-ads-v3)
   - [Amazon Advertising Brand Metrics](#amazon-advertising-brand-metrics)
   - [Amazon Attribution](#amazon-attribution)
-  - [Amazon DSP](#amazon-dsp)
+  - [Amazon DSP](./products/amazon-advertising-dsp-v3.md)
 
 - [Amazon Seller Products](#amazon-seller-products)
   - [Amazon Orders API](#amazon-orders-api)
@@ -108,24 +108,6 @@ __Required Subscription Product Meta__
 > |-|-|-|
 > | profile_id | `STRING` | Associated profile ID. |
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-
-### Amazon DSP
-
-__Product Attributes__
-> | Key | Value |
-> |-|-|
-> | Product ID | 54 |
-> | Remote Identity Type ID | 14 |
-
-__Required Subscription Product Meta__
-> | Data Key | Data Format Value | Data Value |
-> |-|-|-|
-> | profile_id | `STRING` | Associated profile ID. This field is an empty string for Amazon managed accounts |
-> | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | account_id | `STRING` | Remote identity associated with the associated profile. |
-> | managed | `STRING` | `true` for Amazon managed accounts `false` for non managed accounts . |
-> | advertiser_ids | `JSON` | A stringified array of Attribution advertiser IDs.  In case of an Amazon managed accounts it should be an empty array `[]`. |
-
 
 ## Amazon Seller Products
 

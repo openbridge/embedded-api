@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.7] - 2025-01-02
+
+### Added
+ - Added new documentation to suplicment creating DSP subscriptions
+ - Separated tutorial documentation for identities and subscriptions in to different file.
+ - Updated information concerning patching subscriptions.
+ - Removed unnecessary files from the repository.
+
 ## [0.0.6] - 2023-07-17
 
 ### Added
