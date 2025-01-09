@@ -185,7 +185,7 @@ The Managed Ads accounts require the following subscription_product_meta_attribu
 `profile_id`: This field is only required for `self-served` DSP accounts, this will be the Amazon advertising profile associated with the DSP ads account. To retrieve this value a request to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With profile_types parameter set to `dsp`. 
 
 `account_id`: The DSP account ID. This value required for both types.
-  * For Managed accounts a call a request to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With `profile_types` parameter set to `dsp` and the `managed` parameter set to `true`. The `account_id` in the response is is labled `dsp_advertiser_id`.  In this response the ID is the `account_id` and the `dsp_advertiser_id` will need to be placed in the `advertiser_ids` JSON array.
+  * For Managed accounts a call a request to the [Amazon Advertising Profile endpoint](https://github.com/openbridge/embedded-api/blob/main/service-api.md#amazon-advertising-profiles) of the Serive API must be made. With `profile_types` parameter set to `dsp` and the `is_managed` parameter set to `true`. The `account_id` in the response is is labled `dsp_advertiser_id`.  In this response the ID is the `account_id` and the `dsp_advertiser_id` will need to be placed in the `advertiser_ids` JSON array.
 
   ```
   [
