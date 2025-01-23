@@ -637,7 +637,7 @@ The GET method does not require any parameters. Parameters are based on credenti
 ##### Example cURL
 
 ```curl
- curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/identity/{id}
+ curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{id}
 ```
 
 ##### Example Response
@@ -736,7 +736,7 @@ Identities can be shared between more than one Openbridge account. The DELETE ca
 ##### Example cURL
 
 > ```curl
-> curl -X DELETE -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{remite_identity_id}
+> curl -X DELETE -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{id}
 > ```
 
 </details>
