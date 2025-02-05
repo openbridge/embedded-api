@@ -1,1 +1,17 @@
 /dump
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS generated thumbnail files
+._*
+
+# macOS temporary files
+.Trashes
+Spotlight-V100
+VolumeIcon.icns
+
+# macOS filesystem attributes
+.fseventsd
