@@ -1,21 +1,64 @@
 #!/bin/bash
 #
-# Input and environment validation functions
+# Input and environment validation functions with config loading
 
 # Guard against multiple inclusion
 [[ -n "${_VALIDATION_SH:-}" ]] && return
 readonly _VALIDATION_SH=1
 
-# Source required modules
+# Source common if not already sourced
 [[ -n "${_COMMON_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
-[[ -n "${_LOGGING_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
+# Config loading function
+load_config() {
+    local config_file="${CONFIG_FILE:-/app/config/config.env}"
+    
+    # Check if config file exists and is readable
+    if [[ -f "$config_file" && -r "$config_file" ]]; then
+        source "$config_file"
+        return 0
+    fi
+    
+    # If no config file, check for required environment variables
+    if [[ -n "${REFRESH_TOKEN:-}" ]]; then
+        # Minimum required variable is present
+        return 0
+    fi
+    
+    return 1
+}
+
+validate_environment() {
+    # First try to load config if present
+    load_config || true  # Don't fail if config loading fails
+
+    # Check for required environment variables
+    if [[ -z "${REFRESH_TOKEN:-}" ]]; then
+        echo "ERROR: REFRESH_TOKEN environment variable is required" >&2
+        return 1
+    fi
+
+    # Validate LOG_LEVEL if set
+    if [[ -n "${LOG_LEVEL:-}" ]]; then
+        case "${LOG_LEVEL^^}" in
+            DEBUG|INFO|WARN|ERROR) ;;
+            *)
+                echo "ERROR: Invalid LOG_LEVEL. Must be one of: DEBUG, INFO, WARN, ERROR" >&2
+                return 1
+                ;;
+        esac
+    fi
+
+    return 0
+}
 
 validate_datetime() {
     local datetime="$1"
     local label="$2"
     
     if [[ ! "$datetime" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
-        error_exit "Invalid $label format. Use: YYYY-MM-DDThh:mm:ss"
+        echo "ERROR: Invalid $label format. Use: YYYY-MM-DDThh:mm:ss" >&2
+        return 1
     fi
 }
 
@@ -24,97 +67,14 @@ validate_date() {
     date="${date//[[:space:]]/}"
     local date_type="$2"
 
-    log_message "DEBUG" "Validating $date_type: '$date' against pattern: $DATE_REGEX"
-
-    if [[ ! $date =~ $DATE_REGEX ]]; then
-        log_message "DEBUG" "Date validation failed for $date"
-        error_exit "Invalid $date_type format: $date. Expected format is YYYY-MM-DD." $E_INVALID_DATE
-    fi
-
-    # Check if we're on BSD date (macOS) or GNU date
-    if date --version >/dev/null 2>&1; then
-        # GNU date
-        if ! date -d "$date" >/dev/null 2>&1; then
-            error_exit "Invalid $date_type: $date is not a real date." $E_INVALID_DATE
-        fi
-    else
-        # BSD date (macOS)
-        if ! date -j -f "%Y-%m-%d" "$date" >/dev/null 2>&1; then
-            error_exit "Invalid $date_type: $date is not a real date." $E_INVALID_DATE
-        fi
-    fi
-
-    log_message "DEBUG" "Date validation passed for $date"
-}
-
-validate_numeric() {
-    local value="$1"
-    local field="$2"
-    
-    if [[ ! "$value" =~ ^[0-9]+$ ]]; then
-        error_exit "Invalid $field: $value. Must be numeric." $E_INVALID_INPUT
+    if [[ ! $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo "ERROR: Invalid $date_type format: $date. Expected format is YYYY-MM-DD." >&2
+        return 1
     fi
 }
 
-validate_date_range() {
-    local start_date="$1"
-    local end_date="$2"
-
-    # Convert dates to format that BSD date can understand
-    if date --version >/dev/null 2>&1; then
-        # GNU date
-        start_seconds=$(date -d "$start_date" +%s)
-        end_seconds=$(date -d "$end_date" +%s)
-    else
-        # BSD date (macOS)
-        start_seconds=$(date -j -f "%Y-%m-%d" "$start_date" +%s)
-        end_seconds=$(date -j -f "%Y-%m-%d" "$end_date" +%s)
-    fi
-
-    if (( start_seconds > end_seconds )); then
-        error_exit "Start date ($start_date) cannot be later than end date ($end_date)."
-    fi
-}
-
-validate_subscription_id() {
-    local subscription_id="$1"
-
-    if [[ ! "$subscription_id" =~ ^[0-9]+$ ]]; then
-        error_exit "Invalid subscription ID: $subscription_id. It must be a numeric value."
-    fi
-}
-
-validate_subscription_status() {
-    local status="$1"
-    local valid=false
-    
-    for valid_status in "${SUBSCRIPTION_VALID_STATUSES[@]}"; do
-        if [[ "$status" == "$valid_status" ]]; then
-            valid=true
-            break
-        fi
-    done
-    
-    if [[ "$valid" != "true" ]]; then
-        error_exit "Invalid status: $status. Valid values are: ${SUBSCRIPTION_VALID_STATUSES[*]}" $E_INVALID_STATUS
-    fi
-}
-
-validate_environment() {
-
-    # Try to load config first
-    load_config
-
-    if [[ -z "${AUTH_TOKEN:-}" && -z "${REFRESH_TOKEN:-}" ]]; then
-        error_exit "Neither AUTH_TOKEN nor REFRESH_TOKEN is set. Authentication is required."
-    fi
-}
-
-check_dependencies() {
-    local deps=("curl" "date" "jq")
-    for dep in "${deps[@]}"; do
-        if ! command -v "$dep" &>/dev/null; then
-            error_exit "Required dependency '$dep' is not installed." $E_DEPENDENCY
-        fi
-    done
-}
+# Export functions that need to be available to other scripts
+export -f load_config
+export -f validate_environment
+export -f validate_datetime
+export -f validate_date
