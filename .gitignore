@@ -1,4 +1,5 @@
 /dump
+/embed-cli/config.env
 
 # macOS system files
 .DS_Store
