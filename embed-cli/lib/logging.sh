@@ -21,21 +21,28 @@ declare -r CYAN="\033[36m"
 declare -r GRAY="\033[37m"
 
 # Log levels and their numeric values (higher = more severe)
-declare -rA LOG_LEVELS=(
-    ["DEBUG"]=0
-    ["INFO"]=1
-    ["WARNING"]=2
-    ["ERROR"]=3
-    ["SUCCESS"]=1  # Same as INFO level
-)
+get_log_level_value() {
+    local level="$1"
+    case "$level" in
+        "DEBUG") echo 0 ;;
+        "INFO") echo 1 ;;
+        "WARNING") echo 2 ;;
+        "ERROR") echo 3 ;;
+        "SUCCESS") echo 1 ;; # Same as INFO level
+        *) echo 1 ;; # Default to INFO if invalid
+    esac
+}
 
 # Current log level
 readonly CURRENT_LOG_LEVEL="${LOG_LEVEL:-INFO}"
 
 should_log() {
     local msg_level="$1"
-    local current_level="${LOG_LEVELS[$CURRENT_LOG_LEVEL]:-1}"  # Default to INFO if invalid
-    local msg_level_num="${LOG_LEVELS[$msg_level]:-1}"         # Default to INFO if invalid
+    local current_level
+    local msg_level_num
+    
+    current_level=$(get_log_level_value "$CURRENT_LOG_LEVEL")
+    msg_level_num=$(get_log_level_value "$msg_level")
     
     [[ $msg_level_num -ge $current_level ]]
 }

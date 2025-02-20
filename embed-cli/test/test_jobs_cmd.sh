@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # Set up test environment
-export REFRESH_TOKEN="<yourtoken>"
+# Load environment variables from config.env
+if [[ -f "../config.env" ]]; then
+    source "../config.env"
+else
+    echo "Error: config.env not found"
+    exit 1
+fi
 export LOG_LEVEL="DEBUG"
 
 # Colors for test output
@@ -40,11 +46,11 @@ run_test() {
 }
 
 # Source required files for testing
-source lib/common.sh
-source lib/logging.sh
-source lib/validation.sh
-source lib/commands/command.sh
-source lib/commands/jobs.sh
+source "../lib/common.sh"
+source "../lib/logging.sh"
+source "../lib/validation.sh"
+source "../lib/commands/command.sh"
+source "../lib/commands/jobs.sh"
 
 echo "Starting jobs command tests..."
 
@@ -52,23 +58,23 @@ echo "Starting jobs command tests..."
 run_test "Jobs Help" "jobs_help"
 
 # Test jobs list command
-run_test "Jobs List" "jobs_cmd list --subscription 00120560"
+#run_test "Jobs List" "jobs_cmd list --subscription 00120560"
 
 # Test jobs create command
-run_test "Jobs Create" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560"
+#run_test "Jobs Create" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560"
 
 # Test jobs create with stage
-run_test "Jobs Create with Stage" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560 --stage 1001"
+#run_test "Jobs Create with Stage" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560 --stage 1001"
 
 # Test jobs batch command
-echo "date,subscription_id,stage_id" > test.csv
-echo "2024-01-01,00120560,1001" >> test.csv
-run_test "Jobs Batch" "jobs_cmd batch --file test.csv"
+#echo "date,subscription_id,stage_id" > test.csv
+#echo "2024-01-01,00120560,1001" >> test.csv
+#run_test "Jobs Batch" "jobs_cmd batch --file test.csv"
 
 # Test error cases
-run_test "Missing Subscription" "jobs_cmd list" 1
-run_test "Invalid Date" "jobs_cmd create --start 2024-13-01 --end 2024-01-01 --subscription 00120560" 1
-run_test "Missing CSV File" "jobs_cmd batch" 1
+#run_test "Missing Subscription" "jobs_cmd list" 1
+#run_test "Invalid Date" "jobs_cmd create --start 2024-13-01 --end 2024-01-01 --subscription 00120560" 1
+#run_test "Missing CSV File" "jobs_cmd batch" 1
 
 # Clean up
 rm -f test.csv

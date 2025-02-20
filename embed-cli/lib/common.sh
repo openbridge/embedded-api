@@ -65,6 +65,26 @@ readonly VALID_STATUSES=("ERROR" "WARNING" "SUCCESS" "PENDING")
 readonly DEFAULT_CONFIG_FILE="/app/config.env"
 readonly CONFIG_FILE="${CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
 
+
+# Add this to common.sh, before the parse_arguments function:
+
+urlencode() {
+    local string="$1"
+    local strlen="${#string}"
+    local encoded=""
+    local pos c o
+
+    for ((pos=0; pos<strlen; pos++)); do
+        c="${string:${pos}:1}"
+        case "${c}" in
+            [-_.~a-zA-Z0-9]) o="${c}" ;;
+            *) printf -v o '%%%02x' "'${c}" ;;
+        esac
+        encoded+="${o}"
+    done
+    printf "%s" "${encoded}"
+}
+
 # Already have get_relative_date() for date handling
 # Need to add cron schedule generation for 10-15 mins ahead
 
