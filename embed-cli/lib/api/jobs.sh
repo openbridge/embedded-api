@@ -180,7 +180,7 @@ get_jobs() {
     local single_page_mode=false
     local query_params=""
 
-    validate_subscription_id "$subscription_ids"
+    #validate_subscription_id "$subscription_ids"
 
     declare -A params
     while IFS='=' read -r key value; do
