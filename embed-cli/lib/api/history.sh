@@ -6,23 +6,17 @@
 [[ -n "${_API_HISTORY_SH:-}" ]] && return
 readonly _API_HISTORY_SH=1
 
-# Source required modules
 [[ -n "${_COMMON_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../common.sh"
 [[ -n "${_LOGGING_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../logging.sh"
-[[ -n "${_VALIDATION_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../validation.sh"
 [[ -n "${_API_CLIENT_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/client.sh"
 [[ -n "${_API_AUTH_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/auth.sh"
+[[ -n "${_VALIDATION_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../validation.sh"
 
 create_jobs() {
     local start_date="$1"
     local end_date="$2"
     local subscription_id="$3"
     local stage_id="${4:-}"
-
-    # Validate dates first
-    validate_date "$start_date" "start date"
-    validate_date "$end_date" "end date"
-    validate_date_range "$start_date" "$end_date"
 
     # Then validate subscription ID
     if [[ -z "$subscription_id" ]]; then

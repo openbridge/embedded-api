@@ -78,6 +78,11 @@ log_message() {
     fi
 }
 
+error_message() {
+    local message="$1"
+    log_message "ERROR" "$message"
+}
+
 show_progress() {
     local current=$1
     local total=$2

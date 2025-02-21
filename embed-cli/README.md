@@ -344,7 +344,7 @@ Example: Processing a CSV for historical data jobs:
     docker run --rm \
       -e "REFRESH_TOKEN=your_token_here" \
       -v "$(pwd)/backfill.csv:/app/backfill.csv" \
-      openbridge/embed-cli -f /app/backfill.csv
+      openbridge/embed-cli jobs batch -f /app/backfill.csv
 ```
 The `backfill.csv` must look like:
 
