@@ -31,8 +31,10 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - [Product Overview](./products/product-overview.md)
 
  - [Best Practices](#best-practices)
-  - [Identity Health](#identity-health)
+ - [Identity Health](#identity-health)
  - [API Error Handling Guide](#api-error-handling-guide)
+
+- [Definitions](#definitions)
 
 # Getting Started
 
