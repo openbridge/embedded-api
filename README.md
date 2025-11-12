@@ -14,7 +14,8 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - Tutorials
   - [Identity Creation](./tutorials/identity-configuration.md)
   - [Subscription Configuration](./tutorials/subscription-configuration.md)
-- [Requesting History](#history-requests)
+  - [Requesting History](#history-requests)
+  - [Mapping Subscriptions to Tables](#mapping-subscriptions-to-tables)
 - [APIs](#apis)
   - [Authorization API](#authorization-api)
   - [Account API](#account-api)
@@ -364,6 +365,120 @@ Product 57 only has one stage called sp_settlments. Generally, it is not necessa
 ```
 
 **Note:** All `date` and `datetime` fields should be calculated for UTC.
+
+# Mapping Subscriptions to Tables
+
+You can get associated datasets/tables to a pipeline/subscription using the API. 
+
+1. Obtain an access token with this call:
+
+```
+POST https://authentication.api.openbridge.io/auth/api/ref
+
+{
+    "data": {
+        "type": "APIAuth",
+        "attributes": { 
+            "refresh_token": {YOUR-REFRESH-TOKEN}"
+        }
+    }
+}
+```
+
+2. Request the list of [stages](#stages) for the subscription ID. The following call will provide both the product ID and the stage IDs, which determines which tables are attached to this subscription. This will typically return an empty response in older, legacy subscriptions (pre-2024) which haven't been updated.
+
+```
+GET https://subscriptions.api.openbridge.io/spm?subscription=128853&data_key=stage_ids
+Authorization: Bearer {YOUR-ACCESS-TOKEN}
+
+Response:
+{
+  "links": {
+    ...
+  },
+  "data": [
+    {
+      "type": "SubscriptionProductMeta",
+      "id": "175403",
+      "attributes": {
+        ...
+        "data_key": "stage_ids",
+        "data_value": "[1004,1002,1000,1005,1003,1001]",
+        ...
+        "product": {
+          "id": 50,
+          ...
+        },
+        "subscription": {
+          ...
+        },
+        "data_format": "JSON"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 1
+    }
+  }
+}
+```
+
+If the previous call returned an empty list, we can generally assume that the only stage ID is 0, which means a legacy subscription. This is the typical default for legacy. In this case, we just need to get the product ID as below:
+
+```
+GET https://subscriptions.api.openbridge.io/sub/100239
+Authorization: Bearer {YOUR-ACCESS-TOKEN}
+
+Response:
+{
+  "data": {
+    "type": "Subscription",
+    "id": "100239",
+    "attributes": {
+      ...
+      "product_id": 2,
+      ...
+    },
+    "relationships": {
+      ...
+    }
+  },
+  "included": [
+    ...
+  ]
+}
+```
+
+3. Once the prior step is completed, you will know the product ID and any stages linked to the subscription. The following call will return the list of payloads which are run as part of this subscription: `GET https://service.api.openbridge.io/service/products/product/{PRODUCT-ID}/payloads?stage_id={STAGE-ID}`. These payloads _generally_ map directly to a table of the same name, but there are occasional cases where they may not. For example, product ID 64 has a payload named `sp_sales_and_traffic_sku` which generates data for two different tables, `sp_sales_and_traffic_sku_by_date` and sp_sales_and_traffic_sku_by_asin`.
+
+```
+GET https://service.api.openbridge.io/service/products/product/50/payloads?stage_id=1004
+Authorization: Bearer {YOUR-ACCESS-TOKEN}
+
+{
+  "links": {
+    ...
+  },
+  "data": [
+    {
+      "type": "Product",
+      "id": "2184",
+      "attributes": {
+        "name": "amzn_attribution_metrics_by_adgroup",
+        "stage_id": 1004,
+		...
+      }
+    }
+  ],
+  "meta": {
+    ...
+  }
+}
+```
+Note: This endpoint currently only supports supplying one stage at a time. An alternative method would be to fetch all stages using the call `https://service.api.openbridge.io/service/products/product/<PRODUCT-ID>/payloads`, then filtering the response object to only include the applicable stages.
 
 # APIs
 
@@ -1565,8 +1680,6 @@ In the response, you can see the list of associated markets:
 ### How do I get profile information associated with a remote identity.
 Openbridge does not store profile tied to remote identities.  Instead during the creation process we query third-party APIs through our service API based on a product. If you need to know what remote identity is tied to a third-party profile. The remote identity id can be found in the subscription pipeline record tied to that third-party profile.
 
-
-
 ## API Error Handling Guide
 Proper error handling is essential for ensuring smooth interactions and resolving issues promptly. Please look at the following guidelines when handling errors in your application.
 
@@ -1735,6 +1848,11 @@ For more examples on configuration, guides, and constraints please refer to the 
 [Openbridge Documentation](https://docs.openbridge.com/)
 
  If you have not used Openbridge before, you can get a 30-day free trial @ the [Openbridge Website](https://www.openbridge.com). For other guides, tips, or how-to examples, visit us @ the [Openbridge Blog](https://blog.openbridge.com)
+
+# Definitions
+
+### Stage
+A *stage* is a set of payloads which are run as part of the Openbridge process to generate data. Previously this was done with assumed defaults, typically setting stage ID = 0 which ultimately mapped to a set of payloads. However, starting in 2024 new subscriptions require a set of stages to be selected.
 
 # Issues
 
