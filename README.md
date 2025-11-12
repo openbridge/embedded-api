@@ -385,7 +385,7 @@ POST https://authentication.api.openbridge.io/auth/api/ref
 }
 ```
 
-2. Request the list of [stages](#stages) for the subscription ID. The following call will provide both the product ID and the stage IDs, which determines which tables are attached to this subscription. This will typically return an empty response in older, legacy subscriptions (pre-2024) which haven't been updated.
+2. Request the list of [stages](#stage) for the subscription ID. The following call will provide both the product ID and the stage IDs, which determines which tables are attached to this subscription. This will typically return an empty response in older, legacy subscriptions (pre-2024) which haven't been updated.
 
 ```
 GET https://subscriptions.api.openbridge.io/spm?subscription=128853&data_key=stage_ids
