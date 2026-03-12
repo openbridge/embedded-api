@@ -6,7 +6,8 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
   - [API support help](#api-support-help)
   - [How do I get access to Openbridge APIs?](#how-do-i-get-access-to-openbridge-apis)
   - [API User Role](#api-user-role)
-  - [Refresh Tokens](#refresh-tokens)
+  - [Refresh Token](#refresh-token)
+  - [CLI Documentation](./embed-cli/README.md)
 - [Understanding Openbridge data collection](#understanding-openbridge-data-collection)
   - [Destinations](#destinations)
   - [Remote Identities](#remote-identities)
@@ -29,10 +30,6 @@ Welcome to the Openbridge API documentation. This guide is designed to help deve
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Product Overview](./products/product-overview.md)
 
- - [Best Practices](#best-practices)
-  - [Identity Health](#identity-health)
- - [API Error Handling Guide](#api-error-handling-guide)
-
 # Getting Started
 
 ## API Support help.
@@ -47,6 +44,9 @@ Customers who have been granted access to use the Openbridge APIs will be given 
 ## Refresh Token
 A refresh token is a long lived token that your application will use to generate a JWT using the Openbridge authorization API. To create a refresh token you must have been granted the `api-user` role on your account. If you have this role, log into the Openbridge app. In the main menu and select `Account` and you will be presented with a `API Management` menu option to navigate you to the refresh token management page. Click on the `"Create Refresh Token"` button. A modal will present itself where you will need to choose a name for the token. Click the `Create` button and your token will be generated, and presented to you. It is **VERY IMPORTANT** that you copy this token and store it in a text file, or in your application preferences/settings. As a security precaution we will not present this token to you again, as it is not stored in a way we can present it to you again. If you lose your token you will be required to generate a new one.
 
+## CLI Documentation
+For a ready-to-run shell and Docker workflow, see the [`embed-cli` documentation](./embed-cli/README.md).
+
 
 # Understanding Openbridge data collection
 Before you start integrating with Openbridge's API it is important that you understand how Openbridge collects data from third-party APIs for our customers. 
@@ -55,17 +55,17 @@ Before you start integrating with Openbridge's API it is important that you unde
 Before you can start collecting data through Openbridge you must have configured a destination. A destination is the location where Openbridge will store the collected data. Our [Destination FAQ](https://docs.openbridge.com/en/articles/5163160-data-destination-faqs) for more specific information on destinations. Destinations can only be configured through the Openbridge app, we currently do not support destination configuration through the API.
 
 ## Remote Identities.
-Openbridge connects to third-party data sources on the behalf of our customers using credentials granted to us by the customers through the third-party API's chosen authentication method. In most cases this is through industry standard Oauth protocol. We call these grants Remote Identities (sometimes referred to as Identities). In some cases a Remote Identity grant does not expire, and once you create a pipeline attached to an identity that pipeline will collect data until the customer disables it. In other cases a Remote Identity need to be re-authorized periodically. Facebook for example requires that authorizations be re-authorized every 90 days. Openbridge has made the process of [authorizing](#identity-authorization) and reauthorizing a remote identity easy to managed. Our article on "[Understanding Remote Identities](https://docs.openbridge.com/en/articles/3673866-understanding-remote-identities)" provides a in depth understanding of how to manage remote identities and key dos and don'ts.
+Openbridge connects to third-party data sources on behalf of our customers using credentials granted to us by customers through the third-party API's chosen authentication method. In most cases this is through the industry-standard OAuth protocol. We call these grants Remote Identities (sometimes referred to as Identities). In some cases a Remote Identity grant does not expire, and once you create a pipeline attached to an identity, that pipeline will collect data until the customer disables it. In other cases, a Remote Identity must be reauthorized periodically. Facebook, for example, requires authorizations to be renewed every 90 days. Openbridge has made the process of [authorizing](#identity-authorization) and reauthorizing a remote identity easier to manage. Our article on "[Understanding Remote Identities](https://docs.openbridge.com/en/articles/3673866-understanding-remote-identities)" provides an in-depth understanding of how to manage remote identities and key dos and don'ts.
 
-Currently support for authorizing identities through our API for all products except for Shopify which requires a more complex process than defined in "[Identity Authorization](#identity-authorization)".
+Currently, we support authorizing identities through our API for all products except Shopify, which requires a more complex process than the one defined in "[Identity Authorization](#identity-authorization)".
 
 ## Source Pipelines
 
-A source pipeline defines what third-party data will be retrieved for the customer. Some sources require more information to configure than others. (some additional text here about how to learn what is what.). For a better understanding of what specific data a specific source provides please check out one of our many articles on [data sources](https://docs.openbridge.com/en/collections/753294-data-sources).
+A source pipeline defines what third-party data will be retrieved for the customer. Some sources require more information to configure than others. For a better understanding of what a specific source provides, please review one of our articles on [data sources](https://docs.openbridge.com/en/collections/753294-data-sources).
 
 # Identity Authorization
 
-Openbridge call authorizations we have made to third party vendors identities. In most cases these third party authorizations are created through the third party's Oauth service. Openbridge has created our own API that manages redirecting a user to these APIs and on a successful authorization a return to a specific `return_url` with some included meta data stored in the query string. In most cases on an error the user is also redirected back to the return_url with some meta data that specifies the error condition. However due to the way some of the third party APIs handle errors, sometimes a user can result in being dead ended at on a page hosted by the third party. There is unfortunately nothing that can be done in those cases, but to document it.
+Openbridge calls the authorizations we have made to third-party vendors identities. In most cases these authorizations are created through the third party's OAuth service. Openbridge has created an API that manages redirecting a user to these providers and, on a successful authorization, returning the user to a specific `return_url` with metadata stored in the query string. In most error cases the user is also redirected back to the `return_url` with metadata that specifies the error condition. However, because some third-party APIs handle errors differently, a user can occasionally be left on a page hosted by the third party. There is unfortunately nothing that can be done in those cases beyond documenting the behavior.
 
 ## Creating your first identity
 
@@ -75,17 +75,17 @@ The first step in creating an identity is to create a persistent state using the
 The schema for the state to create an identity is:
 
 ```json
- {
-    account_id: string;
-    user_id: string;,
-    region: string;
-    remote_identity_type_id: integer;
-    return_url: string;
-    shop_url: string | null;
-   }
- ```
+{
+  "account_id": "string",
+  "user_id": "string",
+  "region": "string",
+  "remote_identity_type_id": 0,
+  "return_url": "string",
+  "shop_url": null
+}
+```
 
-The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). The `account_id` will be the `data.id` on the response tree, and the `user_id` will be `data.attributes.owner.id` on the response tree.
+The `account_id` and the `user_id` can be retrieved using the [Account API](#account-api). In the response example below, the `account_id` is `data[0].id`, and the `user_id` is `data[0].attributes.owner.id`.
 
 #### Identity Types
 ---
@@ -116,7 +116,7 @@ Openbridge offers connections to several third parties. Internally we call these
 > |-------------------|-----------|
 > | `AU` | `Australia` |
 > | `BR` | `Brazil` |
-> | `CA` | `Canada'` |
+> | `CA` | `Canada` |
 > | `EG` | `Egypt` |
 > | `FR` | `France` |
 > | `DE` | `Germany` |
@@ -144,18 +144,7 @@ The `shop_url` is only used in conjunction with shopify identities. Currently we
 
 
 ### Create your first state object
-With these in mind, let's create a state that can be used for gaining an authorization for Amazon Selling Partner API, We'll do it for account 1, that is owned by user 1. (Don't really do this it is only for example, please use your own user and account id, you can use the [Account API](#account-api) to retrieve them.). We will do it for the `US` region. We'll then return them to the Openbirdge wizard for the Selling Partners "Orders API" product, and we'll pass the stage parameter so we land on the identity selection page.
-
-> ```json
-> {
->  "account_id": "1";
->  "user_id": "1";,
->  "remote_identity_type_id": 17;
->  "region": "US";
->  "return_url": "https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity"
->  "shop_url": null;
-> }
-> ```
+With these in mind, let's create a state that can be used for gaining an authorization for Amazon Selling Partner API. We'll do it for account 1, that is owned by user 1. (Don't really do this; it is only an example. Please use your own user and account ID; you can use the [Account API](#account-api) to retrieve them.) We will do it for the `US` region. We'll then return them to the Openbridge wizard for the Selling Partners "Orders API" product, and we'll pass the stage parameter so we land on the identity selection page.
 
 ```json
 {
@@ -220,22 +209,22 @@ You can see that the output is much like the input, except we have been given `c
 
 ### Starting the authorization process
 ---
-To start the authorization process simply redirect the user in the browser to the Oauth API's initialize URL along with the state token.
+To start the authorization process, redirect the user in the browser to the OAuth API's initialize URL along with the state token.
 
 ```bash
 https://oauth.api.openbridge.io/oauth/initialize?state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 #### Security Note (MUST READ).
-The OAuth API is called via a redirect in the browser. It should **NEVER** be called in a frame or iframe element withing HTML in the browser. Many OAuth providers disable this as it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13). All of the providers Openbridge uses have disabled it. Popups may work on some third parties, but it is **not** supported by Openbridge.
+The OAuth API is called via a redirect in the browser. It should **NEVER** be called in a frame or iframe element within HTML in the browser. Many OAuth providers disable this because it is a [clickjacking security risk](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-23#section-10.13). All of the providers Openbridge uses have disabled it. Popups may work on some third parties, but they are **not** supported by Openbridge.
 
-Once the user is directed to the Openbridge Oauth api, the state is read based on the passed in state token. Based on the `remote_identity_type_id` in the state the end user will be redirected to the correct oauth provider. In our example that is Amazon Selling Partner. Once the user completes the process they are returned back to the Openbridge oauth api, where the identity information is stored in the Openbridge database, and the end user is then redirected to the return_url that was created in the state. In our case the blow URL along with some additional query string parameters.
+Once the user is directed to the Openbridge OAuth API, the state is read based on the passed-in state token. Based on the `remote_identity_type_id` in the state, the end user will be redirected to the correct OAuth provider. In our example that is Amazon Selling Partner. Once the user completes the process, they are returned to the Openbridge OAuth API, where the identity information is stored in the Openbridge database, and the end user is then redirected to the `return_url` that was created in the state. In our case that is the URL below, along with some additional query-string parameters.
 
 ```bash
 https://app.openbridge.com/wizards/amazon-selling-partner-orders?stage=identity&state=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-#### Additional Oauth return parameters
+#### Additional OAuth return parameters
 ---
 > | key | datatype | description |
 > |-------------------|-----------|-|
@@ -257,9 +246,9 @@ After creating a pipeline subscription you may want to back fill past history in
 ## Basic History Request.
 Making a basic history requests uses 2 of the 3 endpoints. The [History Max Requests](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-max-requests) endpoint and the [History Request](https://github.com/openbridge/embedded-api/blob/main/service-api.md#history-create-request) endpoint.
 
-The purpose of the History Max Request endpoint is to provide details reguarding how far back in the past you can go to request. This data contains a list for all products, and is slow changing. Since it is slow changing, this is an example of a request that the data could be cached locally for short periods of time. We recommend not caching it for more than 24hrs at a time. 
+The purpose of the History Max Request endpoint is to provide details regarding how far back in the past you can request data. This data contains a list for all products and changes slowly. Because of that, this is an example of a response that could be cached locally for short periods of time. We recommend not caching it for more than 24 hours at a time.
 
-Using the request below along with your authorizatino token you will be given a list of all Openbridge products that support history requests, along with meta data needed to make those history requests.
+Using the request below along with your authorization token, you will be given a list of all Openbridge products that support history requests, along with metadata needed to make those requests.
 
 > ```curl
 > curl -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" -X GET https://service.api.openbridge.io/service/history/production/history/meta/max-request
@@ -287,7 +276,7 @@ Take the example above for product 57. There are 3 meta attributes. The first is
 
 Example. You have a subscription for product 57. Today is May 1st 2024. Since this product has a `base_request_start` of `2` it means that `start_date` in the history request can be no sooner than `2 days in the past`. Therefore, in this instance The `start_date` can be no sooner than April 29, 2024. With a `max_request_time` of 90 means that the `end_date` date in the history request can be no further back than 90 days. In our case 90 days before May 1st 2024 is February 1st 2024. This is the last date that we can request data for if requesting it on May 1st, 2024. This means you can request a maximum of 88 days worth of data.
 
-Once you have calculated your `start_date` and your `end_date` you can build a payload for your history requeset. Using the above as our example our payload would look something like.
+Once you have calculated your `start_date` and your `end_date`, you can build a payload for your history request. Using the example above, the payload would look something like this.
 
 **Note:** All `date` should be calculated for UTC.
 
@@ -347,7 +336,7 @@ Making a request to this endpoint will give you a list of stages for a given pro
   }
 ```
 
-Product 57 only has one stage called sp_settlments. Generally, it is not necessary to make an advanced history request when the product only has one stage, but for example simplicity we will mock one for this product.  Taking our payload from the basic history request above we will add the 2 fields needed.  The datetime must be a date in the future at least 15 minutes after the time of submission for history request.
+Product 57 only has one stage called `sp_settlements`. Generally, it is not necessary to make an advanced history request when the product only has one stage, but for simplicity we will mock one for this product. Taking our payload from the basic history request above, we will add the two required fields. The datetime must be at least 15 minutes in the future when the history request is submitted.
 
 ```json
 {
@@ -406,9 +395,9 @@ curl --request POST -d '{"data": {"type": "APIAuth","attributes": {"refresh_toke
 
 ## Account API
 
-The Openbridge Account API is a RESTFUL API, that supports. `GET`, `POST` and `PATCH` methods. However, while the API supports all of these methods, Openbridge customers with the `api-user` role are current restricted to only the `GET` method. The reason is that their account and user IDs are prerequisites for many other Openbridge APIs therefore we provide `GET` functionality on the account API to fulfill those requisites.
+The Openbridge Account API is a RESTful API that supports `GET`, `POST`, and `PATCH` methods. However, Openbridge customers with the `api-user` role are currently restricted to only the `GET` method. Their account and user IDs are prerequisites for many other Openbridge APIs, so we provide `GET` functionality on the Account API to fulfill those requirements.
 
-A prerequisite to using the Account API is to create a Openbridge JWT using your account refresh token.
+A prerequisite to using the Account API is creating an Openbridge JWT using your account refresh token.
 
 <details>
  <summary><code>GET</code> <code><b>https://account.api.openbridge.io/account</b></code></summary>
@@ -426,7 +415,7 @@ The GET method does not require any parameters. Parameters are based on credenti
 
 | http code     | content-type                      | response                                                            |
 |---------------|-----------------------------------|---------------------------------------------------------------------|
-| `200`         | `application/json`        | `Configuration created successfully`                                |
+| `200`         | `application/json`        | `Account details returned successfully`                             |
 
 ##### Example cURL
 
@@ -471,7 +460,7 @@ The GET method does not require any parameters. Parameters are based on credenti
        "organization_allowed": false,
        "owner": {
          "id": "YYYY",
-         "auth0_user_id": "auth0|>636a4261738c1d3f4d57ae6f"
+         "auth0_user_id": "auth0|636a4261738c1d3f4d57ae6f"
        }
      }
    }
@@ -483,15 +472,15 @@ The GET method does not require any parameters. Parameters are based on credenti
      "count": 1
    }
  }
->}
+}
 ```
 
-From the example response, the `accountId` is `data.id` and the `userId` is `data.attributes.owner.id` 
+From the example response, the `accountId` is `data[0].id` and the `userId` is `data[0].attributes.owner.id`.
 
 </details> 
 
 ## Remote Identity API
-The Openbridge Remote Identity API is a RESTFUL API, that supports. `GET`, and `POST` methods. However, while the API supports all of these methods, Openbridge customers with the `api-user` role are current restricted to only the `GET` method. Allowing a means to look up state of an identity. Identity creation is handled through the Oauth API.
+The Openbridge Remote Identity API is a RESTful API that supports `GET` and `POST` methods. However, Openbridge customers with the `api-user` role are currently restricted to only the `GET` method, which allows them to look up the state of an identity. Identity creation is handled through the OAuth API.
 
 <details>
  <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/ri</b><b>/{id}</b></code></summary>
@@ -509,136 +498,15 @@ The GET method does not require any parameters. Parameters are based on credenti
 
 > | http code  | content-type      | response               |
 > |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`   | `application/json`  | `Configuration created successfully`        |
+> | `200`   | `application/json`  | `Remote identity returned successfully`        |
 
 ##### Example cURL
 
 > ```curl
-> curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{remite_identity_id}
+> curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{remote_identity_id}
 > ```
 
 The /sri endpoint is used to return a list of all identities that your account has permissions to use. `sri` stands for `shared remote identities`. Since there is a chance that an identity can be shared between multiple Openbridge accounts we provide an endpoint to all identities associated to your account, even if it was created by another account previously.
-
-##### Example Response
-
-Returns an array of Remote Identities
-
-```json
-[{
-  "data": {
-    "type": "RemoteIdentity",
-    "id": "362",
-    "attributes": {
-      "name": "James Andrews",
-      "created_at": "2018-02-13T18:49:51",
-      "modified_at": "2022-10-26T20:43:21",
-      "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
-      "remote_unique_id": "526589612",
-      "account_id": 1,
-      "user_id": 1,
-      "notified_at": null,
-      "invalidate_manually": 0,
-      "invalid_identity": 0,
-      "invalidated_at": "2019-05-11T00:05:01",
-      "notification_counter": 0,
-      "region": "global",
-      "email": "thenetimp+facebook@gmail.com",
-      "oauth_id": null
-    },
-    "relationships": {
-      "remote_identity_type": {
-        "data": {
-          "type": "RemoteIdentityType",
-          "id": "2"
-        }
-      },
-      "account": {
-        "data": {
-          "type": "Account",
-          "id": "1"
-        }
-      },
-      "user": {
-        "data": {
-          "type": "User",
-          "id": "1"
-        }
-      },
-      "trusted_identity": {
-        "data": null
-      },
-      "remote_identity_type_application": {
-        "data": {
-          "type": "RemoteIdentityTypeApplication",
-          "id": "8"
-        }
-      },
-      "oauth": {
-        "data": null
-      }
-    }
-  }
-}]
-```
-
-### Understanding the response fields
-
-##### Attribute Fields
-| key | data type | description |
-|-|-|-|
-| `name` | `string` | `` |
-| `created_at` | `string` | `` |
-| `modified_at` | `string` | `` |
-| `identity_hash` | `string` | `deprecated` |
-| `remote_unique_id` | `string` | `identifying value from the remote third party Oauth API` |
-| `account_id` | `string` | `The id of the account that first created the identity` |
-| `user_id` | `string` | `The id of the user that first created the identity` |
-| `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
-| `invalidate_manually` | `string` | `deprecated` |
-| `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
-| `invalidated_at` | `string` | `The datetime that the identity became invalid` |
-| `notification_counter` | `string` | `deprecated` |
-| `region` | `string` | `The region associated with the identity` |
-| `email` | `string` | `The email address associated with the profile by the third party (if available)` |
-| `oauth_id` | `string` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
-
-##### Relationship Fields.
-| key | data type | description |
-|--|--|--|
-| `remote_identity_type` | `object` | `Reference to the remote identity type` |
-| `account` | `object` | `reference to the account` |
-| `user` | `object` | `reference to the user` |
-| `trusted_identity` | `object` | `deprecated` |
-| `remote_identity_type_application` | `object` | `reference to an internal auth application` |
-| `oauth` | `object` | `Association to an Oauth client/id secret for products that require user provided apps, such as Shopify.` |
-
-**Note**: Identity credentials are not provided via the Remote Identity API
-
-</details>
-
-<details>
- <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/sri</b></code></summary>
-
-##### Headers
-
-> | name  |  data type    | description               |
-> |-----------|------------------------------------|-----------------------------------------------------------------------|
-> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
-
-##### Parameters
-The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
-
-##### Responses
-
-| http code     | content-type                      | response                                                            |
-|---------------|-----------------------------------|---------------------------------------------------------------------|
-| `200`         | `application/json`        | `Configuration created successfully`                                |
-
-##### Example cURL
-
-```curl
- curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/ri/{id}
-```
 
 ##### Example Response
 
@@ -703,6 +571,108 @@ The GET method does not require any parameters. Parameters are based on credenti
 ### Understanding the response fields
 
 ##### Attribute Fields
+| key | data type | description |
+|-|-|-|
+| `name` | `string` | `` |
+| `created_at` | `string` | `` |
+| `modified_at` | `string` | `` |
+| `identity_hash` | `string` | `deprecated` |
+| `remote_unique_id` | `string` | `Identifying value from the remote third-party OAuth API` |
+| `account_id` | `string` | `The id of the account that first created the identity` |
+| `user_id` | `string` | `The id of the user that first created the identity` |
+| `notified_at` | `string` | `The datetime of the last time the account/user was notified the identity credentials had become invalid.` |
+| `invalidate_manually` | `string` | `deprecated` |
+| `invalid_identity` | `boolean` | `If the identity credentials are currently valid` |
+| `invalidated_at` | `string` | `The datetime that the identity became invalid` |
+| `notification_counter` | `string` | `deprecated` |
+| `region` | `string` | `The region associated with the identity` |
+| `email` | `string` | `The email address associated with the profile by the third party (if available)` |
+| `oauth_id` | `string` | `Association to an OAuth client ID/client secret for products that require user-provided apps, such as Shopify.` |
+
+##### Relationship Fields.
+| key | data type | description |
+|--|--|--|
+| `remote_identity_type` | `object` | `Reference to the remote identity type` |
+| `account` | `object` | `reference to the account` |
+| `user` | `object` | `reference to the user` |
+| `trusted_identity` | `object` | `deprecated` |
+| `remote_identity_type_application` | `object` | `reference to an internal auth application` |
+| `oauth` | `object` | `Association to an OAuth client ID/client secret for products that require user-provided apps, such as Shopify.` |
+
+**Note**: Identity credentials are not provided via the Remote Identity API
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>https://remote-identity.api.openbridge.io/sri</b></code></summary>
+
+##### Headers
+
+> | name  |  data type    | description               |
+> |-----------|------------------------------------|-----------------------------------------------------------------------|
+> | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
+
+##### Parameters
+The GET method does not require any parameters. Parameters are based on credentials supplied in the JWT.
+
+##### Responses
+
+| http code     | content-type                      | response                                                            |
+|---------------|-----------------------------------|---------------------------------------------------------------------|
+| `200`         | `application/json`        | `Remote identity list returned successfully`                        |
+
+##### Example cURL
+
+```curl
+ curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://remote-identity.api.openbridge.io/sri?page=1
+```
+
+##### Example Response
+
+```json
+{
+  "links": {
+    "first": "https://remote-identity.api.openbridge.io/sri?page=1",
+    "last": "https://remote-identity.api.openbridge.io/sri?page=3",
+    "next": "https://remote-identity.api.openbridge.io/sri?page=2",
+    "prev": ""
+  },
+  "data": [
+    {
+      "type": "RemoteIdentity",
+      "id": "362",
+      "attributes": {
+        "name": "James Andrews",
+        "created_at": "2018-02-13T18:49:51",
+        "modified_at": "2022-10-26T20:43:21",
+        "identity_hash": "b1e68ff9dca4539522c93f37ff3b9245",
+        "remote_unique_id": "526589612",
+        "account_id": 1,
+        "user_id": 1,
+        "notified_at": null,
+        "invalidate_manually": 0,
+        "invalid_identity": 0,
+        "invalidated_at": "2019-05-11T00:05:01",
+        "notification_counter": 0,
+        "region": "global",
+        "email": "thenetimp+facebook@gmail.com",
+        "oauth_id": null
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 3,
+      "count": 42
+    }
+  }
+}
+```
+
+### Understanding the response fields
+
+##### Attribute Fields
 These are the same as on a call to a single remote identity.
 
 ##### Relationship Fields.
@@ -722,7 +692,7 @@ These are the same as on a call to a single remote identity.
 > | Authorization  | string | Openbridge JWT, passed as a authorization bearer type |
 
 ##### Parameters
-The DELETE method requires the remote identity ID as part of the reuqest string.
+The DELETE method requires the remote identity ID as part of the request path.
 
 Identities can be shared between more than one Openbridge account. The DELETE call will remove any association between the calling account and the identity. If the identity only belongs to the one account it will also delete the identity and any credentials associated with it.
 
@@ -730,7 +700,7 @@ Identities can be shared between more than one Openbridge account. The DELETE ca
 
 > | http code  | content-type      | response               |
 > |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`   | `application/json`  | `Configuration created successfully`        |
+> | `200`   | `application/json`  | `Remote identity deleted successfully`        |
 > | `404`   | `application/json`  | `Not found`        |
 
 ##### Example cURL
@@ -744,7 +714,7 @@ Identities can be shared between more than one Openbridge account. The DELETE ca
 
 ## Subscription API
 
-The Openbridge Subscription API is a RESTFUL API, that supports. `GET`, `POST`, and `PATCH` methods. It is used for creating, retrieving, and updating pipeline subscriptions. 
+The Openbridge Subscription API is a RESTful API that supports `GET`, `POST`, and `PATCH` methods. It is used for creating, retrieving, and updating pipeline subscriptions.
 
 <details>
  <summary><code>POST</code> <code><b>https://subscriptions.api.openbridge.io/sub</b></code></summary>
@@ -1021,7 +991,7 @@ The response will contain many deprecated fields, and will not include the `subs
 
 ##### Example cURL
 
-This example holds the state that is needed during the Oauth request for a Facebook identity
+This example holds the state that is needed during the OAuth request for a Facebook identity.
 
 ```curl
  curl -X GET -H "Content-Type: application/json" -H "authorization: Bearer YOURJWTXXXXXXXXXXXX" https://subscriptions.api.openbridge.io/sub/{id}'
@@ -1277,7 +1247,7 @@ Openbridge's Selling Partner products all use the same payload, the difference i
 
 ## State API.
 
-The Openbridge State API is a RESTFUL API, that supports. `GET` and`POST` It is used pass the state of a transaction around to other APIs and applications with an identifying token. It is a prerequisite to creating Oauth based identities with the Openbridge OauthAPI. 
+The Openbridge State API is a RESTful API that supports `GET` and `POST`. It is used to pass the state of a transaction to other APIs and applications with an identifying token. It is a prerequisite for creating OAuth-based identities with the Openbridge OAuth API.
 
 <details>
  <summary><code>POST</code> <code><b>https://state.api.openbridge.io/state/oauth</b></code></summary>
@@ -1314,13 +1284,13 @@ The POST method does not require any parameters.
 
 ##### Example cURL
 
-This example holds the state that is needed during the Oauth request for a Facebook identity
+This example holds the state that is needed during the OAuth request for a Facebook identity.
 
 ```curl
  curl -H "Content-Type: application/json" -X POST -d '{ "data": { "type": "ClientState", "attributes": { "state": { "account_id": "XXX", "user_id": "YYY", "remote_identity_type_id": 2, "region": "global", "return_url": "https://app.openbridge.com/wizards/facebook-page-insights", "shop_url": null }}}}' https://state.api.openbridge.io/state/oauth
 ```
 
-**Note**: The example payload contains information required by the Openbridge Oauth API to start and manage a Facebook Authorization, but it is not restricted to only those key/value pairs. You could for example include your own key/value pair to help with maintaining the state of your application through the identity process.
+**Note**: The example payload contains information required by the Openbridge OAuth API to start and manage a Facebook authorization, but it is not restricted to only those key/value pairs. You could, for example, include your own key/value pair to help maintain the state of your application through the identity process.
 
 ##### Example Response
 
@@ -1369,7 +1339,7 @@ The response includes the id/token and the timestamps the state was created at.
 
 ##### Example cURL
 
-This example holds the state that is needed during the Oauth request for a Facebook identity
+This example holds the state that is needed during the OAuth request for a Facebook identity.
 
 ```curl
  curl -X GET https://state.api.openbridge.io/state/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
