@@ -238,7 +238,7 @@ jobs_batch_cmd() {
 
 jobs_help() {
     cat << 'HELP'
-Usage: embed-kit jobs COMMAND [options]
+Usage: embed-cli jobs COMMAND [options]
 
 Commands:
     list        List jobs for a subscription
@@ -273,17 +273,17 @@ Batch options:
     --file, -f PATH        Path to CSV file
 
 Examples:
-    embed-kit jobs list --subscription 116223
-    embed-kit jobs list --subscription 116223 --page 5
-    embed-kit jobs list --subscription 116223 --range 5-10
-    embed-kit jobs list --subscription 116223 --last-days 7
-    embed-kit jobs list --subscription 116223 --page-size 50
-    embed-kit jobs list --subscription 116223 --stage 1002 --request-start ">=15"
-    embed-kit jobs list --subscription 116223 --stage 1002 --request-start "<10"
-    embed-kit jobs create --start 2024-01-01 --end 2024-01-01 --subscription 116223
-    embed-kit jobs batch --file jobs.csv
-    embed-kit jobs create-product --job-id 12345 --orders "111-2222-3333,444-5555-6666"
-    embed-kit jobs create-product --job-id 12345 --file orders.csv
+    embed-cli jobs list --subscription 116223
+    embed-cli jobs list --subscription 116223 --page 5
+    embed-cli jobs list --subscription 116223 --range 5-10
+    embed-cli jobs list --subscription 116223 --last-days 7
+    embed-cli jobs list --subscription 116223 --page-size 50
+    embed-cli jobs list --subscription 116223 --stage 1002 --request-start ">=15"
+    embed-cli jobs list --subscription 116223 --stage 1002 --request-start "<10"
+    embed-cli jobs create --start 2024-01-01 --end 2024-01-01 --subscription 116223
+    embed-cli jobs batch --file jobs.csv
+    embed-cli jobs create-product --job-id 12345 --orders "111-2222-3333,444-5555-6666"
+    embed-cli jobs create-product --job-id 12345 --file orders.csv
 HELP
 }
 

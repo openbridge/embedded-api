@@ -42,7 +42,7 @@ decode_jwt_payload() {
     fi
     
     # Extract payload (second part of JWT)
-    if ! payload=$(echo -n "${token#*.}" | cut -d. -f1 | base64 -d 2>/dev/null); then
+    if ! payload=$(decode_base64url "$(printf '%s' "${token#*.}" | cut -d. -f1)" 2>/dev/null); then
         log_message "DEBUG" "Failed to decode base64 payload"
         return 1
     fi
@@ -83,8 +83,7 @@ is_token_valid() {
     fi
 
     local payload
-    payload=$(decode_jwt_payload "$token")
-    if [[ $? -ne 0 ]]; then
+    if ! payload=$(decode_jwt_payload "$token"); then
         log_message "DEBUG" "Invalid token format or corrupted payload"
         return 1
     fi
@@ -113,7 +112,7 @@ is_token_valid() {
         return 1
     fi
 
-    log_message "DEBUG" "JWT token valid until $(date -d "@$expires_at" "+%Y-%m-%d %H:%M:%S")"
+    log_message "DEBUG" "JWT token valid until $(format_unix_timestamp_utc "$expires_at")"
     return 0
 }
 
@@ -127,10 +126,9 @@ save_token() {
 
     # Only attempt to cache if token appears valid
     if decode_jwt_payload "$token" >/dev/null 2>&1; then
-        # Only attempt to cache if CACHE_DIR exists and is writable
+        init_cache
+
         if [[ -d "$CACHE_DIR" && -w "$CACHE_DIR" ]]; then
-            init_cache
-            
             local payload
             payload=$(decode_jwt_payload "$token")
             local expires_at
@@ -146,7 +144,7 @@ save_token() {
                     expires_at: ($expires_at|tonumber),
                     payload: ($payload|fromjson)
                 }' > "$TOKEN_CACHE" 2>/dev/null; then
-                log_message "DEBUG" "Token cached, expires: $(date -d "@$expires_at" "+%Y-%m-%d %H:%M:%S")"
+                log_message "DEBUG" "Token cached, expires: $(format_unix_timestamp_utc "$expires_at")"
             else
                 log_message "DEBUG" "Unable to cache token, continuing without caching"
             fi
@@ -195,8 +193,8 @@ retrieve_jwt_using_refresh() {
          -H "Content-Type: application/json" \
          -d "$payload" \
          "$AUTH_ENDPOINT")
-    
-    if [[ $? -ne 0 ]]; then
+
+    if [[ -z "$response" ]]; then
         log_message "ERROR" "Failed to connect to auth endpoint"
         return 1
     fi

@@ -78,7 +78,7 @@ health_check_cmd() {
 
 health_help() {
     cat << 'HELP'
-Usage: embed-kit health COMMAND [options]
+Usage: embed-cli health COMMAND [options]
 
 Commands:
     check       Get health check information
@@ -91,12 +91,12 @@ Options:
     --page-size NUMBER    Number of results per page (max 100)
 
 Examples:
-    embed-kit health check
-    embed-kit health check --page 1
-    embed-kit health check --last-days 2
-    embed-kit health check --status ERROR
-    embed-kit health check --subscription 116223
-    embed-kit health check --page-size 50
+    embed-cli health check
+    embed-cli health check --page 1
+    embed-cli health check --last-days 2
+    embed-cli health check --status ERROR
+    embed-cli health check --subscription 116223
+    embed-cli health check --page-size 50
 HELP
 }
 

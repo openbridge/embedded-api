@@ -16,7 +16,10 @@ readonly E_INVALID_DATE=2
 readonly E_API_FAILURE=3
 readonly E_INTERRUPTED=4
 readonly E_NO_AUTH=5
+readonly E_USAGE=64
 readonly E_DEPENDENCY=10
+readonly E_INVALID_INPUT=11
+readonly E_INVALID_STATUS=12
 readonly E_FAILURE=255
 
 #######################################
@@ -66,8 +69,6 @@ readonly DEFAULT_CONFIG_FILE="/app/config.env"
 readonly CONFIG_FILE="${CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
 
 
-# Add this to common.sh, before the parse_arguments function:
-
 urlencode() {
     local string="$1"
     local strlen="${#string}"
@@ -85,41 +86,94 @@ urlencode() {
     printf "%s" "${encoded}"
 }
 
-# Already have get_relative_date() for date handling
-# Need to add cron schedule generation for 10-15 mins ahead
+is_gnu_date() {
+    date --version >/dev/null 2>&1
+}
 
-process_order_ids() {
-    local csv_file="${1:-}"
-    local batch_size=100
-    local order_ids=()
-    
-    # Validate input file
-    if [[ -z "$csv_file" ]]; then
-        error_exit "CSV file path is required"
+base64_decode() {
+    if base64 --help 2>&1 | grep -q -- '--decode'; then
+        base64 --decode
+    else
+        base64 -D
+    fi
+}
+
+decode_base64url() {
+    local input="$1"
+    local rem=$(( ${#input} % 4 ))
+
+    input="${input//-/+}"
+    input="${input//_/\/}"
+
+    if [[ $rem -eq 2 ]]; then
+        input="${input}=="
+    elif [[ $rem -eq 3 ]]; then
+        input="${input}="
+    elif [[ $rem -eq 1 ]]; then
+        return 1
     fi
 
-    if [[ ! -f "$csv_file" ]]; then
-        error_exit "Order IDs file not found: $csv_file"
+    printf '%s' "$input" | base64_decode
+}
+
+format_unix_timestamp_utc() {
+    local epoch="$1"
+
+    if is_gnu_date; then
+        date -u -d "@${epoch}" "+%Y-%m-%d %H:%M:%S"
+    else
+        date -u -r "${epoch}" "+%Y-%m-%d %H:%M:%S"
     fi
-    
-    # Read and validate order IDs
-    while IFS= read -r line; do
-        # Skip empty lines
-        [[ -z "$line" ]] && continue
-        
-        # Validate order ID format
-        if [[ ! "$line" =~ ^[0-9]{3}-[0-9]+-[0-9]+$ ]]; then
-            error_exit "Invalid order ID format: $line"
+}
+
+get_relative_date() {
+    local days="$1"
+    local time_of_day="${2:-start}"
+
+    [[ "$days" =~ ^[0-9]+$ ]] || error_exit "Days must be numeric" "$E_INVALID_INPUT"
+
+    if is_gnu_date; then
+        if [[ "$time_of_day" == "start" ]]; then
+            date -d "${days} days ago 00:00:00" "+%Y-%m-%dT%H:%M:%S"
+        else
+            date -d "${days} days ago 23:59:59" "+%Y-%m-%dT%H:%M:%S"
         fi
-        
-        order_ids+=("$line")
-    done < "$csv_file"
-
-    if [[ ${#order_ids[@]} -eq 0 ]]; then
-        error_exit "No valid order IDs found in file"
+    else
+        if [[ "$time_of_day" == "start" ]]; then
+            date -v "-${days}d" -v 0H -v 0M -v 0S "+%Y-%m-%dT%H:%M:%S"
+        else
+            date -v "-${days}d" -v 23H -v 59M -v 59S "+%Y-%m-%dT%H:%M:%S"
+        fi
     fi
-    
-    echo "${order_ids[@]}"
+}
+
+validate_numeric() {
+    local value="$1"
+    local label="${2:-value}"
+
+    [[ "$value" =~ ^[0-9]+$ ]] || error_exit "${label} must be numeric" "$E_INVALID_INPUT"
+}
+
+get_query_param_value() {
+    local opts="$1"
+    local target_key="$2"
+    local param key value
+    local old_ifs="$IFS"
+
+    IFS='&'
+    for param in $opts; do
+        [[ -z "$param" ]] && continue
+        key="${param%%=*}"
+        value="${param#*=}"
+        if [[ "$key" == "$target_key" ]]; then
+            printf '%s' "$value"
+            IFS="$old_ifs"
+            return 0
+        fi
+    done
+    IFS="$old_ifs"
+
+    return 1
 }
 
 generate_future_cron() {
@@ -129,7 +183,7 @@ generate_future_cron() {
         error_exit "Minutes ahead must be a positive number"
     fi
 
-    if date --version >/dev/null 2>&1; then
+    if is_gnu_date; then
         date -u -d "+${minutes_ahead} minutes" "+%M %H * * *"
     else
         date -v+"${minutes_ahead}"M -u "+%M %H * * *"
@@ -137,11 +191,9 @@ generate_future_cron() {
 }
 
 generate_future_timestamp() {
-    if date --version >/dev/null 2>&1; then
-        # GNU date
+    if is_gnu_date; then
         date -u -d "15 minutes" "+%Y-%m-%d %H:%M:%S"
     else
-        # BSD date
         date -v+15M -u "+%Y-%m-%d %H:%M:%S"
     fi
 }
@@ -168,20 +220,6 @@ error_exit() {
 #######################################
 # Configuration
 #######################################
-
-# Update the load_config function:
-load_config() {
-    if [[ -f "$CONFIG_FILE" ]]; then
-        while IFS='=' read -r key value; do
-            if [[ -n "$key" && ! "$key" =~ ^# ]]; then
-                value="${value%\"}"
-                value="${value#\"}"
-                export "$key=$value"
-            fi
-        done < "$CONFIG_FILE"
-    fi
-    return 0
-}
 
 usage() {
     cat << HELP

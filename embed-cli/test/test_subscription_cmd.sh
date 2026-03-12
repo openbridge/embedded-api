@@ -99,7 +99,7 @@ echo "Starting subscription command tests..."
 # Basic command tests - expect success (0)
 run_test "Subscription Help" "subscription_help" 0
 run_test "List All Subscriptions" "subscription_cmd list" 0
-run_test "List With Status Filter" "subscription_cmd list --status invalid" 0
+run_test "List With Status Filter" "subscription_cmd list --status invalid" 12
 run_test "List With Date Filter" "subscription_cmd list --created-after \"2024-10-01T00:00:00\"" 0
 
 # Error cases - expect status 255 for error_exit calls

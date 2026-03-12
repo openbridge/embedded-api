@@ -20,38 +20,37 @@ list_identities() {
     local single_page_mode=false
     local query_params=""
 
-    # Parse options string into associative array
-    declare -A params
-    while IFS='=' read -r key value; do
-        if [[ -n "$key" ]]; then
-            params["$key"]="$value"
-        fi
-    done < <(echo "$opts" | tr '&' '\n')
-    
-    # Validate and process parameters
-    if [[ -n "${params[page_size]:-}" ]]; then
-        if [[ "${params[page_size]}" -gt "$MAX_PAGE_SIZE" ]]; then
+    local page_size invalid_identity invalidated_at_gte invalidated_at_lte
+
+    page_size=$(get_query_param_value "$opts" "page_size" || true)
+    invalid_identity=$(get_query_param_value "$opts" "invalid_identity" || true)
+    invalidated_at_gte=$(get_query_param_value "$opts" "invalidated_at__gte" || true)
+    invalidated_at_lte=$(get_query_param_value "$opts" "invalidated_at__lte" || true)
+
+    if [[ -n "$page_size" ]]; then
+        validate_numeric "$page_size" "page size"
+        if [[ "$page_size" -gt "$MAX_PAGE_SIZE" ]]; then
             error_exit "Page size cannot exceed $MAX_PAGE_SIZE"
         fi
-        query_params+="&page_size=${params[page_size]}"
+        query_params+="&page_size=$page_size"
     fi
 
-    if [[ -n "${params[invalid_identity]:-}" ]]; then
-        if [[ "${params[invalid_identity]}" =~ ^[01]$ ]]; then
-            query_params+="&invalid_identity=${params[invalid_identity]}"
+    if [[ -n "$invalid_identity" ]]; then
+        if [[ "$invalid_identity" =~ ^[01]$ ]]; then
+            query_params+="&invalid_identity=$invalid_identity"
         else
             error_exit "invalid_identity must be 0 or 1"
         fi
     fi
 
-    if [[ -n "${params[invalidated_at__gte]:-}" ]]; then
-        validate_datetime "${params[invalidated_at__gte]}" "invalidated_at__gte"
-        query_params+="&invalidated_at__gte=$(urlencode "${params[invalidated_at__gte]}")"
+    if [[ -n "$invalidated_at_gte" ]]; then
+        validate_datetime "$invalidated_at_gte" "invalidated_at__gte" || return $?
+        query_params+="&invalidated_at__gte=$(urlencode "$invalidated_at_gte")"
     fi
 
-    if [[ -n "${params[invalidated_at__lte]:-}" ]]; then
-        validate_datetime "${params[invalidated_at__lte]}" "invalidated_at__lte"
-        query_params+="&invalidated_at__lte=$(urlencode "${params[invalidated_at__lte]}")"
+    if [[ -n "$invalidated_at_lte" ]]; then
+        validate_datetime "$invalidated_at_lte" "invalidated_at__lte" || return $?
+        query_params+="&invalidated_at__lte=$(urlencode "$invalidated_at_lte")"
     fi
 
     # If only one page number is provided and no end_page, treat as single page request
@@ -137,7 +136,7 @@ get_identity() {
     fi
 
     if [[ -n "$invalidated_at" ]]; then
-        validate_datetime "$invalidated_at" "invalidated_at"
+        validate_datetime "$invalidated_at" "invalidated_at" || return $?
         local encoded_date
         encoded_date=$(urlencode "$invalidated_at")
         local date_param="invalidated_at__${operator}=${encoded_date}"

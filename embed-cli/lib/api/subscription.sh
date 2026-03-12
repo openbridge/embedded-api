@@ -28,20 +28,21 @@ validate_subscription_status() {
     done
     
     if [[ "$valid" != "true" ]]; then
-        error_exit "Invalid status: $status. Valid values are: ${SUBSCRIPTION_VALID_STATUSES[*]}" $E_INVALID_STATUS
+        error_exit "Invalid status: $status. Valid values are: active, cancelled" "$E_INVALID_STATUS"
     fi
 }
 
 parse_options() {
     local opts="$1"
     local query_params=""
-    local IFS='&'
-    local -a params=($opts)
-    
-    for param in "${params[@]}"; do
+    local param key value
+    local old_ifs="$IFS"
+
+    IFS='&'
+    for param in $opts; do
         [[ -z "$param" ]] && continue
-        local key="${param%%=*}"
-        local value="${param#*=}"
+        key="${param%%=*}"
+        value="${param#*=}"
         
         case "$key" in
             status)
@@ -57,19 +58,21 @@ parse_options() {
                 query_params+="&product=$value"
                 ;;
             page_size)
+                validate_numeric "$value" "page size"
                 if [[ "$value" -gt "$MAX_PAGE_SIZE" ]]; then
-                    error_exit "Page size cannot exceed $MAX_PAGE_SIZE" $E_INVALID_INPUT
+                    error_exit "Page size cannot exceed $MAX_PAGE_SIZE" "$E_INVALID_INPUT"
                 fi
                 query_params+="&page_size=$value"
                 ;;
             created_at__gte|created_at__lte|modified_at__gte|modified_at__lte)
-                validate_datetime "$value" "$key"
+                validate_datetime "$value" "$key" || return $?
                 local encoded_value
-                encoded_value=$(printf '%s' "$value" | sed 's/ /%20/g;s/:/%3A/g')
+                encoded_value=$(urlencode "$value")
                 query_params+="&$key=$encoded_value"
                 ;;
         esac
     done
+    IFS="$old_ifs"
 
     echo "$query_params"
 }
@@ -82,7 +85,7 @@ get_subscriptions() {
 
     # Parse and validate options
     if [[ -n "$opts" ]]; then
-        query_params=$(parse_options "$opts")
+        query_params=$(parse_options "$opts") || return $?
     fi
 
     # If only one page number is provided and no end_page, treat as single page request
@@ -93,15 +96,15 @@ get_subscriptions() {
 
     # Validate page numbers
     if [[ ! "$start_page" =~ ^[0-9]+$ ]]; then
-        error_exit "Invalid start page number: $start_page" $E_INVALID_INPUT
+        error_exit "Invalid start page number: $start_page" "$E_INVALID_INPUT"
     fi
 
     if [[ -n "$end_page" ]]; then
         if [[ ! "$end_page" =~ ^[0-9]+$ ]]; then
-            error_exit "Invalid end page number: $end_page" $E_INVALID_INPUT
+            error_exit "Invalid end page number: $end_page" "$E_INVALID_INPUT"
         fi
         if ((start_page > end_page)); then
-            error_exit "Start page ($start_page) cannot be greater than end page ($end_page)" $E_INVALID_INPUT
+            error_exit "Start page ($start_page) cannot be greater than end page ($end_page)" "$E_INVALID_INPUT"
         fi
     fi
 
@@ -199,15 +202,15 @@ update_subscription() {
 
     # Validate inputs
     if [[ -z "$subscription_id" ]]; then
-        error_exit "Subscription ID is required" $E_INVALID_INPUT
+        error_exit "Subscription ID is required" "$E_INVALID_INPUT"
     fi
 
     if [[ ! "$subscription_id" =~ ^[0-9]+$ ]]; then
-        error_exit "Invalid subscription ID: $subscription_id" $E_INVALID_INPUT
+        error_exit "Invalid subscription ID: $subscription_id" "$E_INVALID_INPUT"
     fi
 
     if [[ -z "$update_type" || -z "$update_value" ]]; then
-        error_exit "Update type and value are required" $E_INVALID_INPUT
+        error_exit "Update type and value are required" "$E_INVALID_INPUT"
     fi
 
     # Validate update type and value
@@ -217,11 +220,11 @@ update_subscription() {
             ;;
         storage_group)
             if [[ ! "$update_value" =~ ^[0-9]+$ ]]; then
-                error_exit "Storage group must be numeric" $E_INVALID_INPUT
+                error_exit "Storage group must be numeric" "$E_INVALID_INPUT"
             fi
             ;;
         *)
-            error_exit "Invalid update type: $update_type" $E_INVALID_INPUT
+            error_exit "Invalid update type: $update_type" "$E_INVALID_INPUT"
             ;;
     esac
 

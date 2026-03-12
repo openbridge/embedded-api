@@ -13,57 +13,6 @@ readonly _API_JOBS_SH=1
 [[ -n "${_API_AUTH_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/auth.sh"
 [[ -n "${_VALIDATION_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../validation.sh"
 
-# URL encoding function
-urlencode() {
-    local string="$1"
-    local strlen=${#string}
-    local encoded=""
-    local pos c o
-
-    for ((pos=0; pos<strlen; pos++)); do
-        c=${string:$pos:1}
-        case "$c" in
-            [-_.~a-zA-Z0-9]) o="$c" ;;
-            # Use ' to get ASCII value, properly formatted with %02x
-            *) printf -v o '%%%02x' "'$c" ;;
-        esac
-        encoded+="$o"
-    done
-    echo "$encoded"
-}
-
-process_order_ids() {
-    local csv_file="${1:-}"
-    local order_ids=()
-    local batch_size=100
-
-    if [[ -z "$csv_file" ]]; then
-        error_exit "CSV file path is required"
-    fi
-
-    # Check if file exists and is readable
-    if [[ ! -f "$csv_file" ]]; then
-        error_exit "Order IDs file not found: $csv_file"
-    fi
-
-    log_message "DEBUG" "Reading order IDs from: $csv_file"
-
-    # Skip header line and read rest using process substitution to avoid subshell
-    while IFS= read -r line; do
-        [[ -z "$line" ]] && continue
-        
-        if [[ ! "$line" =~ ^[0-9]{3}-[0-9]+-[0-9]+$ ]]; then
-            error_exit "Invalid order ID format: $line"
-        fi
-        
-        order_ids+=("$line")
-    done < <(tail -n +2 "$csv_file")
-
-    [[ ${#order_ids[@]} -eq 0 ]] && error_exit "No valid order IDs found in file"
-    
-    printf '%s\n' "${order_ids[@]}"
-}
-
 create_product_jobs() {
     local primary_job_id="$1"
     local stage_id="${2:-1000}"
@@ -118,14 +67,13 @@ create_product_jobs() {
 
         local offset_minutes=$((15 + (batch_index * 15)))
 
-        local future_ts
-        future_ts="$(date -u -d "+${offset_minutes} minutes" "+%Y-%m-%d %H %M")"
-
-        local future_day="${future_ts%% *}"
-        local future_rest="${future_ts#* }"
-        local future_hour="${future_rest%% *}"
-        local future_minute="${future_rest##* }"
-        local schedule="${future_minute} ${future_hour} * * *"
+        local future_day schedule
+        if is_gnu_date; then
+            future_day="$(date -u -d "+${offset_minutes} minutes" "+%Y-%m-%d")"
+        else
+            future_day="$(date -u -v+"${offset_minutes}"M "+%Y-%m-%d")"
+        fi
+        schedule="$(generate_future_cron "$offset_minutes")"
 
         local payload
         payload=$(jq -n \
@@ -182,36 +130,37 @@ get_jobs() {
 
     #validate_subscription_id "$subscription_ids"
 
-    declare -A params
-    while IFS='=' read -r key value; do
-        if [[ -n "$key" ]]; then
-            params["$key"]="$value"
-        fi
-    done < <(printf '%s' "$opts" | tr '&' '\n')
+    local stage_id request_start page_size created_at_gte created_at_lte
+    stage_id=$(get_query_param_value "$opts" "stage_id" || true)
+    request_start=$(get_query_param_value "$opts" "request_start" || true)
+    page_size=$(get_query_param_value "$opts" "page_size" || true)
+    created_at_gte=$(get_query_param_value "$opts" "created_at__gte" || true)
+    created_at_lte=$(get_query_param_value "$opts" "created_at__lte" || true)
+
+    if [[ -n "$stage_id" ]]; then
+        [[ ! "$stage_id" =~ ^[0-9]+$ ]] && error_exit "Invalid stage ID: $stage_id"
+        query_params+="&stage_id=$stage_id"
+    fi
+
+    if [[ -n "$request_start" ]]; then
+        [[ ! "$request_start" =~ ^((>=|<=|>|<|=)[0-9]+|[0-9]+)$ ]] && error_exit "Invalid request_start format. Use: [>=|<=|>|<|=]NUMBER or NUMBER"
+        query_params+="&request_start${request_start}"
+    fi
+
+    if [[ -n "$page_size" ]]; then
+        validate_numeric "$page_size" "page size"
+        [[ "$page_size" -gt "$MAX_PAGE_SIZE" ]] && error_exit "Page size cannot exceed $MAX_PAGE_SIZE"
+        query_params+="&page_size=$page_size"
+    fi
+
+    if [[ -n "$created_at_gte" ]]; then
+        validate_datetime "$created_at_gte" "created_at__gte" || return $?
+        query_params+="&created_at__gte=$(urlencode "$created_at_gte")"
+    fi
     
-    if [[ -n "${params[stage_id]:-}" ]]; then
-        [[ ! "${params[stage_id]}" =~ ^[0-9]+$ ]] && error_exit "Invalid stage ID: ${params[stage_id]}"
-        query_params+="&stage_id=${params[stage_id]}"
-    fi
-
-    if [[ -n "${params[request_start]:-}" ]]; then
-        [[ ! "${params[request_start]}" =~ ^((>=|<=|>|<|=)[0-9]+|[0-9]+)$ ]] && error_exit "Invalid request_start format. Use: [>=|<=|>|<|=]NUMBER or NUMBER"
-        query_params+="&request_start${params[request_start]}"
-    fi
-
-    if [[ -n "${params[page_size]:-}" ]]; then
-        [[ "${params[page_size]}" -gt "$MAX_PAGE_SIZE" ]] && error_exit "Page size cannot exceed $MAX_PAGE_SIZE"
-        query_params+="&page_size=${params[page_size]}"
-    fi
-
-    if [[ -n "${params[created_at__gte]:-}" ]]; then
-        validate_datetime "${params[created_at__gte]}" "created_at__gte"
-        query_params+="&created_at__gte=$(urlencode "${params[created_at__gte]}")"
-    fi
-    
-    if [[ -n "${params[created_at__lte]:-}" ]]; then
-        validate_datetime "${params[created_at__lte]}" "created_at__lte"
-        query_params+="&created_at__lte=$(urlencode "${params[created_at__lte]}")"
+    if [[ -n "$created_at_lte" ]]; then
+        validate_datetime "$created_at_lte" "created_at__lte" || return $?
+        query_params+="&created_at__lte=$(urlencode "$created_at_lte")"
     fi
 
     if [[ -n "$start_page" && -z "$end_page" && "$start_page" != "1" ]]; then

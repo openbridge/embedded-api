@@ -5,10 +5,10 @@ The `embed-cli` is a unified tool to manage Openbridge API services. It is desig
 
 - Creating and listing data pipeline jobs  
 - Checking health reports  
-- Retrieving acount and user information  
+- Retrieving account and user information  
 - Getting product metadata 
 
- The `embed-cli` packaged as a Docker based tool provides a packaged, easy-to-run collection of API operations. By containerizing `embed-cli`, you avoid installing dependencies locally and ensure that the runtime environment is consistent across different systems. 
+The CLI can be run either directly from the shell or packaged as a Docker-based tool. Docker provides a consistent runtime, but it is not required for local usage.
 
 ## `embed-cli` Features
 
@@ -48,7 +48,9 @@ The `embed-cli` is a unified tool to manage Openbridge API services. It is desig
 There are two principal prerequisites to quickly use the API:
 
 1. **API Access Approval**
-2. **Docker Installation** to use `embed-cli`
+2. **A runtime for `embed-cli`**, either:
+   - your local shell environment, or
+   - Docker
 
 ### 1. API Access Approval
 Access approval is required to use the Openbridge Embedded APIs. Only Openbridge customers with Premium or higher account plans are eligible for access. Contact Openbridge via the [official support portal](https://openbridge.zendesk.com) to request access. Customers who have been granted access to use the Embedded APIs will be given the `api-user` role to the owner of the account. Once Openbridge access has been granted, you will need to log out of the Openbridge app and then log back in. 
@@ -60,8 +62,15 @@ To create a refresh token you must have been granted the `api-user` role on your
 
 **Note:** *Once you have a copy of your refresh token, securely store this token. This token will not be displayed again, nor will it be stored for future retrieval. If the token is lost, you will need to generate a new one.*
 
-### 2. Docker Installation
-Install Docker in the environment where you plan to execute API commands. This can be either locally or on a hosted cloud platform like Amazon Web Services (AWS). Refer to the appropriate Docker installation guide for your environment:
+### 2. Choose How To Run `embed-cli`
+
+You can run `embed-cli` directly from the repository:
+
+```bash
+./bin/embed-cli --help
+```
+
+If you prefer to run it in a container, install Docker in the environment where you plan to execute API commands. This can be either locally or on a hosted cloud platform like Amazon Web Services (AWS). Refer to the appropriate Docker installation guide for your environment:
 
 - [Docker Installation Guide for Linux](https://docs.docker.com/engine/install/)
 - [Docker Installation Guide for macOS](https://docs.docker.com/desktop/setup/install/mac-install/)
@@ -81,21 +90,35 @@ This command creates a Docker image named `openbridge/embed-cli`. You can name i
 
 When running `embed-cli`, authentication tokens and other configuration values are **primarily passed through environment variables** to the container. Some key environment variables include:
 
-- **`REFRESH_TOKEN`**: Alternative token for API authentication.  
+- **`REFRESH_TOKEN`**: Long-lived token used to obtain a JWT.  
+- **`AUTH_TOKEN`**: Existing JWT token.  
 - **`LOG_LEVEL`**: Controls verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).  
+- **`CONFIG_FILE`**: Path to a config file to source before execution.  
 
 ### Config File
 You can mount a config file into the container with your refresh token information:
 ```docker
         docker run --rm \
-          -v "$(pwd)/config.env:/app/config.env" \
+          -v "$(pwd)/config.env:/app/config.env:ro" \
           openbridge/embed-cli jobs list --subscription 123456
 ```
 `embed-cli` will source environment variables from `/app/config.env`.
 
+For direct local usage, you can point the CLI at the same file:
+
+```bash
+CONFIG_FILE="$(pwd)/config.env" ./bin/embed-cli jobs list --subscription 123456
+```
+
 ### Basic Usage
 
-A simple run without any mounted volumes or additional environment variables might look like:
+A simple local run looks like:
+
+```bash
+REFRESH_TOKEN=your_refresh_token ./bin/embed-cli <command> [options]
+```
+
+The equivalent Docker run looks like:
 
 ```docker
     docker run --rm \
@@ -135,21 +158,23 @@ Responses will be output as JSON, the contents of which will vary based on the s
 
 Here is an example when you retrieve user account information:
 
+```bash
+REFRESH_TOKEN="your_refresh_token" \
+LOG_LEVEL=INFO \
+./bin/embed-cli user info
+```
+
+Docker equivalent:
+
 ```docker
   docker run --rm \                     
-    -e "REFRESH_TOKEN=ABC123DummyToken:78cc49e667485hfc04f79235b5cd2244
-n1234567890abcdef1234567890abcdef" \
+    -e "REFRESH_TOKEN=your_refresh_token" \
     -e "LOG_LEVEL=INFO" \
     openbridge/embed-cli user info
 ```
 When this is run, the user information will be returned for the account as shown in this sample:
 
 ```json
-docker run --rm \                     
-  -e "REFRESH_TOKEN=XYPb2GtdoUVJ2y7nZNpzRn:78cc49e667485hfc04f79235b5cd2244" \
-  -e "LOG_LEVEL=INFO" \
-  openbridge/embed-cli user info
-2025-01-21 22:51:06 - [SUCCESS] - Successfully retrieved new token
 {
   "links": {
     "first": "https://user.api.openbridge.io/user?page=1",
@@ -187,10 +212,10 @@ docker run --rm \
 
 ### Cache Your JWT Token
 
-Token caching improves performance and reliability by storing the JWT locally instead of requesting a new one for each command. The cache stores the token, expiration time, and payload in /app/cache/jwt_token.json. This reduces API calls and latency, particularly important in automation scenarios. The cache automatically refreshes tokens nearing expiration (5-minute buffer).
+Token caching improves performance and reliability by storing the JWT locally instead of requesting a new one for each command. The cache stores the token, expiration time, and payload in `/app/cache/jwt_token.json`. This reduces API calls and latency, particularly important in automation scenarios. The cache automatically refreshes tokens nearing expiration with a five-minute buffer.
 
 
-*Important security considerations:Note, that your local directory permissions should be restricted since it contains sensitive tokens. In our mounted volume at $HOME/.embed-cli example will persist between container runs so ensure proper cleanup occurs as needed. Consider encryption at rest for production environments and monitor the cache directory size over time.*
+Important security considerations: your local directory permissions should be restricted since it contains sensitive tokens. In the mounted-volume example below, `$HOME/.embed-cli` persists between container runs, so ensure proper cleanup occurs as needed. Consider encryption at rest for production environments.
 
 ```docker
 docker run --rm \
@@ -216,7 +241,7 @@ You can quickly create a docker volume to store the token:
 ```docker
 docker volume create embed-cli-cache
 ```
-Then use the new volumne in your command:
+Then use the new volume in your command:
 ```docker
 docker run --rm \
   -e "REFRESH_TOKEN=XYPb2GtdoUVJ2y7nZNpzRn:78cc49e667485hfc04f79235b5cd2244" \
@@ -256,18 +281,17 @@ Get a specific page (e.g., page 5) of health checks:
       -e "REFRESH_TOKEN=your_refresh_token" \
       openbridge/embed-cli health check --page 5
 ```
-Get a range of pages (pages 5 through 10):
-
+Filter health checks to the last 2 days:
 ```docker
     docker run --rm \
       -e "REFRESH_TOKEN=your_refresh_token" \
-      openbridge/embed-cli health check --range 5-10
+      openbridge/embed-cli health check --last-days 2
 ```
-Alternatively:
+Filter health checks by subscription:
 ```docker
     docker run --rm \
       -e "REFRESH_TOKEN=your_refresh_token" \
-      openbridge/embed-cli health check --start-page 5 --end-page 10
+      openbridge/embed-cli health check --subscription 116223
 ```
 ---
 
@@ -307,7 +331,7 @@ You can use a slightly different syntax for the start and end pages:
         -e "REFRESH_TOKEN=your_refresh_token" \
         openbridge/embed-cli jobs list --subscription XXXXXXX --start-page 5 --end-page 10
 ```
-Request jobs based on a specic report or data type by `--stage`
+Request jobs based on a specific report or data type by `--stage`
 ```docker
  docker run --rm \
    -v "$(pwd)/config.env:/app/config.env" \
@@ -354,7 +378,7 @@ The `backfill.csv` must look like:
     2025-01-06,XXXXXXX
     2025-01-07,XXXXXXX
 ```
-`date` reflects the report or data date you want to request and `subscription_id` the specifc pipeline you want to collect the data for.
+`date` reflects the report or data date you want to request and `subscription_id` the specific pipeline you want to collect the data for.
 
 A batch CSV file can also contain an additional column called `stage_id`. The `stage_id` reflects the specific report or data you want to request.
 
@@ -385,7 +409,7 @@ Retrieve just the user ID:
       openbridge/embed-cli user id
 ```
 
-Retrieve compelte user metadaa info:
+Retrieve complete user metadata info:
 ```docker
     docker run --rm \
       -e "REFRESH_TOKEN=your_token_here" \
@@ -404,7 +428,6 @@ List subscriptions with a specific page size:
 ```docker
     docker run --rm \
       -e "REFRESH_TOKEN=your_token_here" \
-      -e "MAX_PAGE_SIZE=50" \
       openbridge/embed-cli subscription list --page-size 50
 ```
 List only active subscriptions:
@@ -505,7 +528,7 @@ To verify which version of the tool you’re running:
 
     docker run --rm openbridge/embed-cli -v
 
-You’ll see output indicating the version, commit hash, or build date, depending on how the CLI is configured.
+You’ll see output in the form `embed-cli version X.Y.Z`.
 
 
 ## Notes and Best Practices
@@ -549,5 +572,3 @@ This is structure of the `embed-cli` project code. This is only relevant if you 
 ```
 
  **Note**: This structure may vary in your own environment.
-
-

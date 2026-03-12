@@ -15,23 +15,26 @@ source "${LIB_DIR}/validation.sh"
 # Source command system
 source "${LIB_DIR}/commands/command.sh"
 
-# Define command handlers mapping
-declare -A command_handler=(
-    ["user"]="${LIB_DIR}/commands/user.sh"
-    ["jobs"]="${LIB_DIR}/commands/jobs.sh"
-    ["health"]="${LIB_DIR}/commands/health.sh"
-    ["stages"]="${LIB_DIR}/commands/stages.sh"
-    ["subscription"]="${LIB_DIR}/commands/subscription.sh"
-    ["identity"]="${LIB_DIR}/commands/identity.sh"
-)
+command_handler_path() {
+    case "$1" in
+        user) printf '%s\n' "${LIB_DIR}/commands/user.sh" ;;
+        jobs) printf '%s\n' "${LIB_DIR}/commands/jobs.sh" ;;
+        health) printf '%s\n' "${LIB_DIR}/commands/health.sh" ;;
+        stages) printf '%s\n' "${LIB_DIR}/commands/stages.sh" ;;
+        subscription) printf '%s\n' "${LIB_DIR}/commands/subscription.sh" ;;
+        identity) printf '%s\n' "${LIB_DIR}/commands/identity.sh" ;;
+        *) return 1 ;;
+    esac
+}
 
 # Execute the specified command
 execute_command() {
     local command="$1"
     shift
-    
-    if [[ -n "${command_handler[$command]:-}" ]]; then
-        source "${command_handler[$command]}"
+
+    local handler_path=""
+    if handler_path=$(command_handler_path "$command"); then
+        source "$handler_path"
         "${command}_cmd" "$@"
     else
         echo "Error: Unknown command '$command'" >&2
@@ -62,6 +65,8 @@ HELP
 }
 
 main() {
+    local command="${1:-}"
+
     # Handle no arguments case
     if [[ $# -eq 0 ]]; then
         show_help
@@ -79,9 +84,10 @@ main() {
             exit 0
             ;;
         *)
-            # Validate environment before executing command
-            validate_environment
-            execute_command "$1" "${@:2}"
+            if [[ "${2:-}" != "--help" && "${2:-}" != "-h" && "${2:-}" != "help" ]]; then
+                validate_environment
+            fi
+            execute_command "$command" "${@:2}"
             ;;
     esac
 }
