@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Main entry point for embed-cli CLI tool
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly LIB_DIR="${SCRIPT_DIR}/../lib"
+
+# Source required libraries
+source "${LIB_DIR}/common.sh"
+source "${LIB_DIR}/logging.sh"
+source "${LIB_DIR}/validation.sh"
+
+# Source command system
+source "${LIB_DIR}/commands/command.sh"
+
+command_handler_path() {
+    case "$1" in
+        user) printf '%s\n' "${LIB_DIR}/commands/user.sh" ;;
+        jobs) printf '%s\n' "${LIB_DIR}/commands/jobs.sh" ;;
+        health) printf '%s\n' "${LIB_DIR}/commands/health.sh" ;;
+        stages) printf '%s\n' "${LIB_DIR}/commands/stages.sh" ;;
+        subscription) printf '%s\n' "${LIB_DIR}/commands/subscription.sh" ;;
+        identity) printf '%s\n' "${LIB_DIR}/commands/identity.sh" ;;
+        *) return 1 ;;
+    esac
+}
+
+# Execute the specified command
+execute_command() {
+    local command="$1"
+    shift
+
+    local handler_path=""
+    if handler_path=$(command_handler_path "$command"); then
+        source "$handler_path"
+        "${command}_cmd" "$@"
+    else
+        echo "Error: Unknown command '$command'" >&2
+        show_help
+        exit "$E_USAGE"
+    fi
+}
+
+show_help() {
+    cat << 'HELP'
+Usage: embed-cli COMMAND [OPTIONS]
+
+Commands:
+    user          Manage user account information
+    jobs          View and manage jobs
+    health        Check system health
+    stages        Manage product stages
+    subscription  Manage subscriptions
+    identity      Manage identity services
+
+Options:
+    -h, --help     Show this help message
+    -v, --version  Show version information
+
+For command-specific help, run:
+    embed-cli COMMAND --help
+HELP
+}
+
+main() {
+    local command="${1:-}"
+
+    # Handle no arguments case
+    if [[ $# -eq 0 ]]; then
+        show_help
+        exit "$E_USAGE"
+    fi
+
+    # Parse command line options
+    case "$1" in
+        "-v"|"--version")
+            echo "embed-cli version $VERSION"
+            exit 0
+            ;;
+        "help"|"-h"|"--help")
+            show_help
+            exit 0
+            ;;
+        *)
+            if [[ "${2:-}" != "--help" && "${2:-}" != "-h" && "${2:-}" != "help" ]]; then
+                validate_environment
+            fi
+            execute_command "$command" "${@:2}"
+            ;;
+    esac
+}
+
+# Set up interrupt handler
+trap 'error_exit "Script interrupted." "$E_INTERRUPTED"' INT TERM
+
+# Only execute main if script is being run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

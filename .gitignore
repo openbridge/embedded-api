@@ -1,1 +1,28 @@
+# Ignore the embed-cli config file.
+/embed-cli/config.env
+
+# Ignore the mentioned backfill.csv file if created
+/embed-cli/backfill.csv
+
+# Ignore the dump directory
 /dump
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Vi cache files
+*.swp
+
+# macOS generated thumbnail files
+._*
+
+# macOS temporary files
+.Trashes
+Spotlight-V100
+VolumeIcon.icns
+
+# macOS filesystem attributes
+.fseventsd
+
