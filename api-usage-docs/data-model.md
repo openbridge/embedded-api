@@ -29,6 +29,7 @@ erDiagram
     Job }o--|| Product : "runs"
     Subscription ||--o{ HistoryTransaction : "has"
     HistoryTransaction ||--o{ Job : "groups"
+    Job ||--o{ Transaction : "creates"
 ```
 
 ## Core entities
@@ -130,6 +131,14 @@ A `Job` record is the final output of the pipeline — the atomic unit of work t
 | `modified_at` | datetime | When the job record was last updated |
 
 Jobs are read-only via the API. See [Jobs API](./jobs-api.md).
+
+---
+
+### Transaction
+
+A `Transaction` is created each time a `Job` is invoked by the scheduler. It records the outcome of that specific execution attempt — the job's runtime status, any errors encountered, and internal metadata such as the system that processed it and the payload it operated on.
+
+Transactions are the lowest-level audit record in the pipeline. They are not exposed via a public API endpoint and are not directly queryable by end-users, but they underpin the status information surfaced on `Job` records.
 
 ---
 
