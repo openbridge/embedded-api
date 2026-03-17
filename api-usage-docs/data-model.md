@@ -25,10 +25,10 @@ erDiagram
     RemoteIdentity }o--o| OAuth : "linked to"
     Product ||--o{ SubscriptionProductMetaRequired : "requires"
     SubscriptionProductMeta }o--|| Product : "scoped to"
-    Subscription ||--o{ Job : "executed as"
+    Subscription ||--o{ Job : "defines"
     Job }o--|| Product : "runs"
-    Subscription ||--o{ HistoryTransaction : "retrieves history via"
-    HistoryTransaction ||--o{ Job : "generates"
+    Subscription ||--o{ HistoryTransaction : "has"
+    HistoryTransaction ||--o{ Job : "groups"
 ```
 
 ## Core entities
@@ -47,7 +47,7 @@ A `Subscription` record represents one configured pipeline.
 | `product` | FK → Product | The source (or destination) product |
 | `name` | string | Human-readable label, unique per storage destination |
 | `canonical_name` | string | Normalized version of `name` |
-| `status` | enum | `active`, `paused`, `cancelled`, or `invalid` — see below |
+| `status` | enum | `active`, `cancelled`, or `invalid` — see below |
 | `date_start` | datetime | Subscription start date (ISO 8601) |
 | `date_end` | datetime | Subscription end date (ISO 8601) |
 | `remote_identity` | FK → RemoteIdentity | Credential record authorizing data access. `NULL` for destination products and source products that do not connect to a third-party data source. |
@@ -60,7 +60,6 @@ A `Subscription` record represents one configured pipeline.
 | Status | Meaning |
 |---|---|
 | `active` | Pipeline is running normally |
-| `paused` | Pipeline is temporarily suspended |
 | `cancelled` | Pipeline has been stopped; `invalidated_at` is set |
 | `invalid` | Subscription is in an error state (e.g., credential expired, misconfigured) |
 
@@ -108,7 +107,7 @@ When building a subscription creation request, check `required_meta_fields` on t
 
 ### Job
 
-A `Job` record represents a single execution run of a subscription's pipeline. Jobs are created automatically by the scheduler and track the status of each data pull attempt.
+A `Job` record is the final output of the pipeline — the atomic unit of work that pulls data for a specific date. Jobs are defined by their parent subscription and executed by the scheduler. A `HistoryTransaction` is simply a named batch of jobs scoped to a backfill date range.
 
 | Field | Type | Description |
 |---|---|---|
@@ -136,7 +135,7 @@ Jobs are read-only via the API. See [Jobs API](./jobs-api.md).
 
 ### HistoryTransaction
 
-A `HistoryTransaction` record represents a request to retrieve historical data for a subscription over a date range. Creating one triggers the scheduler to generate the necessary `Job` records for the specified dates.
+A `HistoryTransaction` is a named batch of `Job` records scoped to a backfill date range for a given subscription. It groups the jobs created for a historical retrieval request and provides a handle for tracking or cancelling that work as a unit.
 
 | Field | Type | Description |
 |---|---|---|
