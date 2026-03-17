@@ -7,7 +7,7 @@ The Jobs API returns `Job` records that represent individual data pipeline execu
 ## Base URL
 
 ```
-https://service.api.openbridge.io/service
+https://service.api.openbridge.io/service/jobs
 ```
 
 ---
