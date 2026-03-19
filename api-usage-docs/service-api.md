@@ -65,7 +65,7 @@ Content-Type: application/json
 
 The platform integration endpoints follow a common pattern: pass a `remote_identity_id` in the URL path and receive structured metadata you need when creating a subscription.
 
-All integration endpoints require a valid `remote_identity_id` — the numeric ID of the connected account (OAuth identity) stored in Openbridge. The correct identity type is noted in each integration doc.
+All integration endpoints require a valid `remote_identity_id` — the numeric ID of the connected account (OAuth identity) stored in Openbridge. See [Remote Identity API](./remote-identity-api.md) for details. The correct identity type is noted in each integration doc.
 
 ### Integration directory
 
