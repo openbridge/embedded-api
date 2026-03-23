@@ -85,7 +85,7 @@ Authorization: Bearer <jwt>
 
 ### List brands
 
-Returns the brand portfolio for a given profile. Use the `brand_entity_id` when creating a Sponsored Brands subscription.
+Returns the brand portfolio for a given profile. Mainly used for to fetch brand metadata for specified profiles.
 
 ```
 GET /service/amzadv/brands/{remote_identity_id}
@@ -121,11 +121,11 @@ Authorization: Bearer <jwt>
 
 **Field reference**
 
-| Field | Description | Use in subscription |
+| Field | Description |
 |---|---|---|
-| `id` | Brand ID | Use as `brand_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
-| `attributes.brand_entity_id` | Brand entity ID in Amazon Brand Registry | Use as `brand_entity_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
-| `attributes.brand_registry_name` | Human-readable brand name | Display in UI |
+| `id` | Brand ID |
+| `attributes.brand_entity_id` |
+| `attributes.brand_registry_name` |
 
 ---
 
