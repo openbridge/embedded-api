@@ -37,7 +37,7 @@ This skill covers **Openbridge Embedded API usage only**. It is not a general Op
 - Billing, plans, or account management
 - Data pipeline performance or delivery SLAs
 - Setting up storage destinations (UI-only)
-- Creating or re-authorizing remote identities (UI-only)
+- Creating storage destinations (UI-only; readable via API)
 - General platform troubleshooting unrelated to API calls
 
 ---
@@ -64,7 +64,7 @@ Load these on demand — do not load all at once. Pick the file(s) relevant to t
 | Getting started / full flow walkthrough | `api-usage-docs/getting-started.md` |
 | Subscriptions CRUD | `api-usage-docs/subscriptions-api.md` |
 | Products & stage IDs | `api-usage-docs/products-api.md` |
-| Remote identities (credentials) | `api-usage-docs/remote-identity-api.md` |
+| Remote identities & identity types (`/ri`, `/sri`, `/rit`) | `api-usage-docs/remote-identity-api.md` |
 | OAuth flow & OAuth app records | `api-usage-docs/oauth-api.md` |
 | State API (ClientState for OAuth) | `api-usage-docs/state-api.md` |
 | History (backfill) | `api-usage-docs/history-api.md` |
@@ -100,7 +100,7 @@ Load these on demand — do not load all at once. Pick the file(s) relevant to t
 **Checklist before creating a subscription:**
 1. `account` — from `GET https://account.api.openbridge.io/account` → `id`
 2. `user` — from `GET https://user.api.openbridge.io/user` → `id`
-3. `product` — from `GET https://subscriptions.api.openbridge.io/product` → `id`
+3. `product` — from `GET https://subscriptions.api.openbridge.io/product` → `id`; check `required_meta_fields` in the response to know which SPM keys are required for that product
 4. `stage_ids` (source products only) — from `GET https://service.api.openbridge.io/service/products/product/{id}/payloads?stage_id__gte=1000`
 5. `remote_identity` — from `GET https://remote-identity.api.openbridge.io/ri` or `/sri` → `id`
 6. `remote_identity_id` (SPM) — same value as above, passed as a **string** inside `subscription_product_meta_attributes`
@@ -185,6 +185,7 @@ Filter for errors only:
 ### 7. OAuth / identity authorization flow
 
 The full sequence for authorizing a new remote identity:
+0. Look up `remote_identity_type_id` from the product: `GET https://subscriptions.api.openbridge.io/product/{product_id}` → `relationships.remote_identity_type.data.id`; use `GET https://remote-identity.api.openbridge.io/rit/{id}` for type details
 1. `POST /state/oauth` → get a `token` (ClientState)
 2. Redirect the user's browser to `GET /oauth/initialize?state={token}`
 3. Provider redirects to `/oauth/callback` (handled by Openbridge)
