@@ -38,9 +38,43 @@ See [Account and User API](./account-api.md) for the endpoints that return your 
 
 ## Endpoints
 
-### List Products and Get Payload Definitions
+### List Products
 
-See [Products API](./products-api.md) for the endpoints that return available products and their payload definitions. Use the product `id` as the `product` value when creating a subscription, and use `stage_id` values from the payload definitions in the `stage_ids` meta attribute.
+Returns all active products. Use the `id` field as the `product` value when creating a subscription.
+
+```
+GET https://subscriptions.api.openbridge.io/product
+```
+
+Common query filters:
+
+- `is_storage_product={0|1}` — `1` for destination products, `0` for source products
+- `remote_identity_type={id}` — filter by required remote identity type
+- `active={0|1}` — defaults to `1`
+
+---
+
+### Get Product
+
+Returns a single product by ID.
+
+```
+GET https://subscriptions.api.openbridge.io/product/{product_id}
+```
+
+See the [Products API](./products-api.md) for full field reference, query filters, and example responses.
+
+---
+
+### Get Product Payload Definitions
+
+For source products, retrieve payload definitions to find valid `stage_id` values. These are required in the `stage_ids` subscription meta attribute and in History API requests. This is a separate call to the service API — it is not part of the Subscriptions API.
+
+```
+GET https://service.api.openbridge.io/service/products/product/{product_id}/payloads?stage_id__gte=1000
+```
+
+See the [Products API](./products-api.md) for full details on payload definitions.
 
 ---
 

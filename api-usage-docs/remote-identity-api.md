@@ -26,6 +26,90 @@ Obtain an access token by posting your refresh token to the Authentication API. 
 
 ## Endpoints
 
+### List Remote Identity Types
+
+Returns all remote identity types — the catalog of third-party providers Openbridge supports. Use this endpoint to look up the `remote_identity_type_id` values required when creating state records for the OAuth flow.
+
+```
+GET https://remote-identity.api.openbridge.io/rit
+```
+
+**Query filters:**
+
+- `name={value}` — filter by exact name
+- `name__icontains={value}` — filter by name (case-insensitive substring)
+- `auth_service={value}` — filter by exact auth service identifier
+- `auth_service__icontains={value}` — filter by auth service (case-insensitive substring)
+
+**Example response:**
+
+```json
+{
+  "links": {
+    "first": "https://remote-identity.api.openbridge.io/rit?page=1",
+    "last": "https://remote-identity.api.openbridge.io/rit?page=1",
+    "next": "",
+    "prev": ""
+  },
+  "data": [
+    {
+      "type": "RemoteIdentityType",
+      "id": "1",
+      "attributes": {
+        "name": "Google",
+        "auth_service": "google-api-oauth2",
+        "created_at": "2014-05-01T00:00:00",
+        "modified_at": "2014-05-01T00:00:00"
+      }
+    },
+    {
+      "type": "RemoteIdentityType",
+      "id": "2",
+      "attributes": {
+        "name": "Facebook",
+        "auth_service": "facebook-api-oauth2",
+        "created_at": "2014-05-01T00:00:00",
+        "modified_at": "2014-05-01T00:00:00"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 19
+    }
+  }
+}
+```
+
+---
+
+### Get Remote Identity Type
+
+Returns a single remote identity type by ID.
+
+```
+GET https://remote-identity.api.openbridge.io/rit/{rit_id}
+```
+
+**Example response:**
+
+```json
+{
+  "type": "RemoteIdentityType",
+  "id": "17",
+  "attributes": {
+    "name": "Amazon Seller Central",
+    "auth_service": "sp-api-oauth",
+    "created_at": "2021-06-21T00:00:00",
+    "modified_at": "2021-06-21T00:00:00"
+  }
+}
+```
+
+---
+
 ### List Remote Identities
 
 Returns remote identities created by your account.
@@ -185,6 +269,17 @@ GET https://remote-identity.api.openbridge.io/ri/{remote_identity_id}/rim-overvi
 ---
 
 ## Response Field Reference
+
+### RemoteIdentityType Attributes
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Display name of the provider (e.g., `Google`, `Amazon Advertising`) |
+| `auth_service` | string | Internal identifier for the authentication service used by this type |
+| `created_at` | datetime | When this identity type was added to Openbridge |
+| `modified_at` | datetime | When this identity type was last updated |
+
+---
 
 ### RemoteIdentity Attributes
 

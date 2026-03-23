@@ -35,7 +35,16 @@ Returns all available products. Use the `id` field as the `product` value when c
 GET https://subscriptions.api.openbridge.io/product
 ```
 
-Results are paginated. Use `page={n}` to advance through pages.
+Returns only active products by default (`active=1`). Pass `active=0` to list inactive products.
+
+**Query filters:**
+
+- `active={0|1}` — filter by active status (default: `1`)
+- `is_storage_product={0|1}` — `1` for destination products, `0` for source products
+- `remote_identity_type={id}` — filter by required remote identity type
+- `name={value}` — exact name match
+- `name__icontains={value}` — case-insensitive name substring
+- `page={n}` — page number
 
 **Example response:**
 
@@ -43,26 +52,32 @@ Results are paginated. Use `page={n}` to advance through pages.
 {
   "links": {
     "first": "https://subscriptions.api.openbridge.io/product?page=1",
-    "last": "https://subscriptions.api.openbridge.io/product?page=5",
+    "last": "https://subscriptions.api.openbridge.io/product?page=4",
     "next": "https://subscriptions.api.openbridge.io/product?page=2",
     "prev": ""
   },
   "data": [
     {
       "type": "Product",
-      "id": "1",
+      "id": "50",
       "attributes": {
-        "active": 0,
-        "name": "Twitter Tweet Vault",
+        "active": 1,
+        "name": "Amazon Attribution",
         "summary": "",
         "is_storage_product": 0,
-        "created_at": "2013-10-24T16:11:07",
-        "modified_at": "2013-10-24T16:11:07",
-        "required_meta_fields": []
+        "created_at": "2019-03-29T09:00:00",
+        "modified_at": "2019-03-29T09:00:00",
+        "required_meta_fields": [
+          "remote_identity_id",
+          "profile_id"
+        ]
       },
       "relationships": {
         "remote_identity_type": {
-          "data": null
+          "data": {
+            "type": "RemoteIdentityType",
+            "id": "14"
+          }
         }
       }
     }
@@ -70,8 +85,47 @@ Results are paginated. Use `page={n}` to advance through pages.
   "meta": {
     "pagination": {
       "page": 1,
-      "pages": 5,
-      "count": 100
+      "pages": 4,
+      "count": 79
+    }
+  }
+}
+```
+
+---
+
+### Get Product
+
+Returns a single product by ID.
+
+```
+GET https://subscriptions.api.openbridge.io/product/{product_id}
+```
+
+**Example response:**
+
+```json
+{
+  "type": "Product",
+  "id": "50",
+  "attributes": {
+    "active": 1,
+    "name": "Amazon Attribution",
+    "summary": "",
+    "is_storage_product": 0,
+    "created_at": "2019-03-29T09:00:00",
+    "modified_at": "2019-03-29T09:00:00",
+    "required_meta_fields": [
+      "remote_identity_id",
+      "profile_id"
+    ]
+  },
+  "relationships": {
+    "remote_identity_type": {
+      "data": {
+        "type": "RemoteIdentityType",
+        "id": "14"
+      }
     }
   }
 }
