@@ -85,10 +85,21 @@ Use these when you need provider-specific metadata to configure subscriptions:
 
 ## Repository Resources
 
+- Openbridge MCP for AI agents and chat clients: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp)
 - CLI workflow: [embed-cli/README.md](./embed-cli/README.md)
 - Tutorials: [tutorials/identity-configuration.md](./tutorials/identity-configuration.md), [tutorials/subscription-configuration.md](./tutorials/subscription-configuration.md)
 - Product overview: [products/product-overview.md](./products/product-overview.md)
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
+
+## AI Agents and MCP
+
+If you are integrating Openbridge with AI agents or chat clients that support MCP, use the Openbridge MCP server:
+
+- Repository: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp)
+- Intended use: connect Openbridge tools to MCP-capable clients such as ChatGPT, Claude, and other agent frameworks
+- Deployment options: local Python runtime, Docker, or a remote hosted deployment
+
+The MCP server is maintained in its own repository and includes setup instructions, environment variables, and client configuration examples.
 
 ## Support
 
