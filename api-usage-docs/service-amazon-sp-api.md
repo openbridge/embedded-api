@@ -82,10 +82,15 @@ POST /service/sp/sp-id
 
 ```json
 {
-  "client_id": "amzn1.application-oa2-client.xxx",
-  "client_secret": "yyy",
-  "region": "na",
-  "refresh_token": "Atzr|..."
+  "data": {
+    "type": "Service",
+    "attributes": {
+      "client_id": "amzn1.application-oa2-client.xxx",
+      "client_secret": "yyy",
+      "region": "na",
+      "refresh_token": "Atzr|..."
+    }
+  }
 }
 ```
 
@@ -125,7 +130,12 @@ POST /service/sp/validate-asins/{remote_identity_id}
 
 ```json
 {
-  "asins": ["B00EXAMPLE1", "B00EXAMPLE2", "B00INVALID99"]
+  "data": {
+    "type": "Service",
+    "attributes": {
+      "asins": ["B00EXAMPLE1", "B00EXAMPLE2", "B00INVALID99"]
+    }
+  }
 }
 ```
 
@@ -163,10 +173,15 @@ POST /service/sp/validate-creds
 
 ```json
 {
-  "client_id": "amzn1.application-oa2-client.xxx",
-  "client_secret": "yyy",
-  "region": "na",
-  "refresh_token": "Atzr|..."
+  "data": {
+    "type": "Service",
+    "attributes": {
+      "client_id": "amzn1.application-oa2-client.xxx",
+      "client_secret": "yyy",
+      "region": "na",
+      "refresh_token": "Atzr|..."
+    }
+  }
 }
 ```
 
@@ -212,7 +227,9 @@ For the full list of valid notification type values by account type, see the [SP
 
 ### Create notification subscription
 
-Registers an SQS queue as a notification destination and subscribes to the specified notification types. If existing subscriptions are found, they are deleted and replaced.
+Registers an SQS queue as a notification destination and subscribes to the specified notification types. If existing subscriptions are found, they are deleted and replaced. 
+
+Note: Openbridge requires two SQS queues for this product. One is used directly by Amazon to push events to and another is used by Openbridge for processing. It is strongly recommended that these are configured with the [CloudFormation template provided by Openbridge](https://openbridge-customer-templates-production.s3.amazonaws.com/amazon-notifications-api/notifications-api.yaml). For more information about configuring the required pieces in AWS, visit the [Notifications API documentation here](https://docs.openbridge.com/en/articles/9997411-amazon-notifications-api-sqs-configuration).
 
 ```
 POST /service/sp/notifications/{remote_identity_id}
@@ -237,7 +254,7 @@ POST /service/sp/notifications/{remote_identity_id}
 | Field | Description |
 |---|---|
 | `queue_arn` | ARN of the SQS queue to receive notifications |
-| `notification_types` | Array of notification type names to subscribe to |
+| `notification_types` | Array of notification type names to subscribe to. These must all be valid for the account type (seller or vendor) or the request will fail. |
 
 **Example response**
 
