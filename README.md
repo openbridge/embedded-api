@@ -83,11 +83,22 @@ Use these when you need provider-specific metadata to configure subscriptions:
 | Shopify | [api-usage-docs/service-shopify-api.md](./api-usage-docs/service-shopify-api.md) |
 | Healthchecks | [api-usage-docs/service-healthchecks-api.md](./api-usage-docs/service-healthchecks-api.md) |
 
+## Tutorials
+
+Step-by-step guides for common integration workflows. These walk through the API calls directly, with equivalent CLI commands at the end of each tutorial.
+
+| Tutorial | Description |
+|---|---|
+| [Identity Configuration](./tutorials/identity-configuration.md) | Create and authorize remote identities through the OAuth flow |
+| [Subscription Configuration](./tutorials/subscription-configuration.md) | Create, update, pause, and delete pipeline subscriptions |
+| [Requesting Historical Data](./tutorials/history-backfill.md) | Backfill data for past date ranges, including batch processing via CSV |
+| [Monitoring Pipeline Health](./tutorials/monitoring-healthchecks.md) | Detect errors, diagnose failures, and respond to invalid identities |
+| [Amazon Order Product Jobs](./tutorials/amazon-order-product-jobs.md) | Create product jobs for specific Amazon order IDs with batching and staggered scheduling |
+
 ## Repository Resources
 
 - Openbridge MCP for AI agents and chat clients: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp)
 - CLI workflow: [embed-cli/README.md](./embed-cli/README.md)
-- Tutorials: [tutorials/identity-configuration.md](./tutorials/identity-configuration.md), [tutorials/subscription-configuration.md](./tutorials/subscription-configuration.md)
 - Product overview: [products/product-overview.md](./products/product-overview.md)
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
