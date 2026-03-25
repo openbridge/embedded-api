@@ -61,6 +61,35 @@ run_test() {
     fi
 }
 
+run_test_not_contains() {
+    local name="$1"
+    local command="$2"
+    local unexpected_text="$3"
+    local expected_status="${4:-0}"
+
+    echo -e "\n${BLUE}Running test: $name${RESET}"
+    ((TESTS_RUN++))
+
+    {
+        output=$(eval "$command" 2>&1)
+        status=$?
+    } || {
+        status=$?
+    }
+
+    echo "Command output:"
+    echo "$output"
+    echo "Exit status: $status"
+
+    if [[ $status -eq $expected_status && "$output" != *"$unexpected_text"* ]]; then
+        echo -e "${GREEN}✓ Test passed${RESET}"
+        ((TESTS_PASSED++))
+    else
+        echo -e "${RED}✗ Test failed${RESET}"
+        ((TESTS_FAILED++))
+    fi
+}
+
 echo "Sourcing required files..."
 
 # Source files in correct dependency order using absolute paths
@@ -101,6 +130,7 @@ echo "Starting identity command tests..."
 # Run tests
 run_test "Identity Help" "identity_help"
 run_test "Identity List" "identity_cmd list" 0
+run_test_not_contains "Identity List Single Page" "identity_cmd list --page 1 --page-size 1" "Fetching identities page: 2" 0
 run_test "Identity List with Range" "identity_cmd list --range 1-5" 0
 
 # Error cases - expect status 255 for error_exit calls

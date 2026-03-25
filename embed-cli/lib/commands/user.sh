@@ -12,7 +12,7 @@ readonly _USER_COMMAND_SH=1
 [[ -n "${_API_USER_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/user.sh"
 
 user_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
@@ -22,7 +22,10 @@ user_cmd() {
         id)
             user_id_cmd "$@"
             ;;
-        --help|-h|help)
+        account-id)
+            user_account_id_cmd "$@"
+            ;;
+        --help|-h|help|"")
             user_help
             ;;
         *)
@@ -43,10 +46,17 @@ user_info_cmd() {
 }
 
 user_id_cmd() {
-    # Get just the account ID
     local id
     id=$(get_user_id) || {
         error_exit "Failed to get user ID"
+    }
+    echo "$id"
+}
+
+user_account_id_cmd() {
+    local id
+    id=$(get_account_id) || {
+        error_exit "Failed to get account ID"
     }
     echo "$id"
 }
@@ -57,11 +67,13 @@ Usage: embed-cli user COMMAND
 
 Commands:
     info        Get full user account information
-    id          Get user account ID only
+    id          Get user ID only
+    account-id  Get account ID only
 
 Examples:
     embed-cli user info
     embed-cli user id
+    embed-cli user account-id
 HELP
 }
 

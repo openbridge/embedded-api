@@ -1,14 +1,23 @@
 #!/bin/bash
 
+# First, establish the base paths
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+LIB_DIR="${BASE_DIR}/lib"
+COMMANDS_DIR="${LIB_DIR}/commands"
+API_DIR="${LIB_DIR}/api"
+
 # Set up test environment
-# Load environment variables from config.env
-if [[ -f "../config.env" ]]; then
-    source "../config.env"
+if [[ -f "${BASE_DIR}/config.env" ]]; then
+    source "${BASE_DIR}/config.env"
 else
     echo "Error: config.env not found"
     exit 1
 fi
-export LOG_LEVEL="DEBUG"
+
+# Set up logging variables
+export LOG_LEVEL="${LOG_LEVEL:-INFO}"
+export LOG_FILE="${LOG_FILE:-}"
+export NO_COLOR="${NO_COLOR:-false}"
 
 # Colors for test output
 GREEN="\033[32m"
@@ -25,17 +34,24 @@ TESTS_FAILED=0
 run_test() {
     local name="$1"
     local command="$2"
-    local expected_status="${3:-0}"  # 0 = success by default
+    local expected_status="${3:-0}"
+
+    echo -e "\n${BLUE}Running test: $name${RESET}"
     ((TESTS_RUN++))
-    
-    echo -e "\n${BLUE}Test $TESTS_RUN: $name${RESET}"
-    echo "Command: $command"
-    echo "Expected status: $expected_status"
-    
-    # Run command and capture status
-    eval "$command"
-    local status=$?
-    
+
+    # Run command with error handling
+    {
+        output=$(eval "$command" 2>&1)
+        status=$?
+    } || {
+        status=$?
+    }
+
+    # Show command output
+    echo "Command output:"
+    echo "$output"
+    echo "Exit status: $status"
+
     if [[ $status -eq $expected_status ]]; then
         echo -e "${GREEN}✓ Test passed${RESET}"
         ((TESTS_PASSED++))
@@ -45,39 +61,53 @@ run_test() {
     fi
 }
 
-# Source required files for testing
-source "../lib/common.sh"
-source "../lib/logging.sh"
-source "../lib/validation.sh"
-source "../lib/commands/command.sh"
-source "../lib/commands/jobs.sh"
+echo "Sourcing required files..."
 
+# Source files in correct dependency order using absolute paths
+source_files=(
+    "${LIB_DIR}/common.sh"
+    "${LIB_DIR}/logging.sh"
+    "${LIB_DIR}/validation.sh"
+    "${API_DIR}/client.sh"
+    "${API_DIR}/auth.sh"
+    "${API_DIR}/user.sh"
+    "${API_DIR}/jobs.sh"
+    "${API_DIR}/history.sh"
+    "${COMMANDS_DIR}/command.sh"
+    "${COMMANDS_DIR}/jobs.sh"
+)
+
+for file in "${source_files[@]}"; do
+    echo "Sourcing: $file"
+    if [[ ! -f "$file" ]]; then
+        echo "Error: Cannot find $file"
+        exit 1
+    fi
+    source "$file" || {
+        echo "Error sourcing $file"
+        exit 1
+    }
+done
+
+# Temporarily disable strict error handling for tests
+set +e
+set +u
+set +o pipefail
+
+echo "Finished sourcing files"
 echo "Starting jobs command tests..."
 
 # Test help display
 run_test "Jobs Help" "jobs_help"
 
-# Test jobs list command
-#run_test "Jobs List" "jobs_cmd list --subscription 00120560"
+# Test no-subcommand shows help instead of crashing
+run_test "Jobs No Subcommand" "jobs_cmd" 0
 
-# Test jobs create command
-#run_test "Jobs Create" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560"
-
-# Test jobs create with stage
-#run_test "Jobs Create with Stage" "jobs_cmd create --start 2024-01-01 --end 2024-01-01 --subscription 00120560 --stage 1001"
-
-# Test jobs batch command
-#echo "date,subscription_id,stage_id" > test.csv
-#echo "2024-01-01,00120560,1001" >> test.csv
-#run_test "Jobs Batch" "jobs_cmd batch --file test.csv"
-
-# Test error cases
-#run_test "Missing Subscription" "jobs_cmd list" 1
-#run_test "Invalid Date" "jobs_cmd create --start 2024-13-01 --end 2024-01-01 --subscription 00120560" 1
-#run_test "Missing CSV File" "jobs_cmd batch" 1
-
-# Clean up
-rm -f test.csv
+# Error cases - expect status 255 for error_exit calls
+run_test "Missing Subscription on List" "jobs_cmd list" 255
+run_test "Invalid Subcommand" "jobs_cmd invalid_subcommand" 255
+run_test "Batch Missing File" "jobs_cmd batch" 255
+run_test "Create-Product No Args" "jobs_cmd create-product" 255
 
 # Print summary
 echo -e "\nTest Summary:"

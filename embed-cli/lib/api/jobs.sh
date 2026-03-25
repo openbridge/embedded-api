@@ -144,7 +144,11 @@ get_jobs() {
 
     if [[ -n "$request_start" ]]; then
         [[ ! "$request_start" =~ ^((>=|<=|>|<|=)[0-9]+|[0-9]+)$ ]] && error_exit "Invalid request_start format. Use: [>=|<=|>|<|=]NUMBER or NUMBER"
-        query_params+="&request_start${request_start}"
+        if [[ "$request_start" =~ ^[0-9]+$ ]]; then
+            query_params+="&request_start=$request_start"
+        else
+            query_params+="&request_start${request_start}"
+        fi
     fi
 
     if [[ -n "$page_size" ]]; then
@@ -163,7 +167,7 @@ get_jobs() {
         query_params+="&created_at__lte=$(urlencode "$created_at_lte")"
     fi
 
-    if [[ -n "$start_page" && -z "$end_page" && "$start_page" != "1" ]]; then
+    if [[ -n "$start_page" && -z "$end_page" ]]; then
         single_page_mode=true
         end_page="$start_page"
     fi
@@ -198,7 +202,7 @@ get_jobs() {
         fi
 
         if echo "$response" | jq -e . >/dev/null 2>&1; then
-            echo "$response" | jq -C '.'
+            echo "$response" | jq_format
         else
             log_message "WARNING" "Response not valid JSON, outputting raw"
             echo "$response"

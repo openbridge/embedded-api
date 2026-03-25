@@ -15,6 +15,19 @@ source "${LIB_DIR}/validation.sh"
 # Source command system
 source "${LIB_DIR}/commands/command.sh"
 
+# Check for required external dependencies
+check_dependencies() {
+    local missing=()
+
+    command -v jq &>/dev/null || missing+=("jq")
+    command -v curl &>/dev/null || missing+=("curl")
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        error_exit "Missing required dependencies: ${missing[*]}. Install them and retry." "$E_DEPENDENCY"
+    fi
+}
+
+# Map command names to their handler scripts
 command_handler_path() {
     case "$1" in
         user) printf '%s\n' "${LIB_DIR}/commands/user.sh" ;;
@@ -27,8 +40,8 @@ command_handler_path() {
     esac
 }
 
-# Execute the specified command
-execute_command() {
+# Execute the specified command by sourcing its handler and dispatching
+run_command() {
     local command="$1"
     shift
 
@@ -38,12 +51,12 @@ execute_command() {
         "${command}_cmd" "$@"
     else
         echo "Error: Unknown command '$command'" >&2
-        show_help
+        show_main_help
         exit "$E_USAGE"
     fi
 }
 
-show_help() {
+show_main_help() {
     cat << 'HELP'
 Usage: embed-cli COMMAND [OPTIONS]
 
@@ -69,7 +82,7 @@ main() {
 
     # Handle no arguments case
     if [[ $# -eq 0 ]]; then
-        show_help
+        show_main_help
         exit "$E_USAGE"
     fi
 
@@ -80,14 +93,16 @@ main() {
             exit 0
             ;;
         "help"|"-h"|"--help")
-            show_help
+            show_main_help
             exit 0
             ;;
         *)
-            if [[ "${2:-}" != "--help" && "${2:-}" != "-h" && "${2:-}" != "help" ]]; then
+            check_dependencies
+            local sub="${2:-}"
+            if [[ -n "$sub" && "$sub" != "--help" && "$sub" != "-h" && "$sub" != "help" ]]; then
                 validate_environment
             fi
-            execute_command "$command" "${@:2}"
+            run_command "$command" "${@:2}"
             ;;
     esac
 }

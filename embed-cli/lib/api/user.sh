@@ -26,10 +26,15 @@ get_user() {
         return 1
     fi
 
-    # Process and validate the JSON response
+    # Process and validate the JSON response, redacting sensitive fields.
     local json_output
-    if json_output=$(jq -C '.' <<< "${response}" 2>&1) && [[ -n "${json_output}" ]]; then
-        # Successful JSON parsing - output formatted result
+    if json_output=$(jq -C '
+        del(
+            .data[].attributes.password,
+            .data[].attributes.password_request_token,
+            .data[].attributes.auth0_user_id
+        )
+    ' <<< "${response}" 2>&1) && [[ -n "${json_output}" ]]; then
         printf "%s\n" "${json_output}"
         return 0
     else
@@ -63,7 +68,39 @@ get_user_id() {
         return 1
     fi
 
-    # Extract and validate account ID in one step
+    # Extract and validate user ID in one step
+    local user_id
+    if ! user_id=$(jq -er '.data[0].id // empty' <<< "${response}"); then
+        log_message "ERROR" "User ID not found or invalid in response"
+        log_message "DEBUG" "Endpoint: ${endpoint}"
+        log_message "DEBUG" "Response content: ${response}"
+        return 1
+    fi
+
+    # Success case handling
+    log_message "INFO" "Successfully retrieved user ID: ${user_id}"
+    printf "%s" "${user_id}"
+    return 0
+}
+
+get_account_id() {
+    local endpoint="${USER_ENDPOINT:?USER_ENDPOINT environment variable not set}"
+
+    log_message "DEBUG" "Attempting to fetch account ID from endpoint: ${endpoint}"
+
+    local response
+    if ! response=$(api_request "GET" "${endpoint}"); then
+        log_message "ERROR" "API request failed for account ID endpoint: ${endpoint}"
+        return 1
+    fi
+
+    if ! jq -e . >/dev/null 2>&1 <<< "${response}"; then
+        log_message "ERROR" "Received invalid JSON response"
+        log_message "DEBUG" "Endpoint: ${endpoint}"
+        log_message "DEBUG" "Invalid JSON content: ${response}"
+        return 1
+    fi
+
     local account_id
     if ! account_id=$(jq -er '.data[0].attributes.account_id // empty' <<< "${response}"); then
         log_message "ERROR" "Account ID not found or invalid in response"
@@ -72,8 +109,7 @@ get_user_id() {
         return 1
     fi
 
-    # Success case handling
-    log_message "INFO" "Successfully retrieved user account ID: ${account_id}"
+    log_message "INFO" "Successfully retrieved account ID: ${account_id}"
     printf "%s" "${account_id}"
     return 0
 }

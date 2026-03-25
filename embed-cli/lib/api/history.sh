@@ -85,7 +85,7 @@ create_jobs() {
 
     if [[ $status -eq 0 ]]; then
         log_message "SUCCESS" "Job created successfully for Subscription ID: $subscription_id"
-        echo "$response" | jq -C '.'
+        echo "$response" | jq_format
         return 0
     else
         log_message "ERROR" "Failed to create job for Subscription ID: $subscription_id"

@@ -32,23 +32,22 @@ if [[ -z "${_VALIDATION_SH:-}" ]]; then
   source "$(dirname "${BASH_SOURCE[0]}")/../validation.sh"
 fi
 
-if ! declare -p VALID_STATUSES &> /dev/null; then
-  declare -a VALID_STATUSES=("healthy" "degraded" "unhealthy")
-fi
+# Health-specific status values
+readonly HEALTH_VALID_STATUSES=("healthy" "degraded" "unhealthy")
 
 validate_status() {
   local status="$1"
   local valid=false
-  
-  for valid_status in "${VALID_STATUSES[@]}"; do
+
+  for valid_status in "${HEALTH_VALID_STATUSES[@]}"; do
     if [[ "${status}" == "${valid_status}" ]]; then
       valid=true
       break
     fi
   done
-  
+
   if [[ "${valid}" != "true" ]]; then
-    error_exit "Invalid status: ${status}. Valid values are: ${VALID_STATUSES[*]}"
+    error_exit "Invalid status: ${status}. Valid values are: ${HEALTH_VALID_STATUSES[*]}"
   fi
 }
 
@@ -99,7 +98,7 @@ get_healthcheck() {
   local account_id
   local query_params
 
-  account_id=$(get_user_id) || {
+  account_id=$(get_account_id) || {
     log_message "ERROR" "Failed to retrieve account ID for health check"
     return 1
   }
@@ -116,7 +115,7 @@ get_healthcheck() {
     }
 
     if jq -e . >/dev/null 2>&1 <<<"${response}"; then
-      jq -C '.' <<<"${response}"
+      jq_format <<<"${response}"
     else
       printf "%s\n" "${response}"
     fi
