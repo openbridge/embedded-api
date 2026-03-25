@@ -12,14 +12,14 @@ readonly _HEALTH_COMMAND_SH=1
 [[ -n "${_API_HEALTH_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/health.sh"
 
 health_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
         check)
             health_check_cmd "$@"
             ;;
-        --help|-h|help)
+        --help|-h|help|"")
             health_help
             ;;
         *)
@@ -86,7 +86,7 @@ Commands:
 Options:
     --page, -p NUMBER     Page number for results pagination
     --last-days NUMBER    Show results from the last N days
-    --status STATUS       Filter by status (ERROR, WARNING, SUCCESS, PENDING)
+    --status STATUS       Filter by status (healthy, degraded, unhealthy)
     --subscription ID     Filter by subscription ID
     --page-size NUMBER    Number of results per page (max 100)
 

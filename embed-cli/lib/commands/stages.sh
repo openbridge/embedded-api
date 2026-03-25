@@ -12,14 +12,14 @@ readonly _STAGES_COMMAND_SH=1
 [[ -n "${_API_PRODUCTS_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/products.sh"
 
 stages_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
         list)
             stages_list_cmd "$@"
             ;;
-        --help|-h|help)
+        --help|-h|help|"")
             stages_help
             ;;
         *)

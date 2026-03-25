@@ -60,7 +60,6 @@ readonly DATE_REGEX='^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
 # API Constants
 #######################################
 readonly MAX_PAGE_SIZE=100
-readonly VALID_STATUSES=("ERROR" "WARNING" "SUCCESS" "PENDING")
 
 #######################################
 # Configuration Loading
@@ -68,6 +67,14 @@ readonly VALID_STATUSES=("ERROR" "WARNING" "SUCCESS" "PENDING")
 readonly DEFAULT_CONFIG_FILE="/app/config.env"
 readonly CONFIG_FILE="${CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
 
+
+jq_format() {
+    if [[ -t 1 ]] && [[ "${NO_COLOR:-}" != "true" ]]; then
+        jq -C '.'
+    else
+        jq '.'
+    fi
+}
 
 urlencode() {
     local string="$1"
@@ -191,10 +198,16 @@ generate_future_cron() {
 }
 
 generate_future_timestamp() {
+    local minutes_ahead="${1:-15}"
+
+    if [[ ! "$minutes_ahead" =~ ^[0-9]+$ ]]; then
+        error_exit "Minutes ahead must be a positive number"
+    fi
+
     if is_gnu_date; then
-        date -u -d "15 minutes" "+%Y-%m-%d %H:%M:%S"
+        date -u -d "+${minutes_ahead} minutes" "+%Y-%m-%d %H:%M:%S"
     else
-        date -v+15M -u "+%Y-%m-%d %H:%M:%S"
+        date -v+"${minutes_ahead}"M -u "+%Y-%m-%d %H:%M:%S"
     fi
 }
 
@@ -211,64 +224,9 @@ error_exit() {
     printf "ERROR: %s\n" "$message" >&2
 
     if [[ "$format" == "json" ]]; then
-        printf '{"error": "%s", "code": %d}\n' "$message" "$exit_code" | jq -C '.' >&2
+        printf '{"error": "%s", "code": %d}\n' "$message" "$exit_code" | jq_format >&2
     fi
 
     exit "$exit_code"
 }
 
-#######################################
-# Configuration
-#######################################
-
-usage() {
-    cat << HELP
-Version: $VERSION
-
-Usage: $(basename "$0") [OPTIONS]
-
-Options:
-    -s <start_date>      Start date (YYYY-MM-DD)
-    -e <end_date>        End date (YYYY-MM-DD)
-    -i <subscription_id> Subscription ID
-    -v                   Show version
-    -p <product_id>      Product ID (for getting stages)
-    -j <subscription_ids> Subscription IDs (for getting jobs)
-    -u                   Get user account data
-    -h                   Show this help message
-    -d                   Enable debug mode
-
-Environment variables:
-    API_ENDPOINT_BASE    Base URL for API endpoint
-    AUTH_TOKEN          Authentication token
-    REFRESH_TOKEN       Refresh token for obtaining new JWT
-    CONFIG_FILE         Path to configuration file
-    LOG_LEVEL          Logging level (DEBUG|INFO|WARNING|ERROR)
-    RETRY_COUNT        Number of retry attempts
-    SLEEP_DURATION     Sleep duration between retries
-HELP
-    exit $E_SUCCESS
-}
-
-parse_arguments() {
-    local OPTIND
-    while getopts ":s:e:i:t:p:j:P:uhHvdf:" opt; do
-        case $opt in
-            s) START_DATE="$OPTARG" ;;
-            e) END_DATE="$OPTARG" ;;
-            i) SUBSCRIPTION_ID="$OPTARG" ;;
-            t) STAGE_ID="$OPTARG" ;;
-            p) PRODUCT_ID="$OPTARG" ;;
-            j) SUBSCRIPTION_IDS="$OPTARG" ;;
-            u) GET_USER=true ;;
-            H) GET_HEALTH=true ;;
-            P) HEALTH_PAGE="$OPTARG" ;;
-            f) CSV_FILE="$OPTARG" ;;
-            h) usage ;;
-            v) echo "Version: $VERSION"; exit $E_SUCCESS ;;
-            d) CURRENT_LOG_LEVEL="DEBUG" ;;
-            :) error_exit "Option -$OPTARG requires an argument." $E_USAGE ;;
-            \?) error_exit "Invalid option: -$OPTARG" $E_USAGE ;;
-        esac
-    done
-}
