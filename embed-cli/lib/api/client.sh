@@ -43,6 +43,8 @@ api_request() {
 
         # Execute the API request using curl
         response=$(curl -s -X "$method" \
+            --connect-timeout 10 \
+            --max-time 30 \
             -H "Content-Type: $CONTENT_TYPE" \
             -H "Authorization: Bearer $AUTH_TOKEN" \
             ${payload:+-d "$payload"} \
@@ -71,8 +73,8 @@ api_request() {
             sleep "$SLEEP_DURATION"
             continue
         else
-        log_message "ERROR" "API request failed with HTTP status $http_code: $response"
-        return 1
+            log_message "ERROR" "API request failed with HTTP status $http_code: $response"
+            return 1
         fi
     done
 

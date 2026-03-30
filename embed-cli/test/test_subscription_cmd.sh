@@ -61,6 +61,35 @@ run_test() {
     fi
 }
 
+run_test_not_contains() {
+    local name="$1"
+    local command="$2"
+    local unexpected_text="$3"
+    local expected_status="${4:-0}"
+
+    echo -e "\n${BLUE}Running test: $name${RESET}"
+    ((TESTS_RUN++))
+
+    {
+        output=$(eval "$command" 2>&1)
+        status=$?
+    } || {
+        status=$?
+    }
+
+    echo "Command output:"
+    echo "$output"
+    echo "Exit status: $status"
+
+    if [[ $status -eq $expected_status && "$output" != *"$unexpected_text"* ]]; then
+        echo -e "${GREEN}✓ Test passed${RESET}"
+        ((TESTS_PASSED++))
+    else
+        echo -e "${RED}✗ Test failed${RESET}"
+        ((TESTS_FAILED++))
+    fi
+}
+
 echo "Sourcing required files..."
 
 # Source files in correct dependency order using absolute paths
@@ -99,6 +128,7 @@ echo "Starting subscription command tests..."
 # Basic command tests - expect success (0)
 run_test "Subscription Help" "subscription_help" 0
 run_test "List All Subscriptions" "subscription_cmd list" 0
+run_test_not_contains "List Single Subscription Page" "subscription_cmd list --page 1 --page-size 1" "Fetching subscriptions page: 2" 0
 run_test "List With Status Filter" "subscription_cmd list --status invalid" 12
 run_test "List With Date Filter" "subscription_cmd list --created-after \"2024-10-01T00:00:00\"" 0
 

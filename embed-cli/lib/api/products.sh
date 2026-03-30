@@ -38,5 +38,5 @@ get_stages() {
     }
 
     # Format and output the response
-    echo "$response" | jq -C '.'
+    echo "$response" | jq_format
 }

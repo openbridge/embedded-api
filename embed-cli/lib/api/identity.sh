@@ -54,7 +54,7 @@ list_identities() {
     fi
 
     # If only one page number is provided and no end_page, treat as single page request
-    if [[ -n "$start_page" && -z "$end_page" && "$start_page" != "1" ]]; then
+    if [[ -n "$start_page" && -z "$end_page" ]]; then
         single_page_mode=true
         end_page="$start_page"
     fi
@@ -81,7 +81,7 @@ list_identities() {
 
         # Format and validate JSON response
         if echo "$response" | jq -e . >/dev/null 2>&1; then
-            echo "$response" | jq -C '.'
+            echo "$response" | jq_format
         else
             log_message "WARNING" "Response not valid JSON, outputting raw"
             echo "$response"
@@ -152,7 +152,7 @@ get_identity() {
     response=$(api_request "GET" "$endpoint") || return 1
 
     if echo "$response" | jq -e . >/dev/null 2>&1; then
-        echo "$response" | jq -C '.'
+        echo "$response" | jq_format
     else
         log_message "WARNING" "Response not valid JSON, outputting raw"
         echo "$response"

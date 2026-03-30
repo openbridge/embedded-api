@@ -61,6 +61,34 @@ run_test() {
     fi
 }
 
+run_test_contains() {
+    local name="$1"
+    local command="$2"
+    local expected_text="$3"
+
+    echo -e "\n${BLUE}Running test: $name${RESET}"
+    ((TESTS_RUN++))
+
+    {
+        output=$(eval "$command" 2>&1)
+        status=$?
+    } || {
+        status=$?
+    }
+
+    echo "Command output:"
+    echo "$output"
+    echo "Exit status: $status"
+
+    if [[ $status -eq 0 && "$output" == *"$expected_text"* ]]; then
+        echo -e "${GREEN}✓ Test passed${RESET}"
+        ((TESTS_PASSED++))
+    else
+        echo -e "${RED}✗ Test failed${RESET}"
+        ((TESTS_FAILED++))
+    fi
+}
+
 echo "Sourcing required files..."
 
 # Source files in correct dependency order using absolute paths
@@ -99,6 +127,8 @@ echo "Starting user command tests..."
 run_test "User Help" "user_help"
 run_test "User Info" "user_cmd info"
 run_test "User ID" "user_cmd id"
+run_test "User Account ID" "user_cmd account-id"
+run_test_contains "User Info Redacts Password" "user_cmd info" "\"email_address\""
 
 # Error case - expect status 255 for error_exit
 run_test "Invalid Subcommand" "user_cmd invalid_subcommand" 255

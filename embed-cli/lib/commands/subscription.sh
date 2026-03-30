@@ -13,7 +13,7 @@ readonly _SUBSCRIPTION_COMMAND_SH=1
 [[ -n "${_API_SUBSCRIPTION_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/subscription.sh"
 
 subscription_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
@@ -23,7 +23,7 @@ subscription_cmd() {
         update)
             subscription_update_cmd "$@"
             ;;
-        --help|-h|help)
+        --help|-h|help|"")
             subscription_help
             ;;
         *)

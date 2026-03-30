@@ -12,7 +12,7 @@ readonly _IDENTITY_COMMAND_SH=1
 [[ -n "${_API_IDENTITY_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/identity.sh"
 
 identity_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
@@ -22,7 +22,7 @@ identity_cmd() {
         get)
             identity_get_cmd "$@"
             ;;
-        --help|-h|help)
+        --help|-h|help|"")
             identity_help
             ;;
         *)

@@ -14,7 +14,7 @@ readonly _JOBS_COMMAND_SH=1
 [[ -n "${_API_HISTORY_SH:-}" ]] || source "$(dirname "${BASH_SOURCE[0]}")/../api/history.sh"
 
 jobs_cmd() {
-    local subcommand="$1"
+    local subcommand="${1:-}"
     shift || true
 
     case "$subcommand" in
@@ -30,7 +30,7 @@ jobs_cmd() {
         batch)
             jobs_batch_cmd "$@"
             ;;
-        --help|-h|help)
+        --help|-h|help|"")
             jobs_help
             ;;
         *)
@@ -241,9 +241,10 @@ jobs_help() {
 Usage: embed-cli jobs COMMAND [options]
 
 Commands:
-    list        List jobs for a subscription
-    create      Create a new job
-    batch       Process batch jobs from CSV
+    list            List jobs for a subscription
+    create          Create a new job
+    create-product  Create product jobs with order IDs
+    batch           Process batch jobs from CSV
 
 List options:
     --subscription, -s ID    Subscription ID to list jobs for
