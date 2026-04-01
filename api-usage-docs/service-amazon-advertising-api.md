@@ -235,7 +235,9 @@ Authorization: Bearer <jwt>
 
 ```json
 {
-  "access_token": "Atza|...",
-  "client_id": "amzn1.application-oa2-client.abc123"
+  "data": {
+    "access_token": "Atza|...",
+    "client_id": "amzn1.application-oa2-client.abc_123"
+  }
 }
 ```
