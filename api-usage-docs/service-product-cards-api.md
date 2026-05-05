@@ -37,6 +37,7 @@ An array of product objects.
 |---|---|---|
 | `id` | integer | Product ID |
 | `name` | string | Product display name |
+| `summary` | string | Brief tagline shown alongside the product name |
 | `payloads` | array of strings | Names of the payloads (stages) available for this product |
 
 **Example response**
@@ -46,13 +47,9 @@ An array of product objects.
   {
     "id": 95,
     "name": "Shopify",
+    "summary": "Operations insights for merchant orders, returns, customers, shipments, and many more",
     "payloads": ["sg_orders", "sg_customers", "sg_products"]
   },
-  {
-    "id": 100,
-    "name": "Amazon Advertising (SP)",
-    "payloads": ["sp_campaigns", "sp_ad_groups"]
-  }
 ]
 ```
 
