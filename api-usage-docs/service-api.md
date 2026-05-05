@@ -38,6 +38,8 @@ The service API adds authentication and request signing before forwarding. The f
 | `history/` | History API | [history-api.md](./history-api.md) |
 | `jobs/` | Jobs API | [jobs-api.md](./jobs-api.md) |
 | `healthchecks/` | Healthchecks API | [service-healthchecks-api.md](./service-healthchecks-api.md) |
+| `rules/` | Rules API | [service-rules-api.md](./service-rules-api.md) |
+| `product-cards/` | Product Cards API | [service-product-cards-api.md](./service-product-cards-api.md) |
 
 ### Example: proxy to history API
 
