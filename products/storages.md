@@ -181,7 +181,7 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 
 ---
 
-### Snowflake — username/password (`snowflake`)
+### Snowflake — username/password or programmatic access token (PAT) (`snowflake`)
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -194,6 +194,29 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 | `snowflake_use_clustering` | boolean | Yes | Enable `CLUSTER BY` on destination tables |
 | `snowflake_s3_bucket` | string | Yes | S3 bucket used as Snowflake external stage |
 | `snowflake_s3_region` | string | Yes | AWS region of the Snowflake S3 stage |
+| `snowflake_stage` | string | Yes | Snowflake stage name |
+| `snowflake_role` | string | No | Snowflake role to assume |
+| `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
+| `snowflake_aws_secret_access_key` | encrypted | No | AWS secret key for the S3 stage |
+
+---
+
+### Snowflake — OAuth with S3 stage, clustering (`snowflake_oauth`)
+
+Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit required field.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
+| `snowflake_database` | string | Yes | Target database |
+| `snowflake_warehouse` | string | Yes | Compute warehouse |
+| `snowflake_schema` | string | Yes | Target schema |
+| `snowflake_use_clustering` | boolean | Yes | Enable `CLUSTER BY` on destination tables |
+| `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
+| `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
+| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
+| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
+| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 | `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
@@ -254,29 +277,6 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 | `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
-
----
-
-### Snowflake — OAuth with S3 stage, clustering (`snowflake_oauth`)
-
-Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit required field.
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
-| `snowflake_database` | string | Yes | Target database |
-| `snowflake_warehouse` | string | Yes | Compute warehouse |
-| `snowflake_schema` | string | Yes | Target schema |
-| `snowflake_use_clustering` | boolean | Yes | Enable `CLUSTER BY` on destination tables |
-| `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
-| `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
-| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
-| `snowflake_stage` | string | Yes | Snowflake stage name |
-| `snowflake_role` | string | No | Snowflake role to assume |
-| `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
-| `snowflake_aws_secret_access_key` | encrypted | No | AWS secret key for the S3 stage |
 
 ---
 
