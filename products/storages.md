@@ -8,24 +8,11 @@ Destinations are created via the [Openbridge Destinations API](../api-usage-docs
 
 ---
 
-## Encrypted fields
-
-Sensitive credential fields are not passed as plain strings. They must be wrapped in an encrypted object:
-
-```json
-{
-  "encrypt": "kms",
-  "value": "<your-secret-value>"
-}
-```
-
-Fields that require this format are marked **encrypted** in the tables below.
-
----
-
 ## Common fields
 
 These fields appear across all storage types.
+
+> **Encryption is automatic.** Sensitive credential fields are encrypted server-side based on the storage type. Pass all field values as plain strings — no client-side wrapping required.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -43,9 +30,9 @@ These fields appear across all storage types.
 |---|---|---|---|
 | `database` | string | Yes | Redshift database name |
 | `port` | string | Yes | Redshift port (typically `5439`) |
-| `host` | encrypted | Yes | Redshift cluster endpoint |
-| `user` | encrypted | Yes | Database user |
-| `password` | encrypted | Yes | Database password |
+| `host` | string | Yes | Redshift cluster endpoint |
+| `user` | string | Yes | Database user |
+| `password` | string | Yes | Database password |
 
 ---
 
@@ -56,8 +43,8 @@ These fields appear across all storage types.
 | `athena_bucket` | string | Yes | S3 bucket for Athena query results |
 | `athena_database` | string | Yes | Athena database name |
 | `athena_region` | string | Yes | AWS region where Athena is configured |
-| `athena_access_key_id` | encrypted | Yes | AWS access key ID |
-| `athena_secret_access_key` | encrypted | Yes | AWS secret access key |
+| `athena_access_key_id` | string | Yes | AWS access key ID |
+| `athena_secret_access_key` | string | Yes | AWS secret access key |
 
 ---
 
@@ -69,16 +56,16 @@ Extends Redshift with an external S3-backed schema. Requires both standard Redsh
 |---|---|---|---|
 | `database` | string | Yes | Redshift database name |
 | `port` | string | Yes | Redshift port |
-| `host` | encrypted | Yes | Redshift cluster endpoint |
-| `user` | encrypted | Yes | Database user |
-| `password` | encrypted | Yes | Database password |
+| `host` | string | Yes | Redshift cluster endpoint |
+| `user` | string | Yes | Database user |
+| `password` | string | Yes | Database password |
 | `spectrum_bucket` | string | Yes | S3 bucket for the Spectrum external schema |
 | `spectrum_database` | string | Yes | Spectrum external database name |
 | `spectrum_iam_role` | string | Yes | IAM role ARN with access to the Spectrum bucket |
 | `spectrum_region` | string | Yes | AWS region of the Spectrum S3 bucket |
 | `spectrum_schema` | string | Yes | Spectrum schema name |
-| `spectrum_access_key_id` | encrypted | Yes | AWS access key ID for Spectrum |
-| `spectrum_secret_access_key` | encrypted | Yes | AWS secret access key for Spectrum |
+| `spectrum_access_key_id` | string | Yes | AWS access key ID for Spectrum |
+| `spectrum_secret_access_key` | string | Yes | AWS secret access key for Spectrum |
 
 ---
 
@@ -88,7 +75,7 @@ Extends Redshift with an external S3-backed schema. Requires both standard Redsh
 |---|---|---|---|
 | `bigquery_dataset_id` | string | Yes | BigQuery dataset ID |
 | `bigquery_project_id` | string | Yes | GCP project ID |
-| `bigquery_service_account` | encrypted | No | Service account JSON key |
+| `remote_identity_id` | string | Yes | Identity with credentials used to access the BigQuery instance. |
 
 ---
 
@@ -98,25 +85,11 @@ Same base fields as `bigquery`. Exactly one authentication method must be provid
 
 **Base fields:**
 
-| Field | Type | Required |
-|---|---|---|
-| `bigquery_dataset_id` | string | Yes |
-| `bigquery_project_id` | string | Yes |
-
-**Option A — Service account:**
-
-| Field | Type | Description |
-|---|---|---|
-| `bigquery_service_account` | encrypted | Service account JSON key |
-
-**Option B — OAuth2:**
-
-| Field | Type | Description |
-|---|---|---|
-| `oauth2_access_token` | encrypted | OAuth2 access token |
-| `oauth2_client_id` | encrypted | OAuth2 client ID |
-| `oauth2_client_secret` | encrypted | OAuth2 client secret |
-| `oauth2_refresh_token` | encrypted | OAuth2 refresh token |
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `bigquery_dataset_id` | string | Yes | BigQuery dataset ID |
+| `bigquery_project_id` | string | Yes | GCP project ID |
+| `remote_identity_id` | string | Yes | Identity with credentials used to access the BigQuery instance. |
 
 ---
 
@@ -125,7 +98,7 @@ Same base fields as `bigquery`. Exactly one authentication method must be provid
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `container` | string | Yes | Azure Blob container name |
-| `connection_string` | encrypted | Yes | Azure storage connection string |
+| `connection_string` | string | Yes | Azure storage connection string |
 
 ---
 
@@ -134,7 +107,7 @@ Same base fields as `bigquery`. Exactly one authentication method must be provid
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `container` | string | Yes | Azure Data Lake container name |
-| `connection_string` | encrypted | Yes | Azure storage connection string |
+| `connection_string` | string | Yes | Azure storage connection string |
 | `dt_partition` | boolean | No | Enable datetime-based partitioning |
 
 ---
@@ -146,8 +119,8 @@ Databricks destination using S3-backed Delta tables.
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `databricks_server_hostname` | string | Yes | Databricks workspace hostname |
-| `databricks_http_path` | encrypted | Yes | SQL warehouse or cluster HTTP path |
-| `databricks_access_token` | encrypted | Yes | Databricks personal access token |
+| `databricks_http_path` | string | Yes | SQL warehouse or cluster HTTP path |
+| `databricks_access_token` | string | Yes | Databricks personal access token |
 | `databricks_schema` | string | Yes | Target schema (nullable) |
 | `databricks_catalog` | string | Yes | Unity Catalog name (nullable) |
 
@@ -160,8 +133,8 @@ Databricks destination using externally managed ADLS storage.
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `databricks_server_hostname` | string | Yes | Databricks workspace hostname |
-| `databricks_http_path` | encrypted | Yes | SQL warehouse or cluster HTTP path |
-| `databricks_access_token` | encrypted | Yes | Databricks personal access token |
+| `databricks_http_path` | string | Yes | SQL warehouse or cluster HTTP path |
+| `databricks_access_token` | string | Yes | Databricks personal access token |
 | `databricks_schema` | string | Yes | Target schema (nullable) |
 | `databricks_catalog` | string | Yes | Unity Catalog name (nullable) |
 | `databricks_storage_format` | string | Yes | External storage format; currently only `"adls"` |
@@ -176,7 +149,7 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 
 | Field | Type | Description |
 |---|---|---|
-| `databricks_adls_connection_string` | encrypted | Azure Data Lake connection string |
+| `databricks_adls_connection_string` | string | Azure Data Lake connection string |
 | `databricks_adls_container` | string | ADLS container name |
 
 ---
@@ -185,9 +158,9 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
-| `snowflake_user` | encrypted | Yes | Snowflake username |
-| `snowflake_password` | encrypted | Yes | Snowflake password or PAT |
+| `snowflake_account` | string | Yes | Snowflake account identifier |
+| `snowflake_user` | string | Yes | Snowflake username |
+| `snowflake_password` | string | Yes | Snowflake password or PAT |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
@@ -196,8 +169,8 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 | `snowflake_s3_region` | string | Yes | AWS region of the Snowflake S3 stage |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
-| `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
-| `snowflake_aws_secret_access_key` | encrypted | No | AWS secret key for the S3 stage |
+| `snowflake_aws_access_key_id` | string | No | AWS access key for the S3 stage |
+| `snowflake_aws_secret_access_key` | string | No | AWS secret key for the S3 stage |
 
 ---
 
@@ -207,20 +180,20 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
+| `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_use_clustering` | boolean | Yes | Enable `CLUSTER BY` on destination tables |
 | `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
 | `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
-| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
+| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
+| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
+| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
-| `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
-| `snowflake_aws_secret_access_key` | encrypted | No | AWS secret key for the S3 stage |
+| `snowflake_aws_access_key_id` | string | No | AWS access key for the S3 stage |
+| `snowflake_aws_secret_access_key` | string | No | AWS secret key for the S3 stage |
 
 ---
 
@@ -228,19 +201,19 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
+| `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
 | `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
-| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
+| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
+| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
+| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
-| `snowflake_aws_access_key_id` | encrypted | No | AWS access key for the S3 stage |
-| `snowflake_aws_secret_access_key` | encrypted | No | AWS secret key for the S3 stage |
+| `snowflake_aws_access_key_id` | string | No | AWS access key for the S3 stage |
+| `snowflake_aws_secret_access_key` | string | No | AWS secret key for the S3 stage |
 
 ---
 
@@ -248,17 +221,17 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
+| `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_az_container` | string | Yes | Azure container used as external stage |
-| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
+| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
+| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
+| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
-| `snowflake_az_connection_string` | encrypted | No | Azure storage connection string for the stage |
+| `snowflake_az_connection_string` | string | No | Azure storage connection string for the stage |
 
 ---
 
@@ -266,15 +239,15 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `snowflake_account` | encrypted | Yes | Snowflake account identifier |
+| `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_gcs_bucket` | string | Yes | GCS bucket used as external stage |
 | `snowflake_gcs_service_account` | string | Yes | GCS service account email for the stage |
-| `snowflake_refresh_token` | encrypted | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | encrypted | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | encrypted | Yes | Snowflake OAuth client secret |
+| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
+| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
+| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 
@@ -288,7 +261,7 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 | `destination_s3_bucket` | string | Yes | Customer-owned S3 bucket for staging |
 | `host` | string | Yes | PostgreSQL host |
 | `user` | string | Yes | Database user |
-| `password` | encrypted | Yes | Database password |
+| `password` | string | Yes | Database password |
 | `database` | string | No | Database name |
 | `port` | string | No | PostgreSQL port (default: `5432`) |
 | `iam_role` | string | No | AWS IAM role ARN |
