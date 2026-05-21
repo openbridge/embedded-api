@@ -26,6 +26,8 @@ These fields appear across all storage types.
 
 ### Amazon Redshift (`redshift`)
 
+See [our Amazon Redshift setup documentation](https://docs.openbridge.com/en/articles/1427334-configuring-your-amazon-redshift-data-warehouse-environment) for instructions for configuring your Redshift environment.
+
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `database` | string | Yes | Redshift database name |
@@ -38,6 +40,8 @@ These fields appear across all storage types.
 
 ### Amazon Athena (`athena`)
 
+See [our Amazon Athena setup documentation](https://docs.openbridge.com/en/articles/1856980-how-to-set-up-amazon-athena-data-destination) for instructions for setting up Athena as a destination.
+
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `athena_bucket` | string | Yes | S3 bucket for Athena query results |
@@ -49,6 +53,8 @@ These fields appear across all storage types.
 ---
 
 ### Amazon Redshift Spectrum (`spectrum`)
+
+See [our Amazon Redshift Spectrum setup documentation](https://docs.openbridge.com/en/articles/1852484-how-to-setup-amazon-redshift-spectrum-data-destination) for instructions for setting up Redshift Spectrum as a destination.
 
 Extends Redshift with an external S3-backed schema. Requires both standard Redshift connection credentials and Spectrum-specific parameters.
 
@@ -71,29 +77,20 @@ Extends Redshift with an external S3-backed schema. Requires both standard Redsh
 
 ### Google BigQuery (`bigquery`)
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `bigquery_dataset_id` | string | Yes | BigQuery dataset ID |
-| `bigquery_project_id` | string | Yes | GCP project ID |
-| `remote_identity_id` | string | Yes | Identity with credentials used to access the BigQuery instance. |
+See [our BigQuery setup documentation](https://docs.openbridge.com/en/articles/1872762-how-to-setup-a-google-bigquery-data-destination) for instructions for configuring your BigQuery instance.
 
----
-
-### Google BigQuery — date-partitioned (`bigquery_date`)
-
-Same base fields as `bigquery`. Exactly one authentication method must be provided.
-
-**Base fields:**
 
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `bigquery_dataset_id` | string | Yes | BigQuery dataset ID |
 | `bigquery_project_id` | string | Yes | GCP project ID |
-| `remote_identity_id` | string | Yes | Identity with credentials used to access the BigQuery instance. |
+| `remote_identity_id` | integer | Yes | ID of the Remote Identity containing credentials used to access the BigQuery instance. |
 
 ---
 
 ### Azure Blob Storage (`azure_blob`)
+
+See [our Azure Blob Storage setup documentation](https://docs.openbridge.com/en/articles/5196085-how-to-create-azure-blob-storage-data-destination) for instructions for creating an Azure Blob Storage destination.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -103,6 +100,8 @@ Same base fields as `bigquery`. Exactly one authentication method must be provid
 ---
 
 ### Azure Data Lake (`azure_datalake`)
+
+See [our Azure Data Lake setup documentation](https://docs.openbridge.com/en/articles/4384989-configuring-your-azure-data-lake-storage-data-destination) for instructions for configuring your Azure Data Lake destination.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -115,6 +114,8 @@ Same base fields as `bigquery`. Exactly one authentication method must be provid
 ### Databricks (`databricks`)
 
 Databricks destination using S3-backed Delta tables.
+
+See [our Databricks setup documentation](https://docs.openbridge.com/en/articles/6804269-how-to-setup-databricks-lakehouse) for instructions for setting up Databricks as a destination.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -129,6 +130,8 @@ Databricks destination using S3-backed Delta tables.
 ### Databricks — external tables (`databricks_external`)
 
 Databricks destination using externally managed ADLS storage.
+
+See [our Databricks external tables setup documentation](https://docs.openbridge.com/en/articles/7225154-configure-databricks-external-locations) for instructions for configuring Databricks external locations.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -156,6 +159,8 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 
 ### Snowflake — username/password or programmatic access token (PAT) (`snowflake`)
 
+See [our Snowflake setup documentation](https://docs.openbridge.com/en/articles/5024964-how-to-setup-snowflake-data-destination) for instructions for configuring your Snowflake instance.
+
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `snowflake_account` | string | Yes | Snowflake account identifier |
@@ -176,10 +181,13 @@ When `databricks_storage_format` is `"adls"`, these additional fields are requir
 
 ### Snowflake — OAuth with S3 stage, clustering (`snowflake_oauth`)
 
-Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit required field.
+OAuth credentials (client ID, client secret, refresh token) must be registered as a Remote Identity before creating this destination. Pass the Remote Identity's ID via `remote_identity_id`.
+
+See [our Snowflake setup documentation](https://docs.openbridge.com/en/articles/11822520-snowflake-warehouse-with-oauth-authentication) for instructions for configuring your Snowflake instance.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `remote_identity_id` | integer | Yes | ID of the Remote Identity containing the Snowflake OAuth credentials |
 | `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
@@ -187,9 +195,6 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 | `snowflake_use_clustering` | boolean | Yes | Enable `CLUSTER BY` on destination tables |
 | `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
 | `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
-| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 | `snowflake_aws_access_key_id` | string | No | AWS access key for the S3 stage |
@@ -197,19 +202,23 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 ---
 
-### Snowflake — OAuth with S3 stage (`snowflake_ext_s3`)
+### Snowflake — OAuth with S3 external stage (`snowflake_ext_s3`)
+
+This is a variant of [Snowflake OAuth](#snowflake--oauth-with-s3-stage-clustering-snowflake_oauth) which stores data in a user-specified S3 bucket.
+
+OAuth credentials (client ID, client secret, refresh token) must be registered as a Remote Identity before creating this destination. Pass the Remote Identity's ID via `remote_identity_id`.
+
+See [our Snowflake setup documentation](https://docs.openbridge.com/en/articles/11822520-snowflake-warehouse-with-oauth-authentication) for instructions for configuring your Snowflake instance.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `remote_identity_id` | integer | Yes | ID of the Remote Identity containing the Snowflake OAuth credentials |
 | `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_s3_bucket` | string | Yes | S3 bucket used as external stage |
 | `snowflake_s3_region` | string | Yes | AWS region of the S3 stage |
-| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 | `snowflake_aws_access_key_id` | string | No | AWS access key for the S3 stage |
@@ -219,16 +228,20 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 ### Snowflake — OAuth with Azure external stage (`snowflake_ext_az`)
 
+This is a variant of [Snowflake OAuth](#snowflake--oauth-with-s3-stage-clustering-snowflake_oauth) which stores data in a user-specified Microsoft Azure data lake.
+
+OAuth credentials (client ID, client secret, refresh token) must be registered as a Remote Identity before creating this destination. Pass the Remote Identity's ID via `remote_identity_id`.
+
+See [our Snowflake setup documentation](https://docs.openbridge.com/en/articles/11999093-snowflake-data-lake-azure-integration) for instructions for configuring Snowflake + Azure.
+
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `remote_identity_id` | integer | Yes | ID of the Remote Identity containing the Snowflake OAuth credentials |
 | `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_az_container` | string | Yes | Azure container used as external stage |
-| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 | `snowflake_az_connection_string` | string | No | Azure storage connection string for the stage |
@@ -237,31 +250,34 @@ Variant of `snowflake_ext_s3` with `snowflake_use_clustering` as an explicit req
 
 ### Snowflake — OAuth with GCS external stage (`snowflake_ext_gcs`)
 
+This is a variant of [Snowflake OAuth](#snowflake--oauth-with-s3-stage-clustering-snowflake_oauth) which stores data in a user-specified Google Cloud storage bucket.
+
+OAuth credentials (client ID, client secret, refresh token) must be registered as a Remote Identity before creating this destination. Pass the Remote Identity's ID via `remote_identity_id`.
+
+See [our Snowflake setup documentation](https://docs.openbridge.com/en/articles/11998892-snowflake-data-lake-gcs-integration) for instructions for configuring Snowflake + GCS.
+
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `remote_identity_id` | integer | Yes | ID of the Remote Identity containing the Snowflake OAuth credentials |
 | `snowflake_account` | string | Yes | Snowflake account identifier |
 | `snowflake_database` | string | Yes | Target database |
 | `snowflake_warehouse` | string | Yes | Compute warehouse |
 | `snowflake_schema` | string | Yes | Target schema |
 | `snowflake_gcs_bucket` | string | Yes | GCS bucket used as external stage |
 | `snowflake_gcs_service_account` | string | Yes | GCS service account email for the stage |
-| `snowflake_refresh_token` | string | Yes | Snowflake OAuth refresh token |
-| `snowflake_client_id` | string | Yes | Snowflake OAuth client ID |
-| `snowflake_client_secret` | string | Yes | Snowflake OAuth client secret |
 | `snowflake_stage` | string | Yes | Snowflake stage name |
 | `snowflake_role` | string | No | Snowflake role to assume |
 
 ---
 
-### PostgreSQL (`postgres`)
+## FAQ
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `destination_s3_region` | string | Yes | AWS region of the customer-owned S3 staging bucket |
-| `destination_s3_bucket` | string | Yes | Customer-owned S3 bucket for staging |
-| `host` | string | Yes | PostgreSQL host |
-| `user` | string | Yes | Database user |
-| `password` | string | Yes | Database password |
-| `database` | string | No | Database name |
-| `port` | string | No | PostgreSQL port (default: `5432`) |
-| `iam_role` | string | No | AWS IAM role ARN |
+### Do I need to create a Remote Identity before creating a destination?
+
+Yes, for destination types that accept a `remote_identity_id` field (such as `bigquery`, `bigquery_date`, `snowflake_oauth`, `snowflake_ext_s3`, `snowflake_ext_az`, and `snowflake_ext_gcs`), the Remote Identity must exist before you create the destination. Remote Identity creation is handled through the Openbridge UI and OAuth flow — it cannot be created via this API. Once the identity has been authorized, retrieve its ID and pass it as `remote_identity_id` in your destination request.
+
+See the [Remote Identity API](../api-usage-docs/remote-identity-api.md) for how to list and look up existing identities.
+
+### How long can I expect the destination creation process to complete?
+
+The runtime of this operation can vary depending on the storage type, destination-specific settings and system load. The process will typically complete in 30-90 seconds, but it can take up to 15 minutes to complete.
