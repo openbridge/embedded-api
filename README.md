@@ -119,6 +119,12 @@ If you have a documentation problem, an API question, or a reproducible issue:
 - Open a GitHub issue in this repository
 - Contact Openbridge through the official support channel
 
+### Usage Notes
+
+Openbridge APIs enforce rate limiting. For guidance on handling API rate limiting errors:
+
+- [Rate Limiting](./api-usage-docs/rate-limiting.md)
+
 Additional product and platform documentation:
 
 - [Openbridge Documentation](https://docs.openbridge.com/)
