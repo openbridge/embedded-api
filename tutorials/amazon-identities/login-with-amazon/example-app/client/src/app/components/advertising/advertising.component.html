@@ -1,0 +1,54 @@
+<div class="card">
+  <h2>Amazon Advertising API</h2>
+  <p>Connect via public OAuth to manage Sponsored Products, Brands, Display campaigns and reporting.</p>
+
+  <div class="info-box">
+    <strong>Scope:</strong> <code>advertising::campaign_management</code> (double colon)<br>
+    <strong>Auth type:</strong> Public OAuth only (3 regional URLs)
+  </div>
+
+  <div class="form-group">
+    <label for="region">Select Region</label>
+    <select id="region" [(ngModel)]="selectedRegion">
+      @for (r of regions; track r.code) {
+        <option [value]="r.code">{{ r.label }}</option>
+      }
+    </select>
+  </div>
+
+  <button class="lwa-btn" (click)="startAuth()">
+    <img src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gold_312x64.png"
+         alt="Login with Amazon"
+         width="156"
+         height="32">
+  </button>
+</div>
+
+<div class="card">
+  <h2>Regional Endpoints</h2>
+  <table>
+    <thead>
+      <tr><th>Region</th><th>Auth URL</th><th>Token Endpoint</th><th>API Base</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>North America</td>
+        <td><code>amazon.com/ap/oa</code></td>
+        <td><code>api.amazon.com</code></td>
+        <td><code>advertising-api.amazon.com</code></td>
+      </tr>
+      <tr>
+        <td>Europe</td>
+        <td><code>eu.account.amazon.com/ap/oa</code></td>
+        <td><code>api.amazon.co.uk</code></td>
+        <td><code>advertising-api-eu.amazon.com</code></td>
+      </tr>
+      <tr>
+        <td>Far East</td>
+        <td><code>apac.account.amazon.com/ap/oa</code></td>
+        <td><code>api.amazon.co.jp</code></td>
+        <td><code>advertising-api-fe.amazon.com</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

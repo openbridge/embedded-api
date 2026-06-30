@@ -1,0 +1,40 @@
+<div class="card">
+  <h2>Authorization Result</h2>
+
+  @if (success) {
+    <div class="success-box">
+      <strong>Authorization successful!</strong>
+    </div>
+
+    <table class="result-table">
+      <tbody>
+        <tr><td>Service</td><td>{{ service }}</td></tr>
+        @if (region) {
+          <tr><td>Region</td><td>{{ region }}</td></tr>
+        }
+        @if (marketplace) {
+          <tr><td>Marketplace</td><td>{{ marketplace }}</td></tr>
+        }
+        @if (sellingPartnerId) {
+          <tr><td>Selling Partner ID</td><td>{{ sellingPartnerId }}</td></tr>
+        }
+        <tr><td>Access Token Expires In</td><td>{{ expiresIn }} seconds</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      In a production system, the server would securely store the refresh token
+      (encrypted at rest) and manage the access token refresh cycle automatically.
+      Refresh tokens expire after 365 days.
+    </div>
+  } @else {
+    <div class="error-box">
+      <strong>Authorization failed</strong><br>
+      {{ error || 'Unknown error occurred' }}
+    </div>
+  }
+
+  <div class="actions">
+    <a routerLink="/" class="btn btn-secondary">Back to Home</a>
+  </div>
+</div>

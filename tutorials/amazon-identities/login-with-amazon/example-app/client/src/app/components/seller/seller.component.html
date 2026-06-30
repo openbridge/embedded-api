@@ -1,0 +1,93 @@
+<div class="card">
+  <h2>Seller Central (SP-API)</h2>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'public'" (click)="activeTab = 'public'">
+      Public App (OAuth)
+    </button>
+    <button class="tab" [class.active]="activeTab === 'private'" (click)="activeTab = 'private'">
+      Private App (Self-Auth)
+    </button>
+  </div>
+
+  @if (activeTab === 'public') {
+    <div class="info-box">
+      <strong>Public apps</strong> serve multiple sellers via OAuth consent flow.
+      Your app owns one set of credentials (Client ID, Client Secret, Application ID).
+      The seller is redirected to their marketplace-specific Seller Central URL to authorize.
+    </div>
+
+    <div class="form-group">
+      <label for="marketplace">Select Marketplace</label>
+      <select id="marketplace" [(ngModel)]="selectedMarketplace">
+        @for (m of marketplaces; track m.code) {
+          <option [value]="m.code">{{ m.label }} ({{ m.code }}) — {{ m.region }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="info-box">
+      <strong>Note:</strong> EU core markets (UK, DE, FR, IT, ES) share
+      <code>sellercentral-europe.amazon.com</code>. Other EU marketplaces have their own URLs.
+    </div>
+
+    <button class="lwa-btn" (click)="startPublicAuth()">
+      <img src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gold_312x64.png"
+           alt="Login with Amazon"
+           width="156"
+           height="32">
+    </button>
+  }
+
+  @if (activeTab === 'private') {
+    <div class="info-box">
+      <strong>Private apps</strong> access your own seller account(s) only. Each private app
+      is a separate registered application with its own credentials. Credentials are
+      <strong>per-account and per-marketplace</strong> — provide them at runtime.
+    </div>
+
+    <div class="form-group">
+      <label for="p-region">Region</label>
+      <select id="p-region" [(ngModel)]="privateRegion">
+        @for (r of regions; track r.code) {
+          <option [value]="r.code">{{ r.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="p-client-id">LWA Client ID</label>
+      <input id="p-client-id" type="text" [(ngModel)]="privateClientId"
+             placeholder="amzn1.application-oa2-client.xxxxx">
+    </div>
+
+    <div class="form-group">
+      <label for="p-client-secret">LWA Client Secret</label>
+      <input id="p-client-secret" type="password" [(ngModel)]="privateClientSecret"
+             placeholder="amzn1.oa2-cs.v1.xxxxx">
+    </div>
+
+    <div class="form-group">
+      <label for="p-refresh-token">Refresh Token</label>
+      <input id="p-refresh-token" type="password" [(ngModel)]="privateRefreshToken"
+             placeholder="Atzr|xxxxx">
+    </div>
+
+    <button class="btn btn-primary" (click)="submitPrivateAuth()"
+            [disabled]="!privateClientId || !privateClientSecret || !privateRefreshToken">
+      Exchange Token
+    </button>
+
+    @if (privateResult) {
+      @if (privateResult.success) {
+        <div class="success-box">
+          Token exchange successful. Access token expires in {{ privateResult.expires_in }} seconds.
+        </div>
+      } @else {
+        <div class="error-box">
+          Error: {{ privateResult.error }}
+        </div>
+      }
+    }
+  }
+</div>
