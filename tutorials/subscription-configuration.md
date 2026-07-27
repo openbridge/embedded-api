@@ -288,7 +288,7 @@ The `profile_id` comes from calling the [Amazon Advertising Profiles](../service
 
 ## Limiting collected datasets with stage_ids
 
-By default a subscription collects all available datasets for the product. To limit collection to specific datasets, add a `stage_ids` entry to the `subscription_product_meta_attributes` array.
+To specify a collection of specific datasets, add a `stage_ids` entry to the `subscription_product_meta_attributes` array.
 
 First, look up the available stage IDs for the product (see [Step 2](#step-2--look-up-available-stage-ids)). Then pass the ones you want as a stringified JSON array:
 
