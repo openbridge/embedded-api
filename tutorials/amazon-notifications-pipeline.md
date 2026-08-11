@@ -356,7 +356,7 @@ PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
 
 Update the `notification_subscriptions`, `selected_tables`, and any other changed meta fields.
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PATCH documentation and the [Service API: Amazon SP-API](../api-usage-docs/service-amazon-sp-api.md) for the update notification endpoint.
+See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-legacy.md) for full PATCH documentation and the [Service API: Amazon SP-API](../api-usage-docs/service-amazon-sp-api.md) for the update notification endpoint.
 
 ---
 

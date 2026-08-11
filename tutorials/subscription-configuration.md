@@ -363,7 +363,7 @@ Include the subscription `id` in the payload and only the fields you want to cha
 }
 ```
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
+See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-legacy.md) for full PATCH documentation.
 
 ---
 

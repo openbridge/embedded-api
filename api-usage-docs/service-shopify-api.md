@@ -75,7 +75,7 @@ Authorization: Bearer <jwt>
 |---|---|---|
 | `shop.id` | Numeric Shopify shop ID | — |
 | `shop.name` | Store display name | Display in UI |
-| `shop.myshopify_domain` | Permanent `.myshopify.com` subdomain | Use as `shop` identifier in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `shop.myshopify_domain` | Permanent `.myshopify.com` subdomain | Use as `shop` identifier in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
 | `shop.domain` | Custom domain (if configured) | Display in UI |
 | `shop.currency` | Store's default currency | — |
 | `shop.timezone` / `shop.iana_timezone` | Store timezone | — |
@@ -120,7 +120,7 @@ Authorization: Bearer <jwt>
 |---|---|---|
 | `shop.id` | GraphQL global ID (GID format) | — |
 | `shop.name` | Store display name | Display in UI |
-| `shop.myshopifyDomain` | Permanent `.myshopify.com` subdomain | Use as `shop` identifier in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `shop.myshopifyDomain` | Permanent `.myshopify.com` subdomain | Use as `shop` identifier in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
 | `shop.currencyCode` | Store's default currency code | — |
 | `shop.createdAt` | Store creation timestamp (ISO 8601) | — |
 

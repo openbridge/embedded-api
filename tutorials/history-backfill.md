@@ -61,7 +61,7 @@ Use the `id` field from the subscription record. You can filter by product:
 GET https://subscriptions.api.openbridge.io/sub?account={account_id}&product={product_id}
 ```
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for all available query filters.
+See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-legacy.md) for all available query filters.
 
 ---
 

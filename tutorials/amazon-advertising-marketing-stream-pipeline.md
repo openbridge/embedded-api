@@ -606,7 +606,7 @@ PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
 
 Update the `queue_urls`, `dataset_params`, `selected_tables`, `stage_ids`, and any other changed meta fields with the new values from the update response.
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
+See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-legacy.md) for full PATCH documentation.
 
 ---
 

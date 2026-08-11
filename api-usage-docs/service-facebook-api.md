@@ -70,7 +70,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | Ad account ID (numeric string, `act_` prefix stripped) | Use as `account_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | Ad account ID (numeric string, `act_` prefix stripped) | Use as `account_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
 | `attributes.name` | Ad account display name | Display in UI |
 | `attributes.account_status` | Account status code (`1` = active) | Filter for active accounts |
 | `attributes.business_name` | Associated business name | Display in UI |
@@ -149,7 +149,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | Facebook Page ID | Use as `page_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | Facebook Page ID | Use as `page_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
 | `attributes.name` | Page display name | Display in UI |
 | `attributes.instagram_business_account.id` | Linked Instagram Business Account ID | Use as `instagram_account_id` for Instagram subscriptions |
 | `attributes.country_page_likes` | Total page likes | — |

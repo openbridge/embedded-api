@@ -71,7 +71,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | Profile ID (numeric) | Use as `profile_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | Profile ID (numeric) | Use as `profile_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
 | `attributes.country_code` | ISO country code for this profile | — |
 | `attributes.currency_code` | Currency for this profile's budget | — |
 | `attributes.timezone` | Timezone used for reporting | — |
