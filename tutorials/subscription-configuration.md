@@ -13,7 +13,7 @@
 - [Step 5 — Gather product-specific meta values](#step-5--gather-product-specific-meta-values)
 - [Step 6 — Build and send the create request](#step-6--build-and-send-the-create-request)
   - [Subscription fields](#subscription-fields)
-  - [SubscriptionProductMeta fields](#subscriptionproductmeta-fields)
+  - [product_parameters](#product_parameters)
   - [Example 1 — Simple product (Amazon Orders API)](#example-1--simple-product-amazon-orders-api)
   - [Example 2 — Product with additional meta (Amazon Sponsored Ads V3)](#example-2--product-with-additional-meta-amazon-sponsored-ads-v3)
 - [Limiting collected datasets with stage_ids](#limiting-collected-datasets-with-stage_ids)
@@ -44,13 +44,13 @@ You will also need your **account ID** and **user ID** before creating a subscri
 Fetch the product you want to subscribe to:
 
 ```
-GET https://subscriptions.api.openbridge.io/product/{product_id}
+GET https://subscriptions.api.openbridge.io/v2/product/{product_id}
 ```
 
 Or list all available source products:
 
 ```
-GET https://subscriptions.api.openbridge.io/product?is_storage_product=0
+GET https://subscriptions.api.openbridge.io/v2/product?is_storage_product=0
 ```
 
 The response includes the product's `id`, required identity type, and the meta fields needed for its subscriptions:
@@ -82,7 +82,7 @@ See the [Products API](../api-usage-docs/products-api.md) for query filters and 
 
 ### Check required meta fields
 
-The `required_meta_fields` array tells you which `subscription_product_meta_attributes` entries are needed. Common patterns:
+The `required_meta_fields` array tells you which `product_parameters` entries are needed. Common patterns:
 
 - **Amazon Seller/Vendor products** — `["remote_identity_id"]`
 - **Amazon Advertising products** — `["remote_identity_id", "profile_id"]`
@@ -137,7 +137,7 @@ Record the `stage_id` values. You will pass them as a stringified JSON array in 
 Storage destinations are created and managed exclusively through the Openbridge UI. To find the ID of an existing destination, list your active storages:
 
 ```
-GET https://subscriptions.api.openbridge.io/storages?status=active
+GET https://subscriptions.api.openbridge.io/v2/storages?status=active
 ```
 
 Use the destination's `id` as the `storage_group` value when creating the subscription.
@@ -179,7 +179,7 @@ See the [Product Overview](../products/product-overview.md) for the exact meta f
 ## Step 6 — Build and send the create request
 
 ```
-POST https://subscriptions.api.openbridge.io/sub
+POST https://subscriptions.api.openbridge.io/v2/sub
 ```
 
 ### Subscription fields
@@ -192,26 +192,19 @@ POST https://subscriptions.api.openbridge.io/sub
 | `name` | string | No | Human-readable label |
 | `status` | enum | Yes | Set to `active` |
 | `date_start` | datetime | Yes | ISO 8601 datetime |
-| `date_end` | datetime | Yes | ISO 8601 datetime |
 | `remote_identity` | integer | Conditional | Remote identity ID; required for products that connect to a third-party source |
 | `storage_group` | integer | Conditional | Storage destination ID from Step 3 |
-| `subscription_product_meta_attributes` | array | Conditional | Product-specific metadata; required for source products |
+| `product_parameters` | object | Conditional | Product-specific metadata; required for source products |
 
-### SubscriptionProductMeta fields
+### product_parameters
 
-Each entry in the `subscription_product_meta_attributes` array has this structure:
+`product_parameters` is a flat key/value object — keys are `data_key` names (e.g., `stage_ids`, `profile_id`) and values are always passed as strings. There is no `data_id`/`data_format`/`product` bookkeeping to send; that is inferred internally.
 
-| Field | Type | Description |
-|---|---|---|
-| `data_id` | integer | Always set to `0` for new entries |
-| `data_key` | string | Attribute name (e.g., `remote_identity_id`, `stage_ids`, `profile_id`) |
-| `data_value` | string | Value as a string |
-| `data_format` | enum | `STRING` or `JSON` |
-| `product` | integer | The product ID this meta entry applies to |
+`remote_identity_id` does not need to be set in `product_parameters`. Set remote identity via the top-level `remote_identity` field instead, and the API will dynamically validate and copy it into the internal parameter row automatically.
 
 ### Example 1 — Simple product (Amazon Orders API)
 
-Amazon Orders API (product `53`) requires only `remote_identity_id` in its meta fields. It uses identity type `17` (Amazon Selling Partner).
+Amazon Orders API (product `53`) requires only a remote identity. It uses identity type `17` (Amazon Selling Partner).
 
 ```json
 {
@@ -224,28 +217,18 @@ Amazon Orders API (product `53`) requires only `remote_identity_id` in its meta 
       "name": "My Orders API Subscription",
       "status": "active",
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
       "remote_identity": 1,
-      "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "1",
-          "data_format": "STRING",
-          "product": 53
-        }
-      ]
+      "storage_group": 1
     }
   }
 }
 ```
 
-Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and the `data_value` for `remote_identity_id`) with IDs from your account.
+Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`) with IDs from your account.
 
 ### Example 2 — Product with additional meta (Amazon Sponsored Ads V3)
 
-Amazon Sponsored Ads V3 (product `70`) requires both `remote_identity_id` and `profile_id`. It uses identity type `14` (Amazon Advertising).
+Amazon Sponsored Ads V3 (product `70`) requires a remote identity plus `profile_id`. It uses identity type `14` (Amazon Advertising).
 
 The `profile_id` comes from calling the [Amazon Advertising Profiles](../service-api.md#amazon-advertising-profiles) endpoint with the remote identity ID. The response returns the available profiles — use the profile ID for the account you want to collect data from.
 
@@ -260,25 +243,11 @@ The `profile_id` comes from calling the [Amazon Advertising Profiles](../service
       "name": "My Sponsored Ads V3 Subscription",
       "status": "active",
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
       "remote_identity": 2,
       "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "2",
-          "data_format": "STRING",
-          "product": 70
-        },
-        {
-          "data_id": 0,
-          "data_key": "profile_id",
-          "data_value": "1234567890",
-          "data_format": "STRING",
-          "product": 70
-        }
-      ]
+      "product_parameters": {
+        "profile_id": "1234567890"
+      }
     }
   }
 }
@@ -288,7 +257,7 @@ The `profile_id` comes from calling the [Amazon Advertising Profiles](../service
 
 ## Limiting collected datasets with stage_ids
 
-By default a subscription collects all available datasets for the product. To limit collection to specific datasets, add a `stage_ids` entry to the `subscription_product_meta_attributes` array.
+By default a subscription collects all available datasets for the product. To limit collection to specific datasets, add a `stage_ids` key to the `product_parameters` object.
 
 First, look up the available stage IDs for the product (see [Step 2](#step-2--look-up-available-stage-ids)). Then pass the ones you want as a stringified JSON array:
 
@@ -303,25 +272,11 @@ First, look up the available stage IDs for the product (see [Step 2](#step-2--lo
       "name": "My Orders API Subscription",
       "status": "active",
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
       "remote_identity": 1,
       "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "1",
-          "data_format": "STRING",
-          "product": 53
-        },
-        {
-          "data_id": 0,
-          "data_key": "stage_ids",
-          "data_value": "[1000,1001]",
-          "data_format": "STRING",
-          "product": 53
-        }
-      ]
+      "product_parameters": {
+        "stage_ids": "[1000,1001]"
+      }
     }
   }
 }
@@ -336,10 +291,10 @@ This tells the pipeline to collect only the datasets corresponding to stage IDs 
 Use a PATCH request to update an existing subscription:
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
-Include the subscription `id` in the payload and only the fields you want to change.
+Include the subscription `id` in the payload and only the fields you want to change. `product_parameters` on update is a partial merge. Omitted keys will retain their stored value.
 
 **Example — add `stage_ids` to an existing subscription:**
 
@@ -349,21 +304,15 @@ Include the subscription `id` in the payload and only the fields you want to cha
     "type": "Subscription",
     "id": "12345",
     "attributes": {
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "stage_ids",
-          "data_value": "[1000,1001,1002]",
-          "data_format": "STRING",
-          "product": 53
-        }
-      ]
+      "product_parameters": {
+        "stage_ids": "[1000,1001,1002]"
+      }
     }
   }
 }
 ```
 
-See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-legacy.md) for full PATCH documentation.
+See the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
 
 ---
 
@@ -372,7 +321,7 @@ See the [Subscriptions API (Legacy v1)](../api-usage-docs/subscriptions-api-lega
 Change the subscription's `status` with a PATCH request:
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
 ```json

@@ -60,7 +60,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | Amazon marketplace ID string | Use as `marketplace_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api-legacy.md) |
+| `id` | Amazon marketplace ID string | Use as `marketplace_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `name` | Human-readable marketplace name | Display in UI |
 | `countryCode` | ISO 3166-1 alpha-2 country code | — |
 | `defaultCurrencyCode` | Default currency for this marketplace | — |

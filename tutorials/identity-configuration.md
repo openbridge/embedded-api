@@ -78,7 +78,7 @@ Each Openbridge product that connects to a third-party data source requires a sp
 Fetch the product you want to use from the Subscriptions API:
 
 ```
-GET https://subscriptions.api.openbridge.io/product/{product_id}
+GET https://subscriptions.api.openbridge.io/v2/product/{product_id}
 ```
 
 The response includes a `remote_identity_type` relationship:
@@ -106,7 +106,7 @@ The response includes a `remote_identity_type` relationship:
 
 The `id` in `relationships.remote_identity_type.data` is your `remote_identity_type_id`. If `remote_identity_type.data` is `null`, the product does not require an identity.
 
-Use `GET https://subscriptions.api.openbridge.io/product` to list all products if you need to find a product ID first. See the [Products API](../api-usage-docs/products-api.md) for query filters.
+Use `GET https://subscriptions.api.openbridge.io/v2/product` to list all products if you need to find a product ID first. See the [Products API](../api-usage-docs/products-api.md) for query filters.
 
 ### Get identity type details
 
