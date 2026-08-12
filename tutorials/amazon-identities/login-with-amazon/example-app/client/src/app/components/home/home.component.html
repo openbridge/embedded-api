@@ -1,0 +1,43 @@
+<div class="card">
+  <h2>Login with Amazon (LWA) Integration Demo</h2>
+  <p>
+    This application demonstrates the OAuth 2.0 authorization flows for connecting to
+    Amazon's three primary API surfaces via Login with Amazon (LWA).
+  </p>
+
+  <div class="service-cards">
+    <div class="service-card">
+      <h3>Amazon Advertising API</h3>
+      <p>Campaign management, reporting, bid optimization. Uses 3 regional OAuth URLs (NA, EU, FE).</p>
+      <p><strong>Auth type:</strong> Public OAuth only</p>
+      <a routerLink="/advertising" class="btn btn-primary">Connect Advertising</a>
+    </div>
+
+    <div class="service-card">
+      <h3>Seller Central (SP-API)</h3>
+      <p>Orders, inventory, fulfillment, listings. Marketplace-specific authorization URLs.</p>
+      <p><strong>Auth types:</strong> Public OAuth + Private App</p>
+      <a routerLink="/seller" class="btn btn-primary">Connect Seller</a>
+    </div>
+
+    <div class="service-card">
+      <h3>Vendor Central (SP-API)</h3>
+      <p>Purchase orders, shipments, invoices. Unique URL per marketplace.</p>
+      <p><strong>Auth types:</strong> Public OAuth + Private App</p>
+      <a routerLink="/vendor" class="btn btn-primary">Connect Vendor</a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>How It Works</h2>
+  <div class="info-box">
+    <strong>Public Apps:</strong> Use OAuth consent flow — user is redirected to Amazon, authorizes,
+    and returns with an authorization code exchanged server-side for tokens.
+  </div>
+  <div class="info-box">
+    <strong>Private Apps (Seller/Vendor only):</strong> Self-authorized in Seller/Vendor Central.
+    User provides their own Client ID, Client Secret, and Refresh Token at runtime.
+    Each private app has its own credentials per account/marketplace.
+  </div>
+</div>

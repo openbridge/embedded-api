@@ -1,0 +1,15 @@
+_bmad
+.claude/skills/bmad*
+
+# Dependencies
+example-app/*/node_modules/
+
+# Server environment
+example-app/server/.env
+
+# SSL certs
+example-app/certs/
+
+# Angular build output
+example-app/client/dist/
+example-app/client/.angular/

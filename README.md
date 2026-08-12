@@ -26,7 +26,7 @@ If you want the end-to-end sequence first, start with [Getting Started](./api-us
 
 There are a few prerequisites that still matter at the repository level:
 
-- API access must be enabled for your Openbridge account by the Openbridge team.
+- API access is available on **Premium**, **Business**, and **Enterprise** plans. You can enable it from your [Account Profile](https://app.openbridge.com/account/general) page.
 - The account owner must have the `api-user` role.
 - Refresh tokens are created in the Openbridge UI under `Account -> API Management`.
 - Refresh tokens are shown only once. Store them securely.

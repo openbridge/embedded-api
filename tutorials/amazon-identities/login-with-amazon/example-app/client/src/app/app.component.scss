@@ -1,0 +1,30 @@
+.app-header {
+  background: #232f3e;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  nav a {
+    color: #ff9900;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+
+    &:hover, &.active {
+      text-decoration: underline;
+    }
+  }
+}
+
+.app-main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
