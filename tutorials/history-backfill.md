@@ -52,16 +52,16 @@ You will need:
 List your subscriptions to find the one you want to backfill:
 
 ```
-GET https://subscriptions.api.openbridge.io/sub?account={account_id}
+GET https://subscriptions.api.openbridge.io/v2/sub
 ```
 
 Use the `id` field from the subscription record. You can filter by product:
 
 ```
-GET https://subscriptions.api.openbridge.io/sub?account={account_id}&product={product_id}
+GET https://subscriptions.api.openbridge.io/v2/sub?product={product_id}
 ```
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for all available query filters.
+See the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md) for all available query filters.
 
 ---
 

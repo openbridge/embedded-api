@@ -72,7 +72,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | Google Ads customer ID (numeric) | Use as `customer_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | Google Ads customer ID (numeric) | Use as `customer_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `descriptive_name` | Human-readable account name | Display in UI |
 | `manager` | `true` if this is a manager (MCC) account | If `true`, call `list-managed` to get client accounts |
 | `currency_code` | Account currency | — |
@@ -127,7 +127,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `attributes[].id` | Client account customer ID | Use as `customer_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `attributes[].id` | Client account customer ID | Use as `customer_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `attributes[].descriptive_name` | Human-readable client account name | Display in UI |
 | `attributes[].level` | Depth in the MCC hierarchy | — |
 | `manager.id` | The manager account's customer ID | — |
@@ -183,7 +183,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | YouTube channel ID | Use as `channel_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | YouTube channel ID | Use as `channel_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `snippet.title` | Channel display name | Display in UI |
 | `snippet.customUrl` | Channel handle (e.g. `@mychannel`) | — |
 | `snippet.country` | Channel country | — |
@@ -243,7 +243,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | YouTube channel ID | Use as `channel_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | YouTube channel ID | Use as `channel_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `attributes.title` | Channel display name | Display in UI |
 | `attributes.customUrl` | Channel handle | — |
 | `attributes.statistics.subscriberCount` | Subscriber count | — |
@@ -301,8 +301,8 @@ Authorization: Bearer <jwt>
 | Field | Description | Use in subscription |
 |---|---|---|
 | `id` | Composite `agencyId:advertiserId` | — |
-| `attributes.agencyId` | SA360 agency ID | Use as `agency_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
-| `attributes.advertiserId` | SA360 advertiser ID | Use as `advertiser_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `attributes.agencyId` | SA360 agency ID | Use as `agency_id` in subscription [`product_parameters`](./subscriptions-api.md) |
+| `attributes.advertiserId` | SA360 advertiser ID | Use as `advertiser_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `attributes.agency` | Agency display name | Display in UI |
 | `attributes.advertiser` | Advertiser display name | Display in UI |
 
@@ -410,7 +410,7 @@ Authorization: Bearer <jwt>
 
 | Field | Description | Use in subscription |
 |---|---|---|
-| `id` | CM360 report ID | Use as `report_id` in subscription [`subscription_product_meta_attributes`](./subscriptions-api.md) |
+| `id` | CM360 report ID | Use as `report_id` in subscription [`product_parameters`](./subscriptions-api.md) |
 | `attributes.name` | Report display name | Display in UI |
 | `attributes.type` | Report type (e.g. `STANDARD`, `FLOODLIGHT`) | — |
 | `includes.next` | Pagination token | Pass as `next` query param for next page |

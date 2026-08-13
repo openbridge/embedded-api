@@ -13,7 +13,7 @@
 - [Step 5 — Select marketing stream datasets](#step-5--select-marketing-stream-datasets)
 - [Step 6 — Provide an AWS IAM Role ARN and generate SQS queues](#step-6--provide-an-aws-iam-role-arn-and-generate-sqs-queues)
 - [Step 7 — Create the pipeline subscription](#step-7--create-the-pipeline-subscription)
-  - [Subscription meta fields](#subscription-meta-fields)
+  - [product_parameters](#product_parameters)
   - [Full example request (Sponsored Ads)](#full-example-request-sponsored-ads)
   - [Full example request (DSP)](#full-example-request-dsp)
 - [Updating a marketing stream subscription](#updating-a-marketing-stream-subscription)
@@ -375,26 +375,25 @@ Save the `queue_urls` and `dataset_params` values from the response — they are
 With all the pieces gathered from the previous steps, create the pipeline subscription for product `87` (Amazon Advertising Marketing Stream).
 
 ```
-POST https://subscriptions.api.openbridge.io/sub
+POST https://subscriptions.api.openbridge.io/v2/sub
 ```
 
 For general detail on subscription creation, see the [Subscription Configuration tutorial](./subscription-configuration.md).
 
-### Subscription meta fields
+### product_parameters
 
-This product requires 9 meta fields in `subscription_product_meta_attributes`.
+This product requires 8 keys in `product_parameters`. Remote identity is set via the top-level `remote_identity` field (see Step 1) rather than a `product_parameters` key.
 
-| `data_key` | `data_format` | Source | Description |
-|---|---|---|---|
-| `remote_identity_id` | STRING | Step 1 | The identity ID as a string |
-| `profile_id` | STRING | Step 3 | The advertising profile ID. Set to `"NOT_APPLICABLE"` for managed DSP. |
-| `profile_type` | STRING | Step 2 | `"ads"`, `"dsp"`, or `"managedDsp"` |
-| `advertiser_id` | STRING | Step 4 | The advertiser ID. Set to `"NOT_APPLICABLE"` for Sponsored Ads (`ads`). |
-| `aws_iam_role_arn` | STRING | Step 6 | The AWS IAM Role ARN provided in the SQS generation request |
-| `queue_urls` | JSON | Step 6 | Stringified `queue_urls` map from the SQS generation response |
-| `dataset_params` | JSON | Step 6 | Stringified `dataset_params` map from the SQS generation response |
-| `selected_tables` | JSON | Step 5 | Stringified array of selected dataset names |
-| `stage_ids` | JSON | Step 5 | Stringified array of stage IDs corresponding to the selected datasets |
+| Key | Source | Description |
+|---|---|---|
+| `profile_id` | Step 3 | The advertising profile ID. Set to `"NOT_APPLICABLE"` for managed DSP. |
+| `profile_type` | Step 2 | `"ads"`, `"dsp"`, or `"managedDsp"` |
+| `advertiser_id` | Step 4 | The advertiser ID. Set to `"NOT_APPLICABLE"` for Sponsored Ads (`ads`). |
+| `aws_iam_role_arn` | Step 6 | The AWS IAM Role ARN provided in the SQS generation request |
+| `queue_urls` | Step 6 | Stringified `queue_urls` map from the SQS generation response (JSON string) |
+| `dataset_params` | Step 6 | Stringified `dataset_params` map from the SQS generation response (JSON string) |
+| `selected_tables` | Step 5 | Stringified array of selected dataset names (JSON string) |
+| `stage_ids` | Step 5 | Stringified array of stage IDs corresponding to the selected datasets (JSON string) |
 
 > **Note:** The `stage_ids` are resolved by mapping each selected dataset name to its corresponding payload stage via the [Products API payload definitions](../api-usage-docs/products-api.md). Each dataset name maps to a payload name (see the tables in Step 5), and the payload's `stage_id` is used.
 
@@ -410,81 +409,19 @@ This product requires 9 meta fields in `subscription_product_meta_attributes`.
       "product": 87,
       "name": "My Marketing Stream - Sponsored Ads",
       "status": "active",
-      "quantity": 1,
-      "price": 0.00,
-      "auto_renew": 1,
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
-      "invalid_subscription": 0,
-      "rabbit_payload_successful": 0,
-      "stripe_subscription_id": "",
       "remote_identity": 112,
       "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "112",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "profile_id",
-          "data_value": "4463883966959342",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "profile_type",
-          "data_value": "ads",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "advertiser_id",
-          "data_value": "NOT_APPLICABLE",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "aws_iam_role_arn",
-          "data_value": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "queue_urls",
-          "data_value": "{\"sp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-traffic-abc123\",\"sp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-conversion-abc123\",\"budget_usage\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-budget-usage-abc123\"}",
-          "data_format": "JSON",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "dataset_params",
-          "data_value": "{\"sp-traffic\":{\"stream_id\":\"str_abc123\"},\"sp-conversion\":{\"stream_id\":\"str_def456\"},\"budget-usage\":{\"stream_id\":\"str_ghi789\"}}",
-          "data_format": "JSON",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "selected_tables",
-          "data_value": "[\"sp-traffic\",\"sp-conversion\",\"budget-usage\"]",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "stage_ids",
-          "data_value": "[101,102,103]",
-          "data_format": "JSON",
-          "product": 87
-        }
-      ]
+      "product_parameters": {
+        "profile_id": "4463883966959342",
+        "profile_type": "ads",
+        "advertiser_id": "NOT_APPLICABLE",
+        "aws_iam_role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
+        "queue_urls": "{\"sp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-traffic-abc123\",\"sp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-conversion-abc123\",\"budget_usage\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-budget-usage-abc123\"}",
+        "dataset_params": "{\"sp-traffic\":{\"stream_id\":\"str_abc123\"},\"sp-conversion\":{\"stream_id\":\"str_def456\"},\"budget-usage\":{\"stream_id\":\"str_ghi789\"}}",
+        "selected_tables": "[\"sp-traffic\",\"sp-conversion\",\"budget-usage\"]",
+        "stage_ids": "[101,102,103]"
+      }
     }
   }
 }
@@ -502,87 +439,25 @@ This product requires 9 meta fields in `subscription_product_meta_attributes`.
       "product": 87,
       "name": "My Marketing Stream - DSP",
       "status": "active",
-      "quantity": 1,
-      "price": 0.00,
-      "auto_renew": 1,
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
-      "invalid_subscription": 0,
-      "rabbit_payload_successful": 0,
-      "stripe_subscription_id": "",
       "remote_identity": 112,
       "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "112",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "profile_id",
-          "data_value": "4463883966959342",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "profile_type",
-          "data_value": "dsp",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "advertiser_id",
-          "data_value": "ADV123456",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "aws_iam_role_arn",
-          "data_value": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "queue_urls",
-          "data_value": "{\"adsp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-traffic-abc123\",\"adsp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-conversion-abc123\"}",
-          "data_format": "JSON",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "dataset_params",
-          "data_value": "{\"adsp-traffic\":{\"stream_id\":\"str_xyz123\"},\"adsp-conversion\":{\"stream_id\":\"str_xyz456\"}}",
-          "data_format": "JSON",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "selected_tables",
-          "data_value": "[\"adsp-traffic\",\"adsp-conversion\"]",
-          "data_format": "STRING",
-          "product": 87
-        },
-        {
-          "data_id": 0,
-          "data_key": "stage_ids",
-          "data_value": "[201,202]",
-          "data_format": "JSON",
-          "product": 87
-        }
-      ]
+      "product_parameters": {
+        "profile_id": "4463883966959342",
+        "profile_type": "dsp",
+        "advertiser_id": "ADV123456",
+        "aws_iam_role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
+        "queue_urls": "{\"adsp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-traffic-abc123\",\"adsp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-conversion-abc123\"}",
+        "dataset_params": "{\"adsp-traffic\":{\"stream_id\":\"str_xyz123\"},\"adsp-conversion\":{\"stream_id\":\"str_xyz456\"}}",
+        "selected_tables": "[\"adsp-traffic\",\"adsp-conversion\"]",
+        "stage_ids": "[201,202]"
+      }
     }
   }
 }
 ```
 
-Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and all `data_value` entries) with values from your account and the previous steps.
+Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and the `product_parameters` values) with values from your account and the previous steps.
 
 ---
 
@@ -601,12 +476,12 @@ The request body is the same structure as the create endpoint — include the `r
 **2. Update the pipeline subscription:**
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
-Update the `queue_urls`, `dataset_params`, `selected_tables`, `stage_ids`, and any other changed meta fields with the new values from the update response.
+Update the `queue_urls`, `dataset_params`, `selected_tables`, `stage_ids`, and any other changed keys in `product_parameters` with the new values from the update response (partial merge — omitted keys keep their stored value).
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
+See the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
 
 ---
 
@@ -615,7 +490,7 @@ See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PAT
 To delete a marketing stream pipeline, mark the pipeline subscription as invalid:
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
 ```json

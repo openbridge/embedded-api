@@ -9,7 +9,7 @@
 - [Step 3 — Configure AWS SQS queues](#step-3--configure-aws-sqs-queues)
 - [Step 4 — Create the notification subscription via Service API](#step-4--create-the-notification-subscription-via-service-api)
 - [Step 5 — Create the pipeline subscription](#step-5--create-the-pipeline-subscription)
-  - [Subscription meta fields](#subscription-meta-fields)
+  - [product_parameters](#product_parameters)
   - [Full example request](#full-example-request)
 - [Updating a notification subscription](#updating-a-notification-subscription)
 - [Deleting a notification subscription](#deleting-a-notification-subscription)
@@ -225,26 +225,25 @@ See the [Service API: Amazon SP-API](../api-usage-docs/service-amazon-sp-api.md)
 With all the pieces gathered from the previous steps, create the pipeline subscription for product `86` (Amazon Selling Partner Notifications).
 
 ```
-POST https://subscriptions.api.openbridge.io/sub
+POST https://subscriptions.api.openbridge.io/v2/sub
 ```
 
 For general detail on subscription creation, see the [Subscription Configuration tutorial](./subscription-configuration.md).
 
-### Subscription meta fields
+### product_parameters
 
-This product requires 9 meta fields in `subscription_product_meta_attributes`. It does **not** use `stage_ids` — dataset selection is handled via the `selected_tables` meta field instead.
+This product requires 8 keys in `product_parameters`. It does **not** use `stage_ids` — dataset selection is handled via the `selected_tables` key instead. Remote identity is set via the top-level `remote_identity` field (see Step 1) rather than a `product_parameters` key.
 
-| `data_key` | `data_format` | Source | Description |
-|---|---|---|---|
-| `remote_identity_id` | STRING | Step 1 | The identity ID as a string |
-| `identity_type` | STRING | Step 1 | `"seller"` or `"vendor"` |
-| `sqs_queue_arn` | STRING | Step 3 | SP-API SQS Queue ARN |
-| `sqs_queue_url` | STRING | Step 3 | SP-API SQS Queue URL (derived from ARN) |
-| `sqs_notification_arn` | STRING | Step 3 | S3 Notifications SQS Queue ARN |
-| `sqs_notification_url` | STRING | Step 3 | S3 Notifications SQS Queue URL (derived from ARN) |
-| `sqs_destination_id` | STRING | Step 4 | `destination_id` from the create notification response |
-| `notification_subscriptions` | JSON | Step 4 | Stringified `subscriptions` map from the create notification response |
-| `selected_tables` | JSON | Step 2 | Stringified array of selected notification type names |
+| Key | Source | Description |
+|---|---|---|
+| `identity_type` | Step 1 | `"seller"` or `"vendor"` |
+| `sqs_queue_arn` | Step 3 | SP-API SQS Queue ARN |
+| `sqs_queue_url` | Step 3 | SP-API SQS Queue URL (derived from ARN) |
+| `sqs_notification_arn` | Step 3 | S3 Notifications SQS Queue ARN |
+| `sqs_notification_url` | Step 3 | S3 Notifications SQS Queue URL (derived from ARN) |
+| `sqs_destination_id` | Step 4 | `destination_id` from the create notification response |
+| `notification_subscriptions` | Step 4 | Stringified `subscriptions` map from the create notification response (JSON string) |
+| `selected_tables` | Step 2 | Stringified array of selected notification type names (JSON string) |
 
 ### Full example request
 
@@ -259,80 +258,24 @@ This product requires 9 meta fields in `subscription_product_meta_attributes`. I
       "name": "My SP-API Notifications Pipeline",
       "status": "active",
       "date_start": "2024-06-01T00:00:00Z",
-      "date_end": "2024-06-01T00:00:00Z",
       "remote_identity": 362,
       "storage_group": 1,
-      "subscription_product_meta_attributes": [
-        {
-          "data_id": 0,
-          "data_key": "remote_identity_id",
-          "data_value": "362",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "identity_type",
-          "data_value": "seller",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "sqs_queue_arn",
-          "data_value": "arn:aws:sqs:us-east-1:123456789012:my-sp-notifications-queue",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "sqs_queue_url",
-          "data_value": "https://sqs.us-east-1.amazonaws.com/123456789012/my-sp-notifications-queue",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "sqs_notification_arn",
-          "data_value": "arn:aws:sqs:us-east-1:123456789012:my-s3-notifications-queue",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "sqs_notification_url",
-          "data_value": "https://sqs.us-east-1.amazonaws.com/123456789012/my-s3-notifications-queue",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "sqs_destination_id",
-          "data_value": "dest_xyz789",
-          "data_format": "STRING",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "notification_subscriptions",
-          "data_value": "{\"ORDER_CHANGE\":\"sub_abc123\",\"FBA_INVENTORY_AVAILABILITY_CHANGES\":\"sub_def456\"}",
-          "data_format": "JSON",
-          "product": 86
-        },
-        {
-          "data_id": 0,
-          "data_key": "selected_tables",
-          "data_value": "[\"ORDER_CHANGE\",\"FBA_INVENTORY_AVAILABILITY_CHANGES\"]",
-          "data_format": "JSON",
-          "product": 86
-        }
-      ]
+      "product_parameters": {
+        "identity_type": "seller",
+        "sqs_queue_arn": "arn:aws:sqs:us-east-1:123456789012:my-sp-notifications-queue",
+        "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/123456789012/my-sp-notifications-queue",
+        "sqs_notification_arn": "arn:aws:sqs:us-east-1:123456789012:my-s3-notifications-queue",
+        "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/123456789012/my-s3-notifications-queue",
+        "sqs_destination_id": "dest_xyz789",
+        "notification_subscriptions": "{\"ORDER_CHANGE\":\"sub_abc123\",\"FBA_INVENTORY_AVAILABILITY_CHANGES\":\"sub_def456\"}",
+        "selected_tables": "[\"ORDER_CHANGE\",\"FBA_INVENTORY_AVAILABILITY_CHANGES\"]"
+      }
     }
   }
 }
 ```
 
-Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and all `data_value` entries) with values from your account and the previous steps.
+Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and the `product_parameters` values) with values from your account and the previous steps.
 
 ---
 
@@ -351,12 +294,12 @@ The request body is the same as the create endpoint — include the updated `que
 **2. Update the pipeline subscription:**
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
-Update the `notification_subscriptions`, `selected_tables`, and any other changed meta fields.
+Update the `notification_subscriptions`, `selected_tables`, and any other changed keys in `product_parameters` (partial merge — omitted keys keep their stored value).
 
-See the [Subscriptions API](../api-usage-docs/subscriptions-api.md) for full PATCH documentation and the [Service API: Amazon SP-API](../api-usage-docs/service-amazon-sp-api.md) for the update notification endpoint.
+See the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md) for full PATCH documentation and the [Service API: Amazon SP-API](../api-usage-docs/service-amazon-sp-api.md) for the update notification endpoint.
 
 ---
 
@@ -375,7 +318,7 @@ This removes all upstream SP-API subscriptions and the registered SQS destinatio
 **2. Mark the pipeline subscription as invalid:**
 
 ```
-PATCH https://subscriptions.api.openbridge.io/sub/{subscription_id}
+PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
 ```
 
 ```json
