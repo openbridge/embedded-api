@@ -4,6 +4,14 @@ A subscription connects a data source product, a storage destination, and data s
 
 ---
 
+## Core Concepts
+
+- **Subscription** — the record that ties a product to a destination (and, for source products, to a remote identity) and controls whether data movement is active.
+- **Remote Identity** — the credentials (OAuth token, service account key, etc.) that authorize Openbridge to pull data from a source on your behalf. Created and authorized in the Openbridge UI, not the API.
+- **Destination** — the storage target (e.g. a data warehouse) data is delivered to. Also managed in the UI; referenced by ID via `storage_group` when creating a subscription.
+
+---
+
 ## Order of Operations
 
 1. [Get your account ID](#step-1--get-your-account-id)
