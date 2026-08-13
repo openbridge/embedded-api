@@ -47,6 +47,7 @@ plugins:
 
 exclude_docs: |
   api-usage-docs/data-model.md
+  tutorials/amazon-identities/*
 
 nav:
   - Home: index.md
