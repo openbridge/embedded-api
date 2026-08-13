@@ -1,0 +1,87 @@
+site_name: Openbridge Embedded API
+site_description: Documentation for integrating with the Openbridge Embedded API
+repo_url: https://github.com/openbridge/embedded-api
+repo_name: openbridge/embedded-api
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+
+plugins:
+  - search
+
+exclude_docs: |
+  api-usage-docs/data-model.md
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: api-usage-docs/getting-started.md
+      - Authentication: api-usage-docs/authentication-api.md
+      - Account & User Lookup: api-usage-docs/account-user-api.md
+  - API Reference:
+      - Products: api-usage-docs/products-api.md
+      - Remote Identities: api-usage-docs/remote-identity-api.md
+      - Subscriptions (v2): api-usage-docs/subscriptions-api.md
+      - Subscriptions (Legacy v1): api-usage-docs/subscriptions-api-legacy.md
+      - History: api-usage-docs/history-api.md
+      - OAuth: api-usage-docs/oauth-api.md
+      - State: api-usage-docs/state-api.md
+      - Jobs: api-usage-docs/jobs-api.md
+      - Rate Limiting: api-usage-docs/rate-limiting.md
+      - Service API Overview: api-usage-docs/service-api.md
+  - Service Integrations:
+      - Amazon Advertising: api-usage-docs/service-amazon-advertising-api.md
+      - Amazon SP-API: api-usage-docs/service-amazon-sp-api.md
+      - Google: api-usage-docs/service-google-api.md
+      - Facebook: api-usage-docs/service-facebook-api.md
+      - Shopify: api-usage-docs/service-shopify-api.md
+      - Healthchecks: api-usage-docs/service-healthchecks-api.md
+      - Openbridge (OB) API: api-usage-docs/service-ob-api.md
+      - Product Cards: api-usage-docs/service-product-cards-api.md
+      - Rules: api-usage-docs/service-rules-api.md
+  - Tutorials:
+      - Identity Configuration: tutorials/identity-configuration.md
+      - Subscription Configuration: tutorials/subscription-configuration.md
+      - Requesting Historical Data: tutorials/history-backfill.md
+      - Monitoring Pipeline Health: tutorials/monitoring-healthchecks.md
+      - Amazon Order Product Jobs: tutorials/amazon-order-product-jobs.md
+      - Amazon Advertising Marketing Stream Pipeline: tutorials/amazon-advertising-marketing-stream-pipeline.md
+      - Amazon Notifications Pipeline: tutorials/amazon-notifications-pipeline.md
+  - Products:
+      - Overview: products/product-overview.md
+      - Amazon Advertising DSP v3: products/amazon-advertising-dsp-v3.md
+      - Destinations: products/destinations.md

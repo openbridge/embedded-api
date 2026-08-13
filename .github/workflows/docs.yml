@@ -1,0 +1,34 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "docs/**"
+      - "api-usage-docs/**"
+      - "tutorials/**"
+      - "products/**"
+  pull_request:
+    paths:
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "docs/**"
+      - "api-usage-docs/**"
+      - "tutorials/**"
+      - "products/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pip install -r requirements-docs.txt
+
+      - run: mkdocs build
