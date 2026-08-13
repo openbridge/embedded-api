@@ -11,7 +11,7 @@
   - [Regions](#regions)
   - [Amazon Advertising regions](#amazon-advertising-regions)
   - [Amazon Selling Partner and Vendor Central regions](#amazon-selling-partner-and-vendor-central-regions)
-- [Step 3 — (Shopify / Snowflake only) Create an OAuth App record](#step-3--shopify--snowflake-only-create-an-oauth-app-record)
+- [Step 3 — (Shopify / Snowflake only) Create an OAuth App record](#step-3--create-an-oauth-app-record-if-needed)
 - [Step 4 — Create a state record](#step-4--create-a-state-record)
   - [State payload fields](#state-payload-fields)
   - [Return URL](#return-url)

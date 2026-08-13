@@ -28,7 +28,7 @@ Builds the static site into `site/` (gitignored — regenerated on every build, 
 mkdocs build --strict
 ```
 
-Same as above, but treats broken internal links/anchors as errors instead of warnings. Currently fails — see **Known issues** below.
+Same as above, but treats broken internal links/anchors as errors instead of warnings. This is also what CI runs.
 
 ## Project layout
 
@@ -44,17 +44,13 @@ Same as above, but treats broken internal links/anchors as errors instead of war
 
 ## GitHub Actions
 
-`.github/workflows/docs.yml` runs on push to `main` and on pull requests that touch docs-related paths (`mkdocs.yml`, `requirements-docs.txt`, `docs/**`, `api-usage-docs/**`, `tutorials/**`, `products/**`). It installs `requirements-docs.txt` and runs `mkdocs build` to confirm the site builds cleanly.
+`.github/workflows/docs.yml` runs on push to `main` and on pull requests that touch docs-related paths (`mkdocs.yml`, `requirements-docs.txt`, `docs/**`, `api-usage-docs/**`, `tutorials/**`, `products/**`). It installs `requirements-docs.txt` and runs `mkdocs build --strict` to confirm the site builds cleanly with no broken internal links or anchors.
 
 This is a **build-validation check only** — it does not deploy anywhere. The final hosting target (GitHub Pages vs. folding into docs.openbridge.com vs. something else) is still an open decision. Once that's picked, the workflow needs a deploy step added (e.g. `mkdocs gh-deploy` or `actions/deploy-pages` for GitHub Pages, or a step that ships the built `site/` output to wherever docs.openbridge.com is served from).
 
-The workflow deliberately runs `mkdocs build` rather than `mkdocs build --strict` for now — see below.
+## Content fixes already made
 
-## Known issues (pre-existing content, not caused by the MkDocs setup)
+A round of pre-existing broken links and anchors (not caused by the MkDocs setup — these were always broken on GitHub too, just never validated) were fixed to get `--strict` passing:
 
-Running `mkdocs build --strict` currently surfaces:
-
-- **Broken relative links**, e.g. `./account-api.md` (likely meant `account-user-api.md`), `../products/storages.md` (renamed to `destinations.md` per git history), and several `service-api.md` references from `products/` and `tutorials/` files using paths that don't resolve from those subdirectories.
-- **A handful of anchor mismatches** in `product-overview.md` and `identity-configuration.md` — links pointing at headers that don't exist under that exact slug.
-
-These links have always been broken on GitHub too (GitHub doesn't validate markdown links), so this isn't a regression — just now visible. Fixing them and switching the CI workflow to `--strict` is a reasonable follow-up once someone has time for it.
+- Relative links that didn't resolve, e.g. `./account-api.md` → `account-user-api.md`, `../products/storages.md` → `destinations.md`, and several `service-api.md` references from `products/` and `tutorials/` files that needed either a corrected path or a redirect to the specific per-service doc (`service-amazon-advertising-api.md`, `service-facebook-api.md`, `service-google-api.md`, `service-shopify-api.md`) where that content now actually lives.
+- Anchor mismatches in `product-overview.md` (added a missing `## Mixed Amazon Seller and Vendor Products` header the table of contents already pointed at) and `identity-configuration.md` (TOC anchor updated to match a since-renamed header).

@@ -36,7 +36,7 @@ Before creating a subscription you will need your **account ID**, **user ID**, a
 
 ### Get Account ID and User ID
 
-See [Account and User API](./account-api.md) for the endpoints that return your account ID and user ID. Use the `id` field from each response as `account` and `user` respectively in subscription requests.
+See [Account and User API](./account-user-api.md) for the endpoints that return your account ID and user ID. Use the `id` field from each response as `account` and `user` respectively in subscription requests.
 
 ---
 
