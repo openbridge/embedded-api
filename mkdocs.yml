@@ -1,5 +1,6 @@
 site_name: Openbridge Embedded API
 site_description: Documentation for integrating with the Openbridge Embedded API
+site_url: https://docs.openbridge.com/api/  # wherever the site is hosted
 repo_url: https://github.com/openbridge/embedded-api
 repo_name: openbridge/embedded-api
 edit_uri: edit/main/docs/
@@ -42,6 +43,7 @@ markdown_extensions:
 
 plugins:
   - search
+  - llmstxt-md
 
 exclude_docs: |
   api-usage-docs/data-model.md
