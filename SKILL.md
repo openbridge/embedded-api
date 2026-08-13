@@ -62,7 +62,8 @@ Load these on demand — do not load all at once. Pick the file(s) relevant to t
 | Authentication & refresh tokens | `api-usage-docs/authentication-api.md` |
 | Getting account/user IDs | `api-usage-docs/account-user-api.md` |
 | Getting started / full flow walkthrough | `api-usage-docs/getting-started.md` |
-| Subscriptions CRUD | `api-usage-docs/subscriptions-api.md` |
+| Subscriptions CRUD (v2) | `api-usage-docs/subscriptions-api.md` |
+| Subscriptions CRUD (legacy v1) | `api-usage-docs/subscriptions-api-legacy.md` |
 | Products & stage IDs | `api-usage-docs/products-api.md` |
 | Remote identities & identity types (`/ri`, `/sri`, `/rit`) | `api-usage-docs/remote-identity-api.md` |
 | OAuth flow & OAuth app records | `api-usage-docs/oauth-api.md` |

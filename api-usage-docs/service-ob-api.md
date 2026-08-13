@@ -76,7 +76,7 @@ Additional keys inside `storage_parameters` depend on the storage type and are p
 
 **Supported `storage` values**
 
-See [Storages](../products/storages.md) for all supported storage types and their required fields.
+See [Destinations](../products/destinations.md) for all supported storage types and their required fields.
 
 ---
 

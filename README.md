@@ -47,7 +47,7 @@ Use these docs in order if you are building a new integration:
    Find products and product payload definitions, including valid `stage_id` values.
 4. [Remote Identity API](./api-usage-docs/remote-identity-api.md)
    Find the identities your account can use and inspect identity health.
-5. [Subscriptions API](./api-usage-docs/subscriptions-api.md)
+5. [Subscriptions API (v2)](./api-usage-docs/subscriptions-api.md)
    Create, inspect, and update subscriptions.
 6. [History API](./api-usage-docs/history-api.md)
    Request historical backfills after a subscription is active.
@@ -63,7 +63,8 @@ Use these docs in order if you are building a new integration:
 | Account and user lookup | [api-usage-docs/account-user-api.md](./api-usage-docs/account-user-api.md) |
 | Products | [api-usage-docs/products-api.md](./api-usage-docs/products-api.md) |
 | Remote identities | [api-usage-docs/remote-identity-api.md](./api-usage-docs/remote-identity-api.md) |
-| Subscriptions | [api-usage-docs/subscriptions-api.md](./api-usage-docs/subscriptions-api.md) |
+| Subscriptions (v2) | [api-usage-docs/subscriptions-api.md](./api-usage-docs/subscriptions-api.md) |
+| Subscriptions (legacy v1) | [api-usage-docs/subscriptions-api-legacy.md](./api-usage-docs/subscriptions-api-legacy.md) |
 | History | [api-usage-docs/history-api.md](./api-usage-docs/history-api.md) |
 | OAuth flow and app records | [api-usage-docs/oauth-api.md](./api-usage-docs/oauth-api.md) |
 | State records | [api-usage-docs/state-api.md](./api-usage-docs/state-api.md) |

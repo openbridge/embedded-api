@@ -30,11 +30,12 @@ GET /service/amzadv/profiles-only/{remote_identity_id}
 | Parameter | Type | Description |
 |---|---|---|
 | `profile_types` | string | Comma-separated filter: `seller`, `vendor`, `dsp`, `attribution`. Omit to return all types. |
+| `is_manager` | string | `true` if the identity is connected to a manager account, `false` otherwise. |
 
 **Example request**
 
 ```http
-GET https://service.api.openbridge.io/service/amzadv/profiles-only/112?profile_types=seller,vendor
+GET https://service.api.openbridge.io/service/amzadv/profiles-only/112?profile_types=seller,vendor&is_manager=false
 Authorization: Bearer <jwt>
 ```
 

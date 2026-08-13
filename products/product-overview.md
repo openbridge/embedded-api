@@ -6,7 +6,7 @@ This document provides information required when creating subscriptions for Open
   - [Amazon	Sponsored Ads (V3)](#amazon-sponsored-ads-v3)
   - [Amazon Advertising Brand Metrics](#amazon-advertising-brand-metrics)
   - [Amazon Attribution](#amazon-attribution)
-  - [Amazon DSP](./products/amazon-advertising-dsp-v3.md)
+  - [Amazon DSP](./amazon-advertising-dsp-v3.md)
 
 - [Amazon Seller Products](#amazon-seller-products)
   - [Amazon Orders API](#amazon-orders-api)
@@ -28,8 +28,8 @@ This document provides information required when creating subscriptions for Open
   - [Amazon Vendor Real-time Reports](#amazon-vendor-real-time-reports)
 
 - [Mixed Amazon Seller and Vendor Products](#mixed-amazon-seller-and-vendor-products)
-  - [Amazon Catalog Keyword Tracker](#amazon-seller-vendor-catalog-keyword-tracker)
-  - [Amazon Catalog API](#amazon-seller-vendor-catalog-api)
+  - [Amazon Catalog Keyword Tracker](#amazon-catalog-keyword-tracker)
+  - [Amazon Catalog API](#amazon-catalog-api)
 
 - [Facebook Products](#facebook-products)
 
@@ -56,9 +56,9 @@ This document provides information required when creating subscriptions for Open
 These products pull reports from resources attributed to the Amazon Advertising API.
 
 ### Amazon	Sponsored Ads (V3)
-This product requires a call to the service API to get the requisit information for the subscription product meta.
+This product requires a call to the service API to get the requisite information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](../api-usage-docs/service-amazon-advertising-api.md#list-profiles) endpoint. This endpoint will return a list of Amazon Advertising profiles based on the requested type  This list will provide the `profile_id` metadata. If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](../api-usage-docs/service-amazon-advertising-api.md#list-brands) endpoint. You can pass up to five profile IDs to retrieve their brand information simultaneously.
 
 __Product Attributes__
 > | Key | Value |
@@ -74,9 +74,9 @@ __Required Subscription Product Meta__
 
 ### Amazon Advertising Brand Metrics
 
-This product requires a call to the service API to get the requisit information for the subscription product meta.
+This product requires a call to the service API to get the requisite information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](../api-usage-docs/service-amazon-advertising-api.md#list-profiles)  endpoint  This endpoint will return a list of Amazon Advertising profiles based on the requested type  This list will provide the `profile_id` meta data  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](../api-usage-docs/service-amazon-advertising-api.md#list-brands) endpoint. You may pass up to five profile IDs to retrieve their brand information simultaneously.
 
 __Product Attributes__
 > | Key | Value |
@@ -93,9 +93,9 @@ __Required Subscription Product Meta__
 
 ### Amazon Attribution
 
-This product requires a call to the service API to get the requisit information for the subscription product meta.
+This product requires a call to the service API to get the requisite information for the subscription product meta.
 
-The first call that needs to be made is to the [Amazon Advertising profiles](service-api.md#amazon-advertising-profiles)  endpoint.  This endpoint will return a list of Amazon Advertising profiles based on the requested type.  This list will provide the `profile_id` meta data.  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](service-api.md#amazon-advertising-profile-brands)  endpoint.  You can pass up to five profile IDs to retrieve their brand information simultaniously.  If you had more than five profiles you would need to iterate through them in groups of five to get them all.
+The first call that needs to be made is to the [Amazon Advertising profiles](../api-usage-docs/service-amazon-advertising-api.md#list-profiles) endpoint. This endpoint will return a list of Amazon Advertising profiles based on the requested type  This list will provide the `profile_id` meta data  If you need more information to display you can request the brand information for the profiles by calling the [Amazon Advertising Profile Brands](../api-usage-docs/service-amazon-advertising-api.md#list-brands) endpoint. You may pass up to five profile IDs to retrieve their brand information simultaneously.
 
 __Product Attributes__
 > | Key | Value |
@@ -323,7 +323,9 @@ __Required Subscription Product Meta__
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
 
-#### Amazon Catalog Keyword Tracker
+## Mixed Amazon Seller and Vendor Products
+
+### Amazon Catalog Keyword Tracker
 
 Amazon Catalog Keyword Tracker requires no additional API lookups with the Openbridge Service API.
 
@@ -337,12 +339,12 @@ __Required Subscription Product Meta__
 > | Data Key | Data Format Value | Data Value |
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | keywords | `STRING` | A stringified JSON array of keywords.  The limit is 100 keywords to prevent Amazon API rate limiting.  Subscriptions with more than 100 may fail to generate reports. |
+> | keywords | `STRING` | A stringified JSON array of keywords  The limit is 100 keywords to prevent Amazon API rate limiting. Subscriptions with more than 100 may fail to generate reports. |
 > | subproduct_id | `STRING` | This product requires a subproduct id which will always be the string `keywords`. |
 
 ### Amazon Catalog API
 
-Amazon Catalog API requires no additional API lookups with the Openbridge Service API.  However, it is recommended that when choosing the `id_type` of `ASIN` that you use the Openbridge Service API for validating `ASIN` numbers if you are not 100% sure the ASINs you are providing are correct.
+Amazon Catalog API requires no additional API lookups with the Openbridge Service API  However, it is recommended that when choosing the `id_type` of `ASIN` that you use the Openbridge Service API for validating `ASIN` numbers if you are not 100% sure the ASINs you are providing are correct.
 
 __Product Attributes__
 > | Key | Value |
@@ -354,16 +356,18 @@ __Required Subscription Product Meta__
 > | Data Key | Data Format Value | Data Value |
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | ids | `STRING` | A stringified JSON array of ids of the type defined by `id_type`.  The limit should be 100 ids to prevent Amazon API rate limiting. Subscriptions with more than 100 may fail to generate reports. |
+> | ids | `STRING` | A stringified JSON array of ids of the type defined by `id_type`  The limit should be 100 ids to prevent Amazon API rate limiting. Subscriptions with more than 100 may fail to generate reports. |
 > | identity_type | `STRING` | `seller` or `vendor` depending if the identity type is a seller or a vendor identity. |
-> | id_type | `STRING` | The catalog API can be used to request reports on different types of identifiers.  `ASIN`,`EAN`, `GTIN`, `ISBN`, `JAN`, `MINSAN`, `SKU`, and `UPC`.  <strong>Note</strong>: that `SKU` types can not be used with `vendor` type identities due to permission restrictions. |
+> | id_type | `STRING` | The catalog API can be used to request reports on different types of identifiers  `ASIN`,`EAN`, `GTIN`, `ISBN`, `JAN`, `MINSAN`, `SKU`, and `UPC`  <strong>Note</strong>: that `SKU` types can not be used with `vendor` type identities due to permission restrictions. |
 > | subproduct_id | `STRING` | This product requires a subproduct id which will always be the string `identifiers`. |
 
 ## Facebook Products
 
 ### Facebook Marketing
 
-Facebook marketing requires a Facebook Ad account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Ad account IDs can be requested with the [Facebook Ads](service-api.md#facebook-ads) endpoint on the Openbridge Service API.
+Facebook marketing requires a Facebook Ad account ID that is connected to the authorized identity attached to the subscription.
+
+A list of available Facebook Ad account IDs can be requested with the [Facebook Ads](../api-usage-docs/service-facebook-api.md#list-ad-accounts) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -378,7 +382,10 @@ __Product Attributes__
 
 ### Facebook Page Insights
 
-Facebook marketing requires a Facebook Page account ID that is connected to the authorized identity attached to the subscription.  A list of available Facebook Page account IDs can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
+Facebook marketing requires a Facebook Page account ID that is connected to the authorized identity attached to the subscription.
+
+A list of available Facebook Page account IDs can be requested with the [Facebook Page Profiles](../api-usage-docs/service-facebook-api.md#list-page-profiles) endpoint on the Openbridge Service API.
+
 __Product Attributes__
 > | Key | Value |
 > |-|-|
@@ -392,7 +399,9 @@ __Product Attributes__
 
 ### Instagram Insights
 
-Instagram Insights requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
+Instagram Insights requires a Instagram account ID that is connected to the authorized identity attached to the subscription as well as the Facebook page ID that the instagram account is connected to.
+
+A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](../api-usage-docs/service-facebook-api.md#list-page-profiles) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -409,7 +418,9 @@ __Required Subscription Product Meta__
 
 ### Instagram Stories
 
-Instagram Stories requires a Instagram account ID that is connected to the authorized identity attached to the subscription.  As well as the Facebook page ID that the instagram account is connected too.  A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](service-api.md#facebook-page-profiles) endpoint on the Openbridge Service API.
+Instagram Stories requires a Instagram account ID that is connected to the authorized identity attached to the subscription, as well as the Facebook page ID that the instagram account is connected to. 
+
+A list of available Facebook Page account IDs and their attached Instagram Account Ids can be requested with the [Facebook Page Profiles](../api-usage-docs/service-facebook-api.md#list-page-profiles) endpoint on the Openbridge Service API.
 
 
 __Product Attributes__
@@ -429,7 +440,9 @@ __Required Subscription Product Meta__
 
 ### Google Ads
 
-Google Ads requires a manager customer ID and client customer ID associated with the remote identity attached to the subsciption.   A list of available manager customer and client customer IDs can be requested from the Openbridge Service API.
+Google Ads requires a manager customer ID and client customer ID associated with the remote identity attached to the subscription. 
+
+A list of available manager customer and client customer IDs can be requested with the [](../api-usage-docs/service-google-api.md#list-managed-customers) in the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -446,7 +459,9 @@ __Required Subscription Product Meta__
 
 ### Google Analytics 360
 
-Google Analytics 360 requires a project ID and dataset ID associated with the remote identity attached to the subsciption.   A list of available project and dataset IDs can be requested with the [Google Ads](service-api.md#google-ads) endpoint on the Openbridge Service API.
+Google Analytics 360 requires a project ID and dataset ID associated with the remote identity attached to the subscription. 
+
+A list of available project and dataset IDs can be requested with the [Google Ads](../api-usage-docs/service-google-api.md#google-search-ads-360) endpoint in the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -463,7 +478,9 @@ __Required Subscription Product Meta__
 
 ### Google Campaign Manager
 
-Google Campaign Manager requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile can be requested with the [Google Campaign Manager Profiles](service-api.md#google-campaign-manager-reports) endpoint on the Openbridge Service API and report IDs can be requested with the [Google Campaign Manager Profiles](service-api.md#google-campaign-manager-reports) endpoint
+Google Campaign Manager requires a profile ID and report ID associated with the remote identity attached to the subscription. 
+
+A list of available profile can be requested with the [Google Campaign Manager Profiles](../api-usage-docs/service-google-api.md#list-user-profiles) endpoint and report IDs can be requested with the [Google Campaign Manager Reports](../api-usage-docs/service-google-api.md#list-reports) endpoint in the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -480,7 +497,9 @@ __Required Subscription Product Meta__
 
 ### Google Search Ads 360
 
-Google Search Ads 360 requires a profile ID and report ID associated with the remote identity attached to the subsciption.   A list of available profile and report IDs can be requested with the [Google Search Ads 360](service-api.md#google-search-ads-360) endpoint on the Openbridge Service API.
+Google Search Ads 360 requires a profile ID and report ID associated with the remote identity attached to the subscription. 
+
+A list of available profile and report IDs can be requested with the [Google Search Ads 360](../api-usage-docs/service-google-api.md#google-search-ads-360) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -497,7 +516,9 @@ __Required Subscription Product Meta__
 
 ## Shopify
 
-Shopify 360 requires the shop creation date associated with the remote identity attached to the subsciption. Shopify info can be requested with the [Shopify Info](service-api.md#shopify-info) endpoint on the Openbridge Service API.
+Shopify 360 requires the shop creation date associated with the remote identity attached to the subscription. 
+
+Shopify info can be requested with the [Shopify Info](../api-usage-docs/service-shopify-api.md#get-shop-info-graphql) endpoint on the Openbridge Service API.
 
 __Product Attributes__
 > | Key | Value |
@@ -509,13 +530,15 @@ __Required Subscription Product Meta__
 > | Data Key | Data Format Value | Data Value |
 > |-|-|-|
 > | remote_identity_id | `STRING` | Remote identity associated with the associated profile. |
-> | shop_created_at | `STRING` | THe shop creation date in the format of YYYY-mm-dd example 2010-03-01 for March 1st 2010.  This information is provided by the shop info endpoint.  |
+> | shop_created_at | `STRING` | THe shop creation date in the format of YYYY-mm-dd example 2010-03-01 for March 1st 2010  This information is provided by the shop info endpoint  |
 
 ## Youtube Products
 
 ### Youtube Channel Insights
 
-Youtube Channel Insights requires a channgel ID associated with the remote identity attached to the subsciption.   A list of available channgel ID can be requested from the Openbridge Service API.
+Youtube Channel Insights requires a channel ID associated with a remote identity. 
+
+The [Channel Metadata](../api-usage-docs/service-google-api.md#get-channel-metadata) endpoint of the Openbridge Service API allows you to get youtube channel IDs for a specified Youtube URL. You can provide a maximum of 7 IDs per subscription.
 
 __Product Attributes__
 > | Key | Value |
@@ -531,7 +554,9 @@ __Required Subscription Product Meta__
 
 ### Youtube Competitor Channels
 
-Youtube Competitor Channels requires a list of channel ids as a stringified JSON array.  The Openbridge service API allows you to get youtube channel IDs based on various Youtube URLs.  You can provide a maximum of 7 IDs per subscription.
+Youtube Competitor Channels requires a list of channel ids as a stringified JSON array.
+
+ The [Channel Metadata](../api-usage-docs/service-google-api.md#get-channel-metadata) endpoint of the Openbridge Service API allows you to get youtube channel IDs for a specified Youtube URL. You can provide a maximum of 7 IDs per subscription.
 
 __Product Attributes__
 > | Key | Value |
@@ -547,7 +572,9 @@ __Required Subscription Product Meta__
 
 ### Youtube Competitor Videos
 
-Youtube Competitor Channels requires a list of channel ids as a stringified JSON array.  The Openbridge service API allows you to get youtube channel IDs based on various Youtube URLs.  You can provide a maximum of 7 IDs per subscription.
+Youtube Competitor Videos requires a list of channel IDs as a stringified JSON array.
+
+ The [Channel Metadata](../api-usage-docs/service-google-api.md#get-channel-metadata) endpoint of the Openbridge Service API allows you to get youtube channel IDs for a specified Youtube URL. You can provide a maximum of 7 IDs per subscription.
 
 __Product Attributes__
 > | Key | Value |
@@ -563,7 +590,9 @@ __Required Subscription Product Meta__
 
 ### Youtube Video Insights
 
-Youtube Video Insights requires a channgel ID associated with the remote identity attached to the subsciption.   A list of available channgel ID can be requested from the Openbridge Service API.
+Youtube Video Insights requires a channgel ID associated with the remote identity attached to the subscription. 
+
+A list of available channgel ID can be requested with the [List Channels](../api-usage-docs/service-google-api.md#list-channels) endpoint the Openbridge Service API.
 
 
 __Product Attributes__

@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.8] - 2026-08-11
+
+### Added
+ - Restructured Subscriptions API documentation around v2: `api-usage-docs/subscriptions-api.md` now documents v2 (versioned `/v2/...` routes, `product_parameters`, SPP endpoints, remote identity reconciliation) as the primary/recommended API.
+ - Added `api-usage-docs/subscriptions-api-legacy.md`, preserving the v1 documentation for existing integrations that have not migrated.
+
 ## [0.0.7] - 2025-01-02
 
 ### Added

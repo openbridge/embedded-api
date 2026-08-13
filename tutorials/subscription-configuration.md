@@ -164,15 +164,15 @@ Use the `id` from the matching record as both the top-level `remote_identity` fi
 
 Some products require additional metadata beyond `remote_identity_id` and `stage_ids`. This data typically comes from a third-party API call through the Openbridge Service API.
 
-**Amazon Advertising products** (`profile_id`): Call the [Amazon Advertising Profiles](../service-api.md#amazon-advertising-profiles) endpoint to get available profile IDs for the remote identity.
+**Amazon Advertising products** (`profile_id`): Call the [Amazon Advertising Profiles](../api-usage-docs/service-amazon-advertising-api.md#list-profiles) endpoint to get available profile IDs for the remote identity.
 
-**Facebook products** (`ad_account_id`, `account_id`): Call the [Facebook Ads](../service-api.md#facebook-ads) or [Facebook Page Profiles](../service-api.md#facebook-page-insights-instagram-insights-instagram-stories) endpoint.
+**Facebook products** (`ad_account_id`, `account_id`): Call the [Facebook Ads](../api-usage-docs/service-facebook-api.md#list-ad-accounts) or [Facebook Page Profiles](../api-usage-docs/service-facebook-api.md#list-page-profiles) endpoint.
 
-**Google products** (`manager_customer_id`, `client_customer_id`, `project_id`, `dataset_id`): Call the relevant [Google endpoint](../service-api.md#google) on the Service API.
+**Google products** (`manager_customer_id`, `client_customer_id`, `project_id`, `dataset_id`): Call the relevant [Google endpoint](../api-usage-docs/service-google-api.md) on the Service API.
 
-**Shopify** (`shop_created_at`): Call the [Shopify Info](../service-api.md#shopify-info) endpoint.
+**Shopify** (`shop_created_at`): Call the [Shopify Info](../api-usage-docs/service-shopify-api.md#get-shop-info-rest) endpoint.
 
-See the [Product Overview](../products/product-overview.md) for the exact meta fields required per product and the [Service API](../service-api.md) for the endpoint details.
+See the [Product Overview](../products/product-overview.md) for the exact meta fields required per product and the [Service API](../api-usage-docs/service-api.md) for the endpoint details.
 
 ---
 
@@ -230,7 +230,7 @@ Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_g
 
 Amazon Sponsored Ads V3 (product `70`) requires a remote identity plus `profile_id`. It uses identity type `14` (Amazon Advertising).
 
-The `profile_id` comes from calling the [Amazon Advertising Profiles](../service-api.md#amazon-advertising-profiles) endpoint with the remote identity ID. The response returns the available profiles — use the profile ID for the account you want to collect data from.
+The `profile_id` comes from calling the [Amazon Advertising Profiles](../api-usage-docs/service-amazon-advertising-api.md#list-profiles) endpoint with the remote identity ID. The response returns the available profiles — use the profile ID for the account you want to collect data from.
 
 ```json
 {
