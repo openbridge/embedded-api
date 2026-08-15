@@ -1,6 +1,6 @@
 # Getting Started
 
-A subscription connects a data source product, a storage destination, and data source credentials (remote identity). This guide walks you through the full sequence — from looking up your account details to optionally backfilling historical data.
+A subscription connects a data source product, data source credentials (remote identity), and a storage destination. This guide walks you through the full sequence — from looking up your account details to optionally backfilling historical data.
 
 ---
 

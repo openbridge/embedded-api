@@ -120,10 +120,10 @@ GET https://service.api.openbridge.io/service/history/production/history/status/
 
 ### Update Transaction Status
 
-Updates the status of a specific transaction. The primary use case is cancellation.
+Updates the status of the specified history transaction. The primary use case is cancellation.
 
 ```
-PATCH https://service.api.openbridge.io/service/history/production/history/status/{transaction_id}
+PATCH https://service.api.openbridge.io/service/history/production/history/{transaction_id}
 ```
 
 **Request body:**
@@ -133,6 +133,30 @@ PATCH https://service.api.openbridge.io/service/history/production/history/statu
   "data": {
     "type": "HistoryTransaction",
     "id": 72418,
+    "attributes": {
+      "status": "cancelled"
+    }
+  }
+}
+```
+
+---
+
+### Update Transaction Status by Subscription ID
+
+Updates the status of all history transactions associated with the specified subscription. The primary use case is cancellation.
+
+```
+PATCH https://service.api.openbridge.io/service/history/production/history/status/{subscription_id}
+```
+
+**Request body:**
+
+```json
+{
+  "data": {
+    "type": "HistoryTransaction",
+    "id": 999999,
     "attributes": {
       "status": "cancelled"
     }
