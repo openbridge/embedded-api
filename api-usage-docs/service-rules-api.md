@@ -42,6 +42,8 @@ Authorization: Bearer <jwt>
 | `version` | Exact version number |
 | `latest` | Set to `true` to return only the highest version per unique path |
 
+Note: Applying a query parameter is strongly recommended. `/rules/search` may time out in cases where result sets are too large.
+
 **Example: look up all paths for a specific integration**
 
 ```http
