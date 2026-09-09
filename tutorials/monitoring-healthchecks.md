@@ -154,6 +154,8 @@ GET .../account/{account_id}?order_by=-modified_at
 | `storage_id` | string | Storage destination identifier |
 | `transaction_id` | string | Pipeline transaction ID |
 
+For processing details, use the [Transactions API](../api-usage-docs/transactions-api.md) to list TX snapshots for the subscription, optionally filtered by `job_id`. The guide explains component statuses, payload branches, and three-day retention. TX snapshots describe processing state; retries update the same TX ID.
+
 ### Key fields for diagnosis
 
 When investigating an issue, focus on:
