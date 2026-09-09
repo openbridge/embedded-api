@@ -69,6 +69,7 @@ Use these docs in order if you are building a new integration:
 | OAuth flow and app records | [api-usage-docs/oauth-api.md](./api-usage-docs/oauth-api.md) |
 | State records | [api-usage-docs/state-api.md](./api-usage-docs/state-api.md) |
 | Jobs | [api-usage-docs/jobs-api.md](./api-usage-docs/jobs-api.md) |
+| Transactions | [api-usage-docs/transactions-api.md](./api-usage-docs/transactions-api.md) |
 | Service API overview | [api-usage-docs/service-api.md](./api-usage-docs/service-api.md) |
 
 ### Service Integration Docs
