@@ -64,6 +64,8 @@ A raw record's `parent` contains its parent TX ID, and `children` contains child
 
 The documented client operation is subscription listing:
 
+> **Required on every GET list call:** Include `subscription_id` in the query string. This applies to raw results, `tree=true`, filtered queries, and every page requested with a cursor. Other parameters such as `job_id`, `parent`, or `cursor` do not replace it. Omitting `subscription_id` causes the Service API to return `403 Forbidden`.
+
 ```http
 GET https://service.api.openbridge.io/service/transactions/tx?subscription_id=123456
 Authorization: Bearer <jwt>
@@ -77,7 +79,7 @@ Filters are combined with AND. Equality filters match exact values; there are no
 
 | Parameter | Type | Behavior |
 |---|---|---|
-| `subscription_id` | integer | Required subscription ID |
+| `subscription_id` | integer | **Required on every GET list call**, including filtered queries, tree expansion, and subsequent pages |
 | `limit` | integer | Default `50`; allowed range `1–200`; limits records evaluated before additional filters and tree expansion |
 | `cursor` | string | Opaque pagination token from `meta.next_cursor` |
 | `timestamp_from`, `timestamp_to` | integer | Inclusive lower/upper bounds on processing time, in Unix seconds |
@@ -209,7 +211,7 @@ In VS Code REST Client, set `next_cursor` to the encoded token from the previous
 
 ## Query examples
 
-Replace the example subscription/job IDs and time bounds with your values. Time-bound examples use VS Code REST Client variables containing Unix seconds.
+Every example requires `subscription_id`; keep it in the query string when adding or changing filters. Replace the example subscription/job IDs and time bounds with your values. Time-bound examples use VS Code REST Client variables containing Unix seconds.
 
 ### Inspect recent processing
 
