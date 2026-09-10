@@ -180,7 +180,7 @@ These are recorded example values; use current processing-time bounds when query
 | `attributes.subscription_name` | string | Subscription display name |
 | `attributes.product_name` | string | Product name |
 | `attributes.payload_name` | string | Payload/dataset name |
-| `attributes.job_id` | string | Associated job ID; may be empty when not supplied |
+| `attributes.job_id` | string | Associated job ID; may be empty depending on the sender |
 | `attributes.attribution_date` | string | Requested upstream data date/time; may include a time component |
 | `attributes.sender` | string | Reporting component selected by merge precedence |
 | `attributes.status` | string | Processing state; interpret with the sender |
@@ -227,14 +227,14 @@ GET https://service.api.openbridge.io/service/transactions/tx?subscription_id=12
 Authorization: Bearer <jwt>
 ```
 
-### Inspect errors in the retained snapshots
+### Inspect errors in the retained transactions
 
 ```http
 GET https://service.api.openbridge.io/service/transactions/tx?subscription_id=123456&status=ERROR
 Authorization: Bearer <jwt>
 ```
 
-This finds snapshots currently reporting `ERROR`, not every failed attempt. A subsequent retry can change the same TX's state.
+This finds transactions currently reporting `ERROR`, not every failed attempt. A subsequent retry can change the same TX's state.
 
 ### Find loaded work for a data date
 
