@@ -4,7 +4,7 @@
 
 The Service API is the primary integration layer for the Openbridge embedded API. It serves two roles:
 
-1. **Proxy**: Routes requests to backend APIs (jobs, history, rules, accmapping) with authentication and request signing applied automatically.
+1. **Proxy**: Routes requests to backend APIs (jobs, history, transactions, rules, accmapping) with authentication and request signing applied automatically.
 2. **Platform integrations**: Exposes endpoints that retrieve IDs and metadata needed to configure subscriptions — for example, looking up an Amazon Advertising profile ID before creating a subscription.
 
 **Base URL**
@@ -37,6 +37,7 @@ The service API adds authentication and request signing before forwarding. The f
 |---|---|---|
 | `history/` | History API | [history-api.md](./history-api.md) |
 | `jobs/` | Jobs API | [jobs-api.md](./jobs-api.md) |
+| `transactions/` | Transactions API — processing snapshots by subscription | [transactions-api.md](./transactions-api.md) |
 | `healthchecks/` | Healthchecks API | [service-healthchecks-api.md](./service-healthchecks-api.md) |
 | `rules/` | Rules API | [service-rules-api.md](./service-rules-api.md) |
 | `product-cards/` | Product Cards API | [service-product-cards-api.md](./service-product-cards-api.md) |
