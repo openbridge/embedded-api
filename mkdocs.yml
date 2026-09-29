@@ -57,13 +57,14 @@ nav:
       - Account & User Lookup: api-usage-docs/account-user-api.md
   - API Reference:
       - Products: api-usage-docs/products-api.md
+      - History: api-usage-docs/history-api.md
+      - Jobs: api-usage-docs/jobs-api.md
+      - Transactions: api-usage-docs/transactions-api.md
       - Remote Identities: api-usage-docs/remote-identity-api.md
       - Subscriptions (v2): api-usage-docs/subscriptions-api.md
       - Subscriptions (Legacy v1): api-usage-docs/subscriptions-api-legacy.md
-      - History: api-usage-docs/history-api.md
       - OAuth: api-usage-docs/oauth-api.md
       - State: api-usage-docs/state-api.md
-      - Jobs: api-usage-docs/jobs-api.md
       - Rate Limiting: api-usage-docs/rate-limiting.md
       - Service API Overview: api-usage-docs/service-api.md
   - Service Integrations:
