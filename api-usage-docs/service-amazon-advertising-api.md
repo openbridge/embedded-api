@@ -247,7 +247,7 @@ Authorization: Bearer <jwt>
 
 ### Marketing Stream v2
 
-Marketing Stream v2 uses `/service/amzadv/stream-s3` and Openbridge-managed delivery resources. No customer AWS account, IAM role, or CloudFormation template is required. Follow the [Marketing Stream v2 pipeline tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline.md) for requests, async response handling, and subscription metadata.
+Marketing Stream v2 (product ID `110`) uses `/service/amzadv/stream-s3` and Openbridge-managed delivery resources. No customer AWS account, IAM role, or CloudFormation template is required. Follow the [Marketing Stream v2 pipeline tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline.md) for requests, async response handling, and subscription metadata.
 
 | Method | Path | Purpose |
 |---|---|---|

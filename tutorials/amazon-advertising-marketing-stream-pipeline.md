@@ -35,7 +35,7 @@ Replace `112` with your remote identity ID. The service returns a flat array of 
 
 This flow uses advertiser account IDs for all requests. The legacy profile-type selection (`ads`, `dsp`, `managedDsp`), profile lookup, and profile-scoped advertiser lookup are no longer setup steps.
 
-## Step 3 — Select datasets and find the product
+## Step 3 — Select datasets
 
 The new service accepts these dataset IDs:
 
@@ -46,21 +46,14 @@ The new service accepts these dataset IDs:
 
 Choose a nonempty array, such as `["ads-performance-v1", "ads-converted-product-v1"]`. The reviewed service code has a dataset-list method but no `/stream-s3/list-datasets` route; the legacy `/stream-v2/list-datasets` returns datasets for the old flow.
 
-Find the Marketing Stream v2 product in the [Products API](../api-usage-docs/products-api.md):
+Marketing Stream v2 uses **product ID `110`**. Retrieve its [payload definitions](../api-usage-docs/products-api.md) to resolve the stage IDs for your selected datasets:
 
 ```http
-GET https://subscriptions.api.openbridge.io/product?remote_identity_type=14&name__icontains=Marketing
+GET https://service.api.openbridge.io/service/products/product/110/payloads?stage_id__gte=1000
 Authorization: Bearer <jwt>
 ```
 
-Follow pagination and confirm the product's name and `required_meta_fields`. Record its numeric `id` and retrieve its payload definitions:
-
-```http
-GET https://service.api.openbridge.io/service/products/product/{product_id}/payloads?stage_id__gte=1000
-Authorization: Bearer <jwt>
-```
-
-Resolve the stages for your selected datasets from these definitions. Do not reuse legacy product `87`, legacy payload mappings, or example stage IDs. The new product ID and dataset-to-payload mappings are not established by the reviewed service implementation; its `109` reference is explicitly marked TODO.
+Resolve the stages for your selected datasets from these definitions. Use the payload mappings and stage IDs for product `110`.
 
 ## Step 4 — Provision managed delivery resources
 
@@ -137,7 +130,7 @@ Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
 
-Prepare `product_parameters` using the selected product's catalog requirements:
+Prepare `product_parameters` for product `110`:
 
 | Key | Value |
 |---|---|
@@ -147,9 +140,9 @@ Prepare `product_parameters` using the selected product's catalog requirements:
 | `selected_tables` | JSON-stringified array of selected dataset IDs |
 | `stage_ids` | JSON-stringified array of corresponding stage IDs from Step 3 |
 
-Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. Confirm any additional required metadata against the selected product before submitting.
+Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. Confirm any additional required metadata against product `110` before submitting.
 
-The following is a request **template** for one dataset. Replace the product placeholder with the numeric product ID and the stage placeholder inside the JSON string with the actual numeric stage ID. Replace all account, destination, advertiser, and resource examples with your values:
+The following is a request **template** for one dataset. Replace the stage placeholder inside the JSON string with the actual numeric stage ID. Replace all account, destination, advertiser, and resource examples with your values:
 
 ```json
 {
@@ -158,7 +151,7 @@ The following is a request **template** for one dataset. Replace the product pla
     "attributes": {
       "account": 1,
       "user": 1,
-      "product": "<marketing_stream_v2_product_id>",
+      "product": 110,
       "name": "My Marketing Stream v2",
       "status": "active",
       "date_start": "2026-10-13T00:00:00Z",
