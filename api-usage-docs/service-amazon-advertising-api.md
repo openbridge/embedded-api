@@ -242,3 +242,23 @@ Authorization: Bearer <jwt>
   }
 }
 ```
+
+---
+
+### Marketing Stream v2
+
+Marketing Stream v2 uses `/service/amzadv/stream-s3` and Openbridge-managed delivery resources. No customer AWS account, IAM role, or CloudFormation template is required. Follow the [Marketing Stream v2 pipeline tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline.md) for requests, async response handling, and subscription metadata.
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/service/amzadv/list-adv-v2/{remote_identity_id}` | List advertiser accounts; optional `advertiser_id` filter |
+| POST | `/service/amzadv/stream-s3/{remote_identity_id}` | Provision resources and register selected datasets |
+| GET | `/service/amzadv/stream/poll-async/{request_id}` | Poll the `Location` returned by create or update |
+| PATCH | `/service/amzadv/stream-s3/update/{remote_identity_id}/{co_id}/{subscription_id}` | Internal update worker; requires an existing ConsoleOps request |
+| DELETE | `/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}` | Archive registered Amazon streams |
+
+Create and the update handler accept `data.attributes.advertiser_id` and a nonempty `data.attributes.datasets` array containing `ads-performance-v1` and/or `ads-converted-product-v1`. There is currently no routed managed S3 dataset-list endpoint.
+
+For the older `/stream-v2` customer-managed AWS flow, see the [legacy tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline-legacy.md).
+
+The customer-facing async update handler is currently not routed. The update worker listed above is not a customer entry point; see the tutorial for this limitation.

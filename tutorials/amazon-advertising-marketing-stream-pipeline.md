@@ -1,300 +1,71 @@
-# Amazon Advertising Marketing Stream Pipeline
+# Amazon Advertising Marketing Stream S3 Pipeline
 
-## Table of Contents
+Marketing Stream S3 uses **`/service/amzadv/stream-s3`** in the Service API. The managed S3 delivery flow uses this endpoint prefix; `/stream-v2` belongs to the [legacy tutorial](./amazon-advertising-marketing-stream-pipeline-legacy.md).
 
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Step 1 — Choose or create a remote identity](#step-1--choose-or-create-a-remote-identity)
-- [Step 2 — Select a profile type](#step-2--select-a-profile-type)
-- [Step 3 — Select a profile](#step-3--select-a-profile)
-  - [Sponsored Ads profiles (seller/vendor)](#sponsored-ads-profiles-sellervendor)
-  - [DSP profiles](#dsp-profiles)
-- [Step 4 — (DSP only) Select an advertiser](#step-4--dsp-only-select-an-advertiser)
-- [Step 5 — Select marketing stream datasets](#step-5--select-marketing-stream-datasets)
-- [Step 6 — Provide an AWS IAM Role ARN and generate SQS queues](#step-6--provide-an-aws-iam-role-arn-and-generate-sqs-queues)
-- [Step 7 — Create the pipeline subscription](#step-7--create-the-pipeline-subscription)
-  - [product_parameters](#product_parameters)
-  - [Full example request (Sponsored Ads)](#full-example-request-sponsored-ads)
-  - [Full example request (DSP)](#full-example-request-dsp)
-- [Updating a marketing stream subscription](#updating-a-marketing-stream-subscription)
-- [Deleting a marketing stream subscription](#deleting-a-marketing-stream-subscription)
-
----
-
-## Overview
-
-This tutorial walks through creating an Amazon Advertising Marketing Stream pipeline subscription end-to-end. The Marketing Stream product (product ID `87`) delivers near-real-time advertising performance data via Amazon's Marketing Stream API into SQS queues provisioned by Openbridge.
-
-Three profile-type flows are supported:
-
-| Profile type | Description |
-|---|---|
-| **Sponsored Ads** (`ads`) | Seller or Vendor accounts running Sponsored Products, Sponsored Brands, or Sponsored Display campaigns |
-| **DSP** (`dsp`) | Demand-Side Platform accounts |
-| **Managed DSP** (`managedDsp`) | DSP manager accounts acting on behalf of advertisers |
-
-The flow mirrors the Openbridge website wizard: choose an identity, select a profile type, pick a profile (and advertiser for DSP), choose datasets, provide an AWS IAM Role ARN to provision SQS queues, and finally create the pipeline subscription.
-
----
+Amazon delivers dataset files to S3, with queue notifications used by Openbridge to process the files into your configured storage destination. Openbridge provisions and manages these delivery resources in its own AWS account. **Customers do not need an AWS account, an IAM role ARN, or a CloudFormation template.**
 
 ## Prerequisites
 
-- A JWT access token — see [Authentication API](../api-usage-docs/authentication-api.md)
-- Your account ID and user ID — see [Identity Configuration Step 1](./identity-configuration.md#step-1--look-up-your-account-and-user-ids)
-- An active Amazon Advertising account
-- An AWS IAM Role ARN with permissions for Openbridge to provision SQS queues on your behalf
-- A storage destination already configured — see [Subscription Configuration Step 3](./subscription-configuration.md#step-3--identify-your-storage-destination)
-
----
+- A [JWT access token](../api-usage-docs/authentication-api.md).
+- Your [account and user IDs](./identity-configuration.md#step-1--look-up-your-account-and-user-ids).
+- An Amazon Advertising remote identity (type `14`) with access to the advertiser account.
+- A configured [storage destination](./subscription-configuration.md#step-3--identify-your-storage-destination).
 
 ## Step 1 — Choose or create a remote identity
 
-The Marketing Stream product requires an **Amazon Advertising** identity (remote identity type `14`).
-
-### Create a new identity
-
-If you do not have an identity yet, follow the [Identity Configuration tutorial](./identity-configuration.md) to create one via the OAuth flow. Amazon Advertising identities are region-specific — use the correct region for your marketplace:
-
-| Region identifier | Region name |
-|---|---|
-| `na` | North America |
-| `eu` | Europe |
-| `fe` | Far East |
-
-### List existing identities
-
-To find an existing Amazon Advertising identity, list remote identities filtered by type:
+Follow the [Identity Configuration tutorial](./identity-configuration.md) to connect an Amazon Advertising account through OAuth, or list existing valid identities:
 
 ```http
 GET https://remote-identity.api.openbridge.io/ri?remote_identity_type=14&invalid_identity=0
 Authorization: Bearer <jwt>
 ```
 
-**Example response:**
+Record the identity's `id`. The service uses its `region` (`na`, `eu`, or `fe`) to select the Amazon API and AWS delivery region; you do not send a region in the create request.
 
-```json
-{
-  "links": {
-    "first": "https://remote-identity.api.openbridge.io/ri?remote_identity_type=14&invalid_identity=0&page=1",
-    "last": "https://remote-identity.api.openbridge.io/ri?remote_identity_type=14&invalid_identity=0&page=1",
-    "next": "",
-    "prev": ""
-  },
-  "data": [
-    {
-      "type": "RemoteIdentity",
-      "id": "112",
-      "attributes": {
-        "name": "My Advertising Account",
-        "created_at": "2024-01-15T12:00:00",
-        "modified_at": "2024-06-01T08:30:00",
-        "remote_unique_id": "amzn1.account.AEHZ5",
-        "account_id": 1,
-        "user_id": 1,
-        "invalid_identity": 0,
-        "region": "na",
-        "email": "advertiser@example.com"
-      }
-    }
-  ],
-  "meta": {
-    "pagination": {
-      "page": 1,
-      "pages": 1,
-      "count": 1
-    }
-  }
-}
-```
+## Step 2 — Select an advertiser account
 
-Record the identity `id` (e.g., `112`) and `region` (e.g., `na`) — you will need both in subsequent steps.
-
-See the [Remote Identity API](../api-usage-docs/remote-identity-api.md) for full endpoint details.
-
----
-
-## Step 2 — Select a profile type
-
-Before fetching profiles, decide which profile type applies to your use case:
-
-| Profile type value | Use case |
-|---|---|
-| `ads` | Seller or Vendor accounts (Sponsored Products, Sponsored Brands, Sponsored Display) |
-| `dsp` | DSP advertiser accounts |
-| `managedDsp` | DSP manager accounts operating on behalf of advertisers |
-
-This choice determines the wizard flow, the available datasets, and how the SQS queue payload is constructed. Record your `profile_type` — you will use it in Steps 3, 5, and 6.
-
----
-
-## Step 3 — Select a profile
-
-### Sponsored Ads profiles (seller/vendor)
-
-For `ads` profile types, fetch seller and vendor profiles:
+Use the new advertiser-account lookup, which does not require a profile ID:
 
 ```http
-GET https://service.api.openbridge.io/service/amzadv/profiles-only/{remote_identity_id}?profile_types=seller,vendor
+GET https://service.api.openbridge.io/service/amzadv/list-adv-v2/112
 Authorization: Bearer <jwt>
 ```
 
-Replace `{remote_identity_id}` with the identity ID from Step 1.
+Replace `112` with your remote identity ID. The service returns a flat array of Amazon `advertiserAccounts` records and collects all pages from Amazon. Record the selected record's `advertiserAccountId` as `advertiser_id`. To filter the lookup, append `?advertiser_id={advertiserAccountId}`.
 
-**Example response:**
+This flow uses advertiser account IDs for all requests. The legacy profile-type selection (`ads`, `dsp`, `managedDsp`), profile lookup, and profile-scoped advertiser lookup are no longer setup steps.
 
-```json
-[
-  {
-    "id": 4463883966959342,
-    "type": "AmazonAdvertisingProfile",
-    "attributes": {
-      "country_code": "US",
-      "currency_code": "USD",
-      "daily_budget": 10.0,
-      "timezone": "America/Los_Angeles",
-      "account_info": {
-        "id": "ENTITY1234567890",
-        "type": "AmazonAdvertisingProfileAccountInfo",
-        "attributes": {
-          "marketplace_country": "US",
-          "marketplace_string_id": "ATVPDKIKX0DER",
-          "name": "My Seller Account",
-          "type": "seller",
-          "subType": "",
-          "valid_payment_method": true
-        }
-      }
-    }
-  }
-]
-```
+## Step 3 — Select datasets and find the product
 
-Record the profile `id` (e.g., `4463883966959342`). For Sponsored Ads, the `advertiser_id` meta field will be set to `NOT_APPLICABLE`.
+The new service accepts these dataset IDs:
 
-> **Note:** Profiles with `subType` of `AMAZON_ATTRIBUTION` are excluded and cannot be used with Marketing Stream.
+| Dataset ID |
+|---|
+| `ads-performance-v1` |
+| `ads-converted-product-v1` |
 
-### DSP profiles
+Choose a nonempty array, such as `["ads-performance-v1", "ads-converted-product-v1"]`. The reviewed service code has a dataset-list method but no `/stream-s3/list-datasets` route; the legacy `/stream-v2/list-datasets` returns datasets for the old flow.
 
-For `dsp` profile types, fetch DSP profiles:
+Find the Marketing Stream v2 product in the [Products API](../api-usage-docs/products-api.md):
 
 ```http
-GET https://service.api.openbridge.io/service/amzadv/profiles-only/{remote_identity_id}?profile_types=dsp
+GET https://subscriptions.api.openbridge.io/product?remote_identity_type=14&name__icontains=Marketing
 Authorization: Bearer <jwt>
 ```
 
-For `managedDsp` profile types, fetch managed DSP accounts:
+Follow pagination and confirm the product's name and `required_meta_fields`. Record its numeric `id` and retrieve its payload definitions:
 
 ```http
-GET https://service.api.openbridge.io/service/amzadv/profiles-only/{remote_identity_id}?profile_types=dsp&is_manager=true
+GET https://service.api.openbridge.io/service/products/product/{product_id}/payloads?stage_id__gte=1000
 Authorization: Bearer <jwt>
 ```
 
-For managed DSP accounts, the response includes a `dsp_advertiser_id` field. Record this value — it is used as the `advertiser_id` in subsequent steps. For managed DSP, the `profile_id` meta field will be set to `NOT_APPLICABLE`.
+Resolve the stages for your selected datasets from these definitions. Do not reuse legacy product `87`, legacy payload mappings, or example stage IDs. The new product ID and dataset-to-payload mappings are not established by the reviewed service implementation; its `109` reference is explicitly marked TODO.
 
-See the [Service API: Amazon Advertising](../api-usage-docs/service-amazon-advertising-api.md) for full endpoint details.
-
----
-
-## Step 4 — (DSP only) Select an advertiser
-
-This step applies only to the `dsp` profile type. If your profile type is `ads` or `managedDsp`, skip to Step 5.
-
-Fetch the advertisers available under your DSP profile:
+## Step 4 — Provision managed delivery resources
 
 ```http
-GET https://service.api.openbridge.io/service/amzadv/list-adv/{remote_identity_id}/{profile_id}
-Authorization: Bearer <jwt>
-```
-
-Replace `{remote_identity_id}` with your identity ID and `{profile_id}` with the DSP profile ID from Step 3.
-
-**Example response:**
-
-```json
-[
-  {
-    "id": "ADV123456",
-    "type": "AmazonAdvertisingAdvertiser",
-    "attributes": {
-      "name": "My DSP Advertiser",
-      "country": "US",
-      "currency": "USD",
-      "timezone": "America/Los_Angeles",
-      "url": "https://example.com"
-    }
-  }
-]
-```
-
-Record the advertiser `id` (e.g., `ADV123456`) — you will use it as the `advertiser_id` in the SQS payload and subscription meta.
-
----
-
-## Step 5 — Select marketing stream datasets
-
-Fetch the available marketing stream datasets for your region and profile type:
-
-```http
-GET https://service.api.openbridge.io/service/amzadv/stream-v2/list-datasets?region={region}&profile_type={profile_type}
-Authorization: Bearer <jwt>
-```
-
-Replace `{region}` with your identity's region (e.g., `na`) and `{profile_type}` with the type from Step 2 (e.g., `ads` or `dsp`).
-
-The response returns a list of dataset names. Below are the known datasets and their internal payload names:
-
-### Sponsored Ads datasets
-
-| Dataset name | Payload name |
-|---|---|
-| `sp-traffic` | `amzn_stream2_sp_traffic` |
-| `sp-conversion` | `amzn_stream2_sp_conversion` |
-| `budget-usage` | `amzn_stream2_budget_usage` |
-| `sd-traffic` | `amzn_stream2_sd_traffic` |
-| `sd-conversion` | `amzn_stream2_sb_conversion` |
-| `sb-traffic` | `amzn_stream2_sb_traffic` |
-| `sb-conversion` | `amzn_stream2_sd_conversion` |
-| `sb-clickstream` | `amzn_stream2_sb_clickstream` |
-| `sb-rich-media` | `amzn_stream2_sb_rich_media` |
-| `sp-budget-recommendations` | `amzn_stream2_sp_budget_recommendations` |
-| `sponsored-ads-campaign-diagnostics-recommendations` | `amzn_stream2_campaign_recommendations` |
-| `campaigns` | `amzn_stream2_campaigns` |
-| `adgroups` | `amzn_stream2_adgroups` |
-| `ads` | `amzn_stream2_ads` |
-| `targets` | `amzn_stream2_targets` |
-
-### DSP datasets
-
-| Dataset name | Payload name |
-|---|---|
-| `adsp-traffic` | `amzn_stream2_adsp_traffic` |
-| `adsp-conversion` | `amzn_stream2_adsp_conversion` |
-| `adsp-clickstream` | `amzn_stream2_adsp_clickstream` |
-| `adsp-rich-media` | `amzn_stream2_adsp_rich_media` |
-| `adsp-campaigns` | `amzn_stream2_adsp_campaigns` |
-| `adsp-campaign-flights` | `amzn_stream2_adsp_campaign_flights` |
-| `adsp-adgroups` | `amzn_stream2_adsp_adgroups` |
-
-Choose the datasets you want to subscribe to and record them as an array (e.g., `["sp-traffic", "sp-conversion", "budget-usage"]`). You will pass this array in Step 6 and as a stringified JSON array in the subscription meta in Step 7.
-
----
-
-## Step 6 — Provide an AWS IAM Role ARN and generate SQS queues
-
-The Marketing Stream product requires an AWS IAM Role ARN that grants Openbridge permission to create and manage SQS queues in your AWS account. Openbridge uses this role to provision dedicated SQS queues for each selected dataset.
-
-### Create the SQS queues
-
-```
-POST https://service.api.openbridge.io/service/amzadv/stream-v2/{remote_identity_id}
-```
-
-Replace `{remote_identity_id}` with the identity ID from Step 1.
-
-**Example request (Sponsored Ads):**
-
-```http
-POST https://service.api.openbridge.io/service/amzadv/stream-v2/112
+POST https://service.api.openbridge.io/service/amzadv/stream-s3/112
 Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
@@ -304,100 +75,81 @@ Content-Type: application/json
   "data": {
     "type": "Service",
     "attributes": {
-      "role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-      "datasets": ["sp-traffic", "sp-conversion", "budget-usage"],
-      "profile_type": "ads",
-      "profile_id": "4463883966959342"
+      "advertiser_id": "ADVERTISER_ACCOUNT_ID",
+      "datasets": ["ads-performance-v1", "ads-converted-product-v1"]
     }
   }
 }
 ```
 
-**Example request (DSP):**
+Use the advertiser account ID from Step 2. These are the two setup fields consumed by the new implementation; omit `role_arn`, `aws_account_id`, `profile_id`, and `profile_type`.
+
+### Poll the asynchronous operation
+
+The service returns `202 Accepted` and a `Location` header:
+
+```http
+Location: https://service.api.openbridge.io/service/amzadv/stream/poll-async/{request_id}
+```
 
 ```json
 {
   "data": {
-    "type": "Service",
-    "attributes": {
-      "role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-      "datasets": ["adsp-traffic", "adsp-conversion"],
-      "profile_type": "dsp",
-      "advertiser_id": "ADV123456"
-    }
+    "type": "AmazonAdvertisingBrandMetricsStream",
+    "id": "ADVERTISER_ACCOUNT_ID",
+    "attributes": {"status": "CREATING"}
   }
 }
 ```
 
-| Field | Description |
-|---|---|
-| `role_arn` | AWS IAM Role ARN granting Openbridge permissions to manage SQS queues |
-| `datasets` | Array of dataset names from Step 5 |
-| `profile_type` | `"ads"` for Sponsored Ads, `"dsp"` for DSP and Managed DSP |
-| `profile_id` | Required when `profile_type` is `"ads"` — the profile ID from Step 3 |
-| `advertiser_id` | Required when `profile_type` is `"dsp"` — the advertiser ID from Step 4 (or the `dsp_advertiser_id` for managed DSP) |
+Send authenticated `GET` requests to the returned `Location` using the same user token. Poll while the HTTP status is `202`, for example every two seconds with an application timeout. Continue only after `200 OK`; handle terminal errors before creating the pipeline subscription. The shared polling path remains `/stream/poll-async`, for managed S3 delivery operations.
 
-### Async response handling
-
-This endpoint returns an **asynchronous response**. The initial response includes a `Location` header with a polling URL. Poll this URL until you receive an HTTP `200` response with the queue data.
-
-- **Poll interval:** 2 seconds
-- **Timeout:** up to 13 minutes (the queue provisioning process can take several minutes)
-
-**Example success response:**
+The completed response has **top-level `attributes`**, unlike the initial `data.attributes` envelope. Example for one selected dataset:
 
 ```json
 {
-  "data": {
-    "type": "AmazonAdvertisingStreamV2",
-    "attributes": {
-      "queue_urls": {
-        "sp-traffic": "https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-traffic-abc123",
-        "sp-conversion": "https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-conversion-abc123",
-        "budget-usage": "https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-budget-usage-abc123"
-      },
-      "dataset_params": {
-        "sp-traffic": {"stream_id": "str_abc123"},
-        "sp-conversion": {"stream_id": "str_def456"},
-        "budget-usage": {"stream_id": "str_ghi789"}
+  "type": "ServiceAmzAdvBrandMetricsStream",
+  "advertiser_id": "ADVERTISER_ACCOUNT_ID",
+  "attributes": {
+    "queue_urls": {
+      "ads-performance-v1": "https://sqs.us-east-1.amazonaws.com/123456789012/example-queue"
+    },
+    "dataset_params": {
+      "ads-performance-v1": {
+        "amz_subscription_id": "AMAZON_STREAM_SUBSCRIPTION_ID",
+        "bucket": "example-openbridge-managed-bucket",
+        "queue": "arn:aws:sqs:us-east-1:123456789012:example-queue"
       }
     }
   }
 }
 ```
 
-Save the `queue_urls` and `dataset_params` values from the response — they are required for the pipeline subscription meta in Step 7.
+Save both maps exactly as returned, including the hyphenated dataset keys. `queue_urls` contains queue URLs; `dataset_params` contains each Amazon subscription ID, bucket name, and queue ARN. These are Openbridge-managed resources, not customer AWS resources. The response type names shown above are the names currently emitted by the service.
 
----
+## Step 5 — Create the pipeline subscription
 
-## Step 7 — Create the pipeline subscription
+Create the pipeline through the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md):
 
-With all the pieces gathered from the previous steps, create the pipeline subscription for product `87` (Amazon Advertising Marketing Stream).
-
-```
+```http
 POST https://subscriptions.api.openbridge.io/v2/sub
+Authorization: Bearer <jwt>
+Content-Type: application/json
 ```
 
-For general detail on subscription creation, see the [Subscription Configuration tutorial](./subscription-configuration.md).
+Prepare `product_parameters` using the selected product's catalog requirements:
 
-### product_parameters
+| Key | Value |
+|---|---|
+| `advertiser_id` | Advertiser account ID from Step 2 |
+| `queue_urls` | JSON-stringified complete `queue_urls` map from Step 4 |
+| `dataset_params` | JSON-stringified complete `dataset_params` map from Step 4 |
+| `selected_tables` | JSON-stringified array of selected dataset IDs |
+| `stage_ids` | JSON-stringified array of corresponding stage IDs from Step 3 |
 
-This product requires 8 keys in `product_parameters`. Remote identity is set via the top-level `remote_identity` field (see Step 1) rather than a `product_parameters` key.
+Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. Confirm any additional required metadata against the selected product before submitting.
 
-| Key | Source | Description |
-|---|---|---|
-| `profile_id` | Step 3 | The advertising profile ID. Set to `"NOT_APPLICABLE"` for managed DSP. |
-| `profile_type` | Step 2 | `"ads"`, `"dsp"`, or `"managedDsp"` |
-| `advertiser_id` | Step 4 | The advertiser ID. Set to `"NOT_APPLICABLE"` for Sponsored Ads (`ads`). |
-| `aws_iam_role_arn` | Step 6 | The AWS IAM Role ARN provided in the SQS generation request |
-| `queue_urls` | Step 6 | Stringified `queue_urls` map from the SQS generation response (JSON string) |
-| `dataset_params` | Step 6 | Stringified `dataset_params` map from the SQS generation response (JSON string) |
-| `selected_tables` | Step 5 | Stringified array of selected dataset names (JSON string) |
-| `stage_ids` | Step 5 | Stringified array of stage IDs corresponding to the selected datasets (JSON string) |
-
-> **Note:** The `stage_ids` are resolved by mapping each selected dataset name to its corresponding payload stage via the [Products API payload definitions](../api-usage-docs/products-api.md). Each dataset name maps to a payload name (see the tables in Step 5), and the payload's `stage_id` is used.
-
-### Full example request (Sponsored Ads)
+The following is a request **template** for one dataset. Replace the product placeholder with the numeric product ID and the stage placeholder inside the JSON string with the actual numeric stage ID. Replace all account, destination, advertiser, and resource examples with your values:
 
 ```json
 {
@@ -406,91 +158,63 @@ This product requires 8 keys in `product_parameters`. Remote identity is set via
     "attributes": {
       "account": 1,
       "user": 1,
-      "product": 87,
-      "name": "My Marketing Stream - Sponsored Ads",
+      "product": "<marketing_stream_v2_product_id>",
+      "name": "My Marketing Stream v2",
       "status": "active",
-      "date_start": "2024-06-01T00:00:00Z",
+      "date_start": "2026-10-13T00:00:00Z",
       "remote_identity": 112,
       "storage_group": 1,
       "product_parameters": {
-        "profile_id": "4463883966959342",
-        "profile_type": "ads",
-        "advertiser_id": "NOT_APPLICABLE",
-        "aws_iam_role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-        "queue_urls": "{\"sp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-traffic-abc123\",\"sp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-sp-conversion-abc123\",\"budget_usage\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-budget-usage-abc123\"}",
-        "dataset_params": "{\"sp-traffic\":{\"stream_id\":\"str_abc123\"},\"sp-conversion\":{\"stream_id\":\"str_def456\"},\"budget-usage\":{\"stream_id\":\"str_ghi789\"}}",
-        "selected_tables": "[\"sp-traffic\",\"sp-conversion\",\"budget-usage\"]",
-        "stage_ids": "[101,102,103]"
+        "advertiser_id": "ADVERTISER_ACCOUNT_ID",
+        "queue_urls": "{\"ads-performance-v1\":\"https://sqs.us-east-1.amazonaws.com/123456789012/example-queue\"}",
+        "dataset_params": "{\"ads-performance-v1\":{\"amz_subscription_id\":\"AMAZON_STREAM_SUBSCRIPTION_ID\",\"bucket\":\"example-openbridge-managed-bucket\",\"queue\":\"arn:aws:sqs:us-east-1:123456789012:example-queue\"}}",
+        "selected_tables": "[\"ads-performance-v1\"]",
+        "stage_ids": "[<stage_id>]"
       }
     }
   }
 }
 ```
 
-### Full example request (DSP)
-
-```json
-{
-  "data": {
-    "type": "Subscription",
-    "attributes": {
-      "account": 1,
-      "user": 1,
-      "product": 87,
-      "name": "My Marketing Stream - DSP",
-      "status": "active",
-      "date_start": "2024-06-01T00:00:00Z",
-      "remote_identity": 112,
-      "storage_group": 1,
-      "product_parameters": {
-        "profile_id": "4463883966959342",
-        "profile_type": "dsp",
-        "advertiser_id": "ADV123456",
-        "aws_iam_role_arn": "arn:aws:iam::123456789012:role/openbridge-marketing-stream-role",
-        "queue_urls": "{\"adsp_traffic\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-traffic-abc123\",\"adsp_conversion\":\"https://sqs.us-east-1.amazonaws.com/123456789012/ob-stream2-adsp-conversion-abc123\"}",
-        "dataset_params": "{\"adsp-traffic\":{\"stream_id\":\"str_xyz123\"},\"adsp-conversion\":{\"stream_id\":\"str_xyz456\"}}",
-        "selected_tables": "[\"adsp-traffic\",\"adsp-conversion\"]",
-        "stage_ids": "[201,202]"
-      }
-    }
-  }
-}
-```
-
-Replace the placeholder values (`account`, `user`, `remote_identity`, `storage_group`, and the `product_parameters` values) with values from your account and the previous steps.
-
----
+For multiple datasets, include every selected dataset in both response maps and both selection arrays.
 
 ## Updating a marketing stream subscription
 
-To update an existing marketing stream subscription (e.g., to add or remove datasets), use two requests:
+The current service URL configuration exposes only the update worker route:
 
-**1. Update the SQS queues via Service API:**
-
-```
-PATCH https://service.api.openbridge.io/service/amzadv/stream-v2/update/{remote_identity_id}/{subscription_id}
+```http
+PATCH https://service.api.openbridge.io/service/amzadv/stream-s3/update/{remote_identity_id}/{co_id}/{subscription_id}
 ```
 
-The request body is the same structure as the create endpoint — include the `role_arn`, updated `datasets`, `profile_type`, and `profile_id` or `advertiser_id`. This is an async operation with the same polling behavior as the create endpoint.
+This route calls `update_stack` and requires an existing ConsoleOps request ID (`co_id`). It is not the customer-facing async entry point. The `update` handler that creates that request and returns a polling `Location` is currently not routed. A customer-facing dataset update cannot be started through the documented public endpoints until that route is restored; do not create a `co_id` or call the worker directly.
 
-**2. Update the pipeline subscription:**
+When the customer-facing update entry point is available, its handler expects the stored `advertiser_id` and the **full desired dataset list**, not just additions, using the same body as Step 4. The implementation archives **all existing Amazon stream subscriptions** and registers the requested datasets again, including retained datasets. Allow for a delivery interruption.
 
-```
+After a successful managed resource update, update the pipeline:
+
+```http
 PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
+Authorization: Bearer <jwt>
+Content-Type: application/json
 ```
 
-Update the `queue_urls`, `dataset_params`, `selected_tables`, `stage_ids`, and any other changed keys in `product_parameters` with the new values from the update response (partial merge — omitted keys keep their stored value).
-
-See the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md) for full PATCH documentation.
-
----
+Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the newly stringified `queue_urls`, `dataset_params`, `selected_tables`, and `stage_ids`. Replace both resource maps with the complete successful response, because Amazon stream subscription IDs can change. Omitted product parameter keys keep their stored values.
 
 ## Deleting a marketing stream subscription
 
-To delete a marketing stream pipeline, mark the pipeline subscription as invalid:
+First archive the registered Amazon streams while their metadata is still available:
 
+```http
+DELETE https://service.api.openbridge.io/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}
+Authorization: Bearer <jwt>
 ```
+
+After `204 No Content`, mark the pipeline subscription invalid:
+
+```http
 PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
+Authorization: Bearer <jwt>
+Content-Type: application/json
 ```
 
 ```json
@@ -498,11 +222,9 @@ PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
   "data": {
     "type": "Subscription",
     "id": "12345",
-    "attributes": {
-      "status": "invalid"
-    }
+    "attributes": {"status": "invalid"}
   }
 }
 ```
 
-See the [Subscription Configuration tutorial](./subscription-configuration.md#deleting-a-subscription) for more detail on subscription status management.
+The reviewed delete handler archives Amazon stream subscriptions; it does not delete the managed S3 bucket or SQS queues. See [subscription status management](./subscription-configuration.md#deleting-a-subscription) for pipeline behavior.
