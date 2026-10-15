@@ -33,7 +33,7 @@ Authorization: Bearer <jwt>
 
 Replace `112` with your remote identity ID. The service returns a flat array of Amazon `advertiserAccounts` records and collects all pages from Amazon. Record the selected record's `advertiserAccountId` as `advertiser_id`. To filter the lookup, append `?advertiser_id={advertiserAccountId}`.
 
-This flow uses advertiser account IDs for all requests. The legacy profile-type selection (`ads`, `dsp`, `managedDsp`), profile lookup, and profile-scoped advertiser lookup are no longer setup steps.
+This flow uses advertiser account IDs for all requests. Profile lookup and profile-scoped advertiser lookup are no longer setup steps. The service request does not use `profile_type`, but the product `110` subscription schema still requires it; retain the account type (`ads`, `dsp`, or `managedDsp`) for Step 5.
 
 ## Step 3 — Select datasets
 
@@ -97,28 +97,28 @@ Location: https://service.api.openbridge.io/service/amzadv/stream/poll-async/{re
 
 Send authenticated `GET` requests to the returned `Location` using the same user token. Poll while the HTTP status is `202`, for example every two seconds with an application timeout. Continue only after `200 OK`; handle terminal errors before creating the pipeline subscription. The shared polling path remains `/stream/poll-async`, for managed S3 delivery operations.
 
-The completed response has **top-level `attributes`**, unlike the initial `data.attributes` envelope. Example for one selected dataset:
+The completed response uses the following `data` envelope:
 
 ```json
 {
-  "type": "ServiceAmzAdvBrandMetricsStream",
-  "advertiser_id": "ADVERTISER_ACCOUNT_ID",
-  "attributes": {
-    "queue_urls": {
-      "ads-performance-v1": "https://sqs.us-east-1.amazonaws.com/123456789012/example-queue"
-    },
-    "dataset_params": {
-      "ads-performance-v1": {
-        "amz_subscription_id": "AMAZON_STREAM_SUBSCRIPTION_ID",
-        "bucket": "example-openbridge-managed-bucket",
-        "queue": "arn:aws:sqs:us-east-1:123456789012:example-queue"
+  "data": {
+    "type": "ServiceAmzAdvBrandMetricsStream",
+    "advertiser_id": "589711999947333868",
+    "attributes": {
+      "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/699059249070/ams-dev-ri6073-589711999947333868-s3-notifications",
+      "bucket": "openbridge-ams-us-east-1-589711999947333868",
+      "amz_subscription_ids": {
+        "ads-performance-v1": "amzn1.ads-stream.sub1.4VzvRZFtnSqGFKLhHomypB",
+        "ads-converted-product-v1": "amzn1.ads-stream.sub1.6sGplvMSZ73EW51WDlnM6w"
       }
     }
   }
 }
 ```
 
-Save both maps exactly as returned, including the hyphenated dataset keys. `queue_urls` contains queue URLs; `dataset_params` contains each Amazon subscription ID, bucket name, and queue ARN. These are Openbridge-managed resources, not customer AWS resources. The response type names shown above are the names currently emitted by the service.
+All selected datasets share `sqs_notification_url` and `bucket`. Save those values and the complete `amz_subscription_ids` map, preserving the hyphenated dataset keys. The service no longer returns `queue_urls`, `dataset_params`, or a per-dataset queue ARN.
+
+The service worker and shared polling handler currently store and return the completed object without the outer `data` wrapper. Clients supporting that implementation should also accept the unwrapped object (`response.attributes` instead of `response.data.attributes`).
 
 ## Step 5 — Create the pipeline subscription
 
@@ -134,13 +134,19 @@ Prepare `product_parameters` for product `110`:
 
 | Key | Value |
 |---|---|
-| `advertiser_id` | Advertiser account ID from Step 2 |
-| `queue_urls` | JSON-stringified complete `queue_urls` map from Step 4 |
-| `dataset_params` | JSON-stringified complete `dataset_params` map from Step 4 |
-| `selected_tables` | JSON-stringified array of selected dataset IDs |
-| `stage_ids` | JSON-stringified array of corresponding stage IDs from Step 3 |
+| `advertiser_id` | Required nonempty alphanumeric string from Step 2 |
+| `selected_tables` | Required JSON-stringified nonempty array of unique dataset ID strings |
+| `stage_ids` | Optional JSON-stringified nonempty array of unique integer stage IDs from Step 3 |
+| `profile_type` | Required string: `ads`, `dsp`, or `managedDsp` |
+| `sqs_notification_url` | Required nonempty string: the shared notification queue URL from Step 4 |
+| `bucket` | Save the shared bucket name from Step 4 |
+| `amz_subscription_ids` | Save the complete map from Step 4 as a JSON string; required by the service update/delete handlers |
 
-Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. Confirm any additional required metadata against product `110` before submitting.
+Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. The product schema allows additional properties, so retain `bucket` and `amz_subscription_ids` alongside its required fields. `queue_urls` and `dataset_params` are no longer required by the schema.
+
+The schema defines `selected_tables` and `stage_ids` as arrays, but the v2 subscription validator requires JSON-encoded strings in the request and decodes them before validation. `sqs_notification_url` is a plain URL string, copied directly from the service response. Although its schema description still refers to a stringified dataset map, the service returns one shared URL.
+
+**Integration limitation:** the product `110` resource validator still reads the removed `queue_urls` and `dataset_params` fields. The template below satisfies the corrected schema after selection-array decoding, but that validator must also be aligned with the new fields for end-to-end subscription creation.
 
 The following is a request **template** for one dataset. Replace the stage placeholder inside the JSON string with the actual numeric stage ID. Replace all account, destination, advertiser, and resource examples with your values:
 
@@ -158,9 +164,11 @@ The following is a request **template** for one dataset. Replace the stage place
       "remote_identity": 112,
       "storage_group": 1,
       "product_parameters": {
-        "advertiser_id": "ADVERTISER_ACCOUNT_ID",
-        "queue_urls": "{\"ads-performance-v1\":\"https://sqs.us-east-1.amazonaws.com/123456789012/example-queue\"}",
-        "dataset_params": "{\"ads-performance-v1\":{\"amz_subscription_id\":\"AMAZON_STREAM_SUBSCRIPTION_ID\",\"bucket\":\"example-openbridge-managed-bucket\",\"queue\":\"arn:aws:sqs:us-east-1:123456789012:example-queue\"}}",
+        "advertiser_id": "589711999947333868",
+        "profile_type": "ads",
+        "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/123456789012/example-queue",
+        "bucket": "example-openbridge-managed-bucket",
+        "amz_subscription_ids": "{\"ads-performance-v1\":\"AMAZON_STREAM_SUBSCRIPTION_ID\"}",
         "selected_tables": "[\"ads-performance-v1\"]",
         "stage_ids": "[<stage_id>]"
       }
@@ -169,7 +177,7 @@ The following is a request **template** for one dataset. Replace the stage place
 }
 ```
 
-For multiple datasets, include every selected dataset in both response maps and both selection arrays.
+For multiple datasets, include every selected dataset in `amz_subscription_ids` and `selected_tables`, and resolve the corresponding `stage_ids` if supplied. Keep the single shared `sqs_notification_url` and `bucket`.
 
 ## Updating a marketing stream subscription
 
@@ -191,7 +199,7 @@ Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
 
-Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the newly stringified `queue_urls`, `dataset_params`, `selected_tables`, and `stage_ids`. Replace both resource maps with the complete successful response, because Amazon stream subscription IDs can change. Omitted product parameter keys keep their stored values.
+Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the refreshed `sqs_notification_url`, `bucket`, and JSON-stringified `amz_subscription_ids`, plus JSON-stringified `selected_tables` and optional `stage_ids`. Preserve the required `advertiser_id` and `profile_type`. Replace the complete Amazon subscription ID map, because IDs can change. The product validation limitation in Step 5 also applies to updates. Omitted product parameter keys keep their stored values.
 
 ## Deleting a marketing stream subscription
 

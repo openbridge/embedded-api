@@ -259,6 +259,8 @@ Marketing Stream v2 (product ID `110`) uses `/service/amzadv/stream-s3` and Open
 
 Create and the update handler accept `data.attributes.advertiser_id` and a nonempty `data.attributes.datasets` array containing `ads-performance-v1` and/or `ads-converted-product-v1`. There is currently no routed managed S3 dataset-list endpoint.
 
+Completed operations return a shared `sqs_notification_url` and `bucket`, plus `amz_subscription_ids` keyed by dataset ID. They no longer return per-dataset `queue_urls` or `dataset_params`. Product `110` requires `advertiser_id`, `sqs_notification_url`, `selected_tables`, and `profile_type`; see the tutorial for wire encoding, additional lifecycle metadata, and the current resource validation limitation.
+
 For the older `/stream-v2` customer-managed AWS flow, see the [legacy tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline-legacy.md).
 
 The customer-facing async update handler is currently not routed. The update worker listed above is not a customer entry point; see the tutorial for this limitation.
