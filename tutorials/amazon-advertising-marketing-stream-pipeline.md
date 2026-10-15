@@ -37,23 +37,30 @@ This flow uses advertiser account IDs for all requests. Profile lookup and profi
 
 ## Step 3 — Select datasets
 
-The new service accepts these dataset IDs:
-
-| Dataset ID |
-|---|
-| `ads-performance-v1` |
-| `ads-converted-product-v1` |
-
-Choose a nonempty array, such as `["ads-performance-v1", "ads-converted-product-v1"]`. The reviewed service code has a dataset-list method but no `/stream-s3/list-datasets` route; the legacy `/stream-v2/list-datasets` returns datasets for the old flow.
-
-Marketing Stream v2 uses **product ID `110`**. Retrieve its [payload definitions](../api-usage-docs/products-api.md) to resolve the stage IDs for your selected datasets:
+Marketing Stream S3 uses **product ID `110`** with stage ID **`1000`** for every dataset selection. Retrieve the valid dataset IDs:
 
 ```http
-GET https://service.api.openbridge.io/service/products/product/110/payloads?stage_id__gte=1000
+GET https://service.api.openbridge.io/service/amzadv/stream-s3/list-datasets
 Authorization: Bearer <jwt>
 ```
 
-Resolve the stages for your selected datasets from these definitions. Use the payload mappings and stage IDs for product `110`.
+The endpoint returns a JSON array:
+
+```json
+{
+  "data": {
+    "type": "AMSDatasets",
+    "attributes": {
+      "datasets": [
+        "ads-performance-v1",
+        "ads-converted-product-v1"
+      ]
+    }
+  }
+}
+```
+
+The stage ID remains `1000` whether you select one dataset or both. All selected datasets use the shared notification queue and bucket returned in Step 4.
 
 ## Step 4 — Provision managed delivery resources
 
@@ -136,7 +143,7 @@ Prepare `product_parameters` for product `110`:
 |---|---|
 | `advertiser_id` | Required nonempty alphanumeric string from Step 2 |
 | `selected_tables` | Required JSON-stringified nonempty array of unique dataset ID strings |
-| `stage_ids` | Optional JSON-stringified nonempty array of unique integer stage IDs from Step 3 |
+| `stage_ids` | Optional; when supplied, use `"[1000]"` for this product |
 | `profile_type` | Required string: `ads`, `dsp`, or `managedDsp` |
 | `sqs_notification_url` | Required nonempty string: the shared notification queue URL from Step 4 |
 | `bucket` | Save the shared bucket name from Step 4 |
@@ -148,7 +155,7 @@ The schema defines `selected_tables` and `stage_ids` as arrays, but the v2 subsc
 
 **Integration limitation:** the product `110` resource validator still reads the removed `queue_urls` and `dataset_params` fields. The template below satisfies the corrected schema after selection-array decoding, but that validator must also be aligned with the new fields for end-to-end subscription creation.
 
-The following is a request **template** for one dataset. Replace the stage placeholder inside the JSON string with the actual numeric stage ID. Replace all account, destination, advertiser, and resource examples with your values:
+The following is a request **template** for one dataset. Replace all account, destination, advertiser, and resource examples with your values:
 
 ```json
 {
@@ -170,14 +177,14 @@ The following is a request **template** for one dataset. Replace the stage place
         "bucket": "example-openbridge-managed-bucket",
         "amz_subscription_ids": "{\"ads-performance-v1\":\"AMAZON_STREAM_SUBSCRIPTION_ID\"}",
         "selected_tables": "[\"ads-performance-v1\"]",
-        "stage_ids": "[<stage_id>]"
+        "stage_ids": "[1000]"
       }
     }
   }
 }
 ```
 
-For multiple datasets, include every selected dataset in `amz_subscription_ids` and `selected_tables`, and resolve the corresponding `stage_ids` if supplied. Keep the single shared `sqs_notification_url` and `bucket`.
+For multiple datasets, include every selected dataset in `amz_subscription_ids` and `selected_tables`, and keep `stage_ids` as `"[1000]"`. Keep the single shared `sqs_notification_url` and `bucket`.
 
 ## Updating a marketing stream subscription
 

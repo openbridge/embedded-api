@@ -252,12 +252,13 @@ Marketing Stream v2 (product ID `110`) uses `/service/amzadv/stream-s3` and Open
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/service/amzadv/list-adv-v2/{remote_identity_id}` | List advertiser accounts; optional `advertiser_id` filter |
+| GET | `/service/amzadv/stream-s3/list-datasets` | List valid dataset IDs as a JSON array |
 | POST | `/service/amzadv/stream-s3/{remote_identity_id}` | Provision resources and register selected datasets |
 | GET | `/service/amzadv/stream/poll-async/{request_id}` | Poll the `Location` returned by create or update |
 | PATCH | `/service/amzadv/stream-s3/update/{remote_identity_id}/{co_id}/{subscription_id}` | Internal update worker; requires an existing ConsoleOps request |
 | DELETE | `/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}` | Archive registered Amazon streams |
 
-Create and the update handler accept `data.attributes.advertiser_id` and a nonempty `data.attributes.datasets` array containing `ads-performance-v1` and/or `ads-converted-product-v1`. There is currently no routed managed S3 dataset-list endpoint.
+Create and the update handler accept `data.attributes.advertiser_id` and a nonempty `data.attributes.datasets` array containing `ads-performance-v1` and/or `ads-converted-product-v1`. Retrieve the valid IDs with `GET /service/amzadv/stream-s3/list-datasets`. Product `110` uses stage ID `1000` for every dataset selection (`stage_ids: "[1000]"` when supplied).
 
 Completed operations return a shared `sqs_notification_url` and `bucket`, plus `amz_subscription_ids` keyed by dataset ID. They no longer return per-dataset `queue_urls` or `dataset_params`. Product `110` requires `advertiser_id`, `sqs_notification_url`, `selected_tables`, and `profile_type`; see the tutorial for wire encoding, additional lifecycle metadata, and the current resource validation limitation.
 
