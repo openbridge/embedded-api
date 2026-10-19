@@ -33,8 +33,6 @@ Authorization: Bearer <jwt>
 
 Replace `112` with your remote identity ID. The service returns a flat array of Amazon `advertiserAccounts` records and collects all pages from Amazon. Record the selected record's `advertiserAccountId` as `advertiser_id`. To filter the lookup, append `?advertiser_id={advertiserAccountId}`.
 
-This flow uses advertiser account IDs for all requests. Profile lookup and profile-scoped advertiser lookup are no longer setup steps. The service request does not use `profile_type`, but the product `110` subscription schema still requires it; retain the account type (`ads`, `dsp`, or `managedDsp`) for Step 5.
-
 ## Step 3 — Select datasets
 
 Marketing Stream S3 uses **product ID `110`** with stage ID **`1000`** for every dataset selection. Retrieve the valid dataset IDs:
@@ -82,7 +80,7 @@ Content-Type: application/json
 }
 ```
 
-Use the advertiser account ID from Step 2. These are the two setup fields consumed by the new implementation; omit `role_arn`, `aws_account_id`, `profile_id`, and `profile_type`.
+Use the advertiser account ID from Step 2. These are the two setup fields consumed by the new implementation; omit `role_arn`, `aws_account_id` and `profile_id`.
 
 ### Poll the asynchronous operation
 
@@ -144,7 +142,6 @@ Prepare `product_parameters` for product `110`:
 | `advertiser_id` | Required nonempty alphanumeric string from Step 2 |
 | `selected_tables` | Required JSON-stringified nonempty array of unique dataset ID strings |
 | `stage_ids` | Optional; when supplied, use `"[1000]"` for this product |
-| `profile_type` | Required string: `ads`, `dsp`, or `managedDsp` |
 | `sqs_notification_url` | Required nonempty string: the shared notification queue URL from Step 4 |
 | `bucket` | Save the shared bucket name from Step 4 |
 | `amz_subscription_ids` | Save the complete map from Step 4 as a JSON string; required by the service update/delete handlers |
@@ -172,7 +169,6 @@ The following is a request **template** for one dataset. Replace all account, de
       "storage_group": 1,
       "product_parameters": {
         "advertiser_id": "589711999947333868",
-        "profile_type": "ads",
         "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/123456789012/example-queue",
         "bucket": "example-openbridge-managed-bucket",
         "amz_subscription_ids": "{\"ads-performance-v1\":\"AMAZON_STREAM_SUBSCRIPTION_ID\"}",
@@ -206,7 +202,7 @@ Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
 
-Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the refreshed `sqs_notification_url`, `bucket`, and JSON-stringified `amz_subscription_ids`, plus JSON-stringified `selected_tables` and optional `stage_ids`. Preserve the required `advertiser_id` and `profile_type`. Replace the complete Amazon subscription ID map, because IDs can change. The product validation limitation in Step 5 also applies to updates. Omitted product parameter keys keep their stored values.
+Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the refreshed `sqs_notification_url`, `bucket`, and JSON-stringified `amz_subscription_ids`, plus JSON-stringified `selected_tables` and optional `stage_ids`. Preserve the required `advertiser_id`. Replace the complete Amazon subscription ID map, because IDs can change. The product validation limitation in Step 5 also applies to updates. Omitted product parameter keys keep their stored values.
 
 ## Deleting a marketing stream subscription
 
