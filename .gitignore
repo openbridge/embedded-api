@@ -31,3 +31,6 @@ tmp-prompts
 
 # mkdocs build output (generated - deploy target rebuilds this from source)
 /site/
+
+# Ignore directories that may be local for a dev, but not necessary to go into the repo.
+/old.embed-cli
