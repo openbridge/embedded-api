@@ -77,6 +77,28 @@ nav:
       - Openbridge (OB) API: api-usage-docs/service-ob-api.md
       - Product Cards: api-usage-docs/service-product-cards-api.md
       - Rules: api-usage-docs/service-rules-api.md
+  - CLI:
+      - obcmd: embed-cli/README.md
+      - Getting Started: embed-cli/getting-started.md
+      - Authentication: embed-cli/authentication.md
+      - Command Reference: embed-cli/commands.md
+      - Output and Exit Codes: embed-cli/output-and-exit-codes.md
+      - Recipes: embed-cli/recipes.md
+      - Troubleshooting: embed-cli/troubleshooting.md
+      - Examples:
+          - Overview: embed-cli/examples/README.md
+          - Authenticating and Setting Defaults: embed-cli/examples/authenticating.md
+          - Discovering Commands and Scripting obcmd: embed-cli/examples/discovering-commands.md
+          - Browsing the Product Catalog: embed-cli/examples/browsing-the-catalog.md
+          - Resolving Platform IDs: embed-cli/examples/resolving-platform-ids.md
+          - Authorizing a Third-Party Identity: embed-cli/examples/authorizing-an-identity.md
+          - Inspecting Identities: embed-cli/examples/inspecting-identities.md
+          - Provisioning a Destination: embed-cli/examples/provisioning-a-destination.md
+          - Creating a Subscription: embed-cli/examples/creating-a-subscription.md
+          - Managing Subscriptions: embed-cli/examples/managing-subscriptions.md
+          - Requesting Historical Data: embed-cli/examples/history-backfill.md
+          - Monitoring Pipelines: embed-cli/examples/monitoring-pipelines.md
+          - SP-API Notification Subscriptions: embed-cli/examples/sp-api-notifications.md
   - Tutorials:
       - Identity Configuration: tutorials/identity-configuration.md
       - Subscription Configuration: tutorials/subscription-configuration.md

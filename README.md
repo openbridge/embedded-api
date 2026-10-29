@@ -100,7 +100,7 @@ Step-by-step guides for common integration workflows. These walk through the API
 ## Repository Resources
 
 - Openbridge MCP for AI agents and chat clients: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp)
-- CLI workflow: [embed-cli/README.md](./embed-cli/README.md)
+- CLI workflow: [docs/embed-cli/README.md](./docs/embed-cli/README.md)
 - Product overview: [products/product-overview.md](./products/product-overview.md)
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
