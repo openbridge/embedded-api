@@ -60,6 +60,22 @@ Openbridge's `execute` tool is not marked read-only, so ChatGPT treats it as a w
 
 ---
 
+## Gemini web app
+
+In the Gemini app, MCP servers are "custom apps." They can only be added on the web, but once added they also work in the Gemini mobile app.
+
+1. Go to [gemini.google.com](https://gemini.google.com) and click **Settings → Connected Apps**.
+2. Under **Custom apps**, click **Add a custom app**.
+3. Enter `https://mcp.openbridge.com/mcp`.
+4. Click **Next** and follow the prompts to sign in to Openbridge. You do not need to fill in anything under **Advanced features** — that section is for servers that cannot register themselves, and Openbridge can.
+
+Call it in a conversation by typing `@` and selecting the app.
+
+!!! note "Availability"
+    Google limits custom apps to personal Google Accounts — not work or school — for users 18 and over in the US, with History turned on, in English. It is part of Gemini Spark, so it is not available on every plan.
+
+---
+
 ## Claude Code
 
 Add the server, then authenticate:
@@ -242,7 +258,7 @@ Authenticate and inspect from inside a session:
 
 ## Verify the Connection
 
-Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex CLI, `agy mcp list` in Antigravity. In claude.ai, Claude Desktop, and ChatGPT, open the connector or plugin entry and check that it lists tools. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
+Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex CLI, `agy mcp list` in Antigravity. In the chat clients, open the connector, plugin, or custom app entry and check that it lists tools. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
 
 A good first prompt once connected:
 
@@ -269,11 +285,11 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 ## Troubleshooting
 
-**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code or Antigravity, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI), or reconnect the connector in claude.ai, Claude Desktop, or ChatGPT, and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
+**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code or Antigravity, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI), or reconnect the connector in a chat client, and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
 
 **Browser flow finishes but a CLI client still fails.** The redirect must reach the client's local callback listener. Complete the flow on the same machine as the client; an SSH session or container without browser access to the host loopback will not work.
 
-**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex CLI needs a fresh session after a `config.toml` change, and Antigravity needs one after an `mcp_config.json` edit. In claude.ai, Claude Desktop, and ChatGPT the connector is per conversation — enable it in a new chat (**+ → Connectors** in Claude, `@` in ChatGPT) rather than expecting it in an existing one.
+**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex CLI needs a fresh session after a `config.toml` change, and Antigravity needs one after an `mcp_config.json` edit. In the chat clients the connector is scoped to a conversation — bring it into a new chat (**+ → Connectors** in Claude, `@` in ChatGPT and the Gemini app) rather than expecting it in an existing one.
 
 **`403 Forbidden` on specific operations.** The authenticated account lacks access to that resource, or the operation is in the privileged profile. Confirm you authenticated as the intended account.
 
