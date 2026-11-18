@@ -14,12 +14,12 @@ The Openbridge MCP server exposes the Openbridge platform to AI agents and chat 
 ## Before You Begin
 
 - An Openbridge account.
-- For CLI clients, a browser on the machine running the client, for the OAuth consent step. Chat clients (claude.ai, Claude Desktop, ChatGPT) run the consent step in the browser you are already signed in with.
+- A browser, to sign in the first time you connect. With a command-line client, that browser has to be on the same machine you run the client on.
 
-You do **not** need a refresh token, API credential, or client ID. The server advertises its OAuth metadata at `/.well-known/oauth-protected-resource/mcp` and supports dynamic client registration, so clients register themselves and prompt you to sign in on first use.
+You do not need any keys or credentials. Each client signs you in through your browser on first use.
 
 !!! note "No API keys in config"
-    Do not paste an Openbridge JWT or `account_id:token` credential into client configuration for the hosted endpoint. Let the OAuth flow run — tokens are stored and refreshed by the client's own credential store.
+    Do not paste an Openbridge token into a client's configuration. Sign in through the browser instead — the client stores and renews the token for you.
 
 ---
 
