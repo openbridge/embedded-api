@@ -83,7 +83,8 @@ nav:
       - Requesting Historical Data: tutorials/history-backfill.md
       - Monitoring Pipeline Health: tutorials/monitoring-healthchecks.md
       - Amazon Order Product Jobs: tutorials/amazon-order-product-jobs.md
-      - Amazon Advertising Marketing Stream Pipeline: tutorials/amazon-advertising-marketing-stream-pipeline.md
+      - Amazon Advertising Marketing Stream v2 Pipeline: tutorials/amazon-advertising-marketing-stream-pipeline.md
+      - Amazon Advertising Marketing Stream Pipeline (Legacy): tutorials/amazon-advertising-marketing-stream-pipeline-legacy.md
       - Amazon Notifications Pipeline: tutorials/amazon-notifications-pipeline.md
   - Products:
       - Overview: products/product-overview.md
