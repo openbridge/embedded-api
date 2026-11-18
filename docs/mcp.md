@@ -14,18 +14,53 @@ The Openbridge MCP server exposes the Openbridge platform to AI agents and chat 
 ## Before You Begin
 
 - An Openbridge account with API access enabled by the Openbridge team.
-- A browser on the machine running the client, for the OAuth consent step.
+- For CLI clients, a browser on the machine running the client, for the OAuth consent step. Chat clients (claude.ai, Claude Desktop, ChatGPT) run the consent step in the browser you are already signed in with.
 
-You do **not** need a refresh token, API credential, or client ID. The server advertises its OAuth metadata at `/.well-known/oauth-protected-resource/mcp` and supports dynamic client registration, so every client below registers itself and opens a browser window on first use.
+You do **not** need a refresh token, API credential, or client ID. The server advertises its OAuth metadata at `/.well-known/oauth-protected-resource/mcp` and supports dynamic client registration, so clients register themselves and prompt you to sign in on first use.
 
 !!! note "No API keys in config"
     Do not paste an Openbridge JWT or `account_id:token` credential into client configuration for the hosted endpoint. Let the OAuth flow run — tokens are stored and refreshed by the client's own credential store.
 
 ---
 
-## Claude
+## Claude (claude.ai and Claude Desktop)
 
-### Claude Code (CLI)
+Add the endpoint as a custom connector. Same steps in the web app and the desktop app:
+
+1. Open **Customize → Connectors**.
+2. Select **+ Add**, then **Add custom connector**.
+3. Give it a name — `Openbridge` — and enter the URL `https://mcp.openbridge.com/mcp`.
+4. Leave authentication on OAuth. For how Claude identifies itself, **Use Claude's published identity** or **Register automatically** both work; you do not need your own OAuth client.
+5. Click **Add**, then complete the Openbridge sign-in.
+
+Enable it per conversation with the **+** button in the chat composer → **Connectors** → **Openbridge**.
+
+!!! note "Reachability"
+    Connectors are fetched by Anthropic's servers, not your machine, so the endpoint must be reachable from the public internet on port 443. That is automatic for the hosted endpoint; a [self-hosted](#self-hosting) instance behind a VPN will not connect from claude.ai and needs a CLI client instead.
+
+---
+
+## ChatGPT
+
+Custom MCP servers are added as plugins, in ChatGPT on the web:
+
+1. Open **ChatGPT Plugins**.
+2. Select **+**, then **Add custom MCP server**.
+3. Enter a name — `Openbridge` — and the server URL `https://mcp.openbridge.com/mcp`.
+4. Set authentication to **OAuth**.
+5. Accept the risk warning, create the plugin, and install it.
+6. Complete the Openbridge sign-in when prompted.
+
+Call it in a conversation by typing `@` and selecting the plugin. Naming the tool explicitly helps — *"Use the Openbridge app's `search` tool to find subscription operations."*
+
+Openbridge's `execute` tool is not marked read-only, so ChatGPT treats it as a write action and asks you to confirm each run. Read the call before confirming.
+
+!!! note "Plan requirements"
+    Custom MCP servers need a paid ChatGPT plan on the web. Business and Enterprise/Edu workspaces get full tool access, and only admins and owners can create or publish the connection; Pro is limited to read and fetch tools, which rules out the mutating Openbridge operations. Free and Go do not support custom MCP servers.
+
+---
+
+## Claude Code
 
 Add the server, then authenticate:
 
@@ -76,20 +111,9 @@ Project scope writes a `.mcp.json` at the repo root:
 }
 ```
 
-### Claude Desktop and Claude web
-
-Add the endpoint as a custom connector:
-
-1. Open **Settings → Connectors**.
-2. Choose **Add custom connector**.
-3. Enter `https://mcp.openbridge.com/mcp` as the URL and give it a name.
-4. Click **Connect** and complete the browser sign-in.
-
-The connector appears in the tools menu of new conversations once connected.
-
 ---
 
-## Codex
+## Codex CLI
 
 Codex CLI reads MCP servers from `~/.codex/config.toml`. Add the server with:
 
@@ -127,7 +151,7 @@ codex mcp list
 
 ---
 
-## Gemini
+## Gemini CLI
 
 Gemini CLI uses `httpUrl` for streamable HTTP servers (`url` means SSE). Add it with:
 
@@ -163,7 +187,7 @@ Authenticate and inspect from inside a session:
 
 ## Verify the Connection
 
-Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
+Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex CLI. In claude.ai, Claude Desktop, and ChatGPT, open the connector or plugin entry and check that it lists tools. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
 
 A good first prompt once connected:
 
@@ -190,11 +214,11 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 ## Troubleshooting
 
-**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI) and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
+**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI), or reconnect the connector in claude.ai, Claude Desktop, or ChatGPT, and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
 
-**Browser flow finishes but the client still fails.** The redirect must reach the client's local callback listener. Complete the flow on the same machine as the client; an SSH session or container without browser access to the host loopback will not work.
+**Browser flow finishes but a CLI client still fails.** The redirect must reach the client's local callback listener. Complete the flow on the same machine as the client; an SSH session or container without browser access to the host loopback will not work.
 
-**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex needs a fresh session after a `config.toml` change.
+**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex CLI needs a fresh session after a `config.toml` change. In claude.ai, Claude Desktop, and ChatGPT the connector is per conversation — enable it in a new chat (**+ → Connectors** in Claude, `@` in ChatGPT) rather than expecting it in an existing one.
 
 **`403 Forbidden` on specific operations.** The authenticated account lacks access to that resource, or the operation is in the privileged profile. Confirm you authenticated as the intended account.
 
