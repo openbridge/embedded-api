@@ -14,7 +14,6 @@ The Openbridge MCP server exposes the Openbridge platform to AI agents and chat 
 ## Before You Begin
 
 - An Openbridge account with API access enabled by the Openbridge team.
-- The account owner must have the `api-user` role.
 - A browser on the machine running the client, for the OAuth consent step.
 
 You do **not** need a refresh token, API credential, or client ID. The server advertises its OAuth metadata at `/.well-known/oauth-protected-resource/mcp` and supports dynamic client registration, so every client below registers itself and opens a browser window on first use.
@@ -197,7 +196,7 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 **Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex needs a fresh session after a `config.toml` change.
 
-**`403 Forbidden` on specific operations.** The authenticated account lacks access to that resource, or the operation is in the privileged profile. Confirm the account has the `api-user` role and that you authenticated as the intended account.
+**`403 Forbidden` on specific operations.** The authenticated account lacks access to that resource, or the operation is in the privileged profile. Confirm you authenticated as the intended account.
 
 **Operations fail against a resource you expect to exist.** The MCP server is a view onto the same APIs as the rest of these docs. Reproduce the call with [obcmd](embed-cli/README.md) or `curl` to separate an MCP problem from a data or permissions problem — see [Diagnosing pipelines](tutorials/monitoring-healthchecks.md).
 
