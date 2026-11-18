@@ -207,4 +207,6 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 `https://mcp.openbridge.com/mcp` is the hosted endpoint Openbridge operates, and it is the right choice for most integrations. The server is also open source, so you can run your own instance instead — typically to place it inside your own network, to control which tools are exposed, or to point an agent at a local build while developing.
 
+Self-hosting requires a Premium, Business, or Enterprise Openbridge account with API access enabled. A self-hosted instance authenticates against the same Openbridge APIs, so the account behind it needs the same access as any other API integration.
+
 Client configuration is the same as above with your own URL in place of the hosted one. Setup, deployment topology, and the full environment reference live in the repository: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp).
