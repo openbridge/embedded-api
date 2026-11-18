@@ -1058,7 +1058,7 @@ Your app manages Amazon integrations for multiple customers. When Customer A cli
 state_data = {
     "tenant_id": "customer-a",
     "connection_type": "seller_central",
-    "initiated_by": "user@customer-a.com"
+    "initiated_by": "user@example.com"
 }
 ```
 
