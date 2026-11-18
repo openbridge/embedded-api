@@ -13,7 +13,7 @@ The Openbridge MCP server exposes the Openbridge platform to AI agents and chat 
 
 ## Before You Begin
 
-- An Openbridge account with API access enabled by the Openbridge team.
+- An Openbridge account.
 - For CLI clients, a browser on the machine running the client, for the OAuth consent step. Chat clients (claude.ai, Claude Desktop, ChatGPT) run the consent step in the browser you are already signed in with.
 
 You do **not** need a refresh token, API credential, or client ID. The server advertises its OAuth metadata at `/.well-known/oauth-protected-resource/mcp` and supports dynamic client registration, so clients register themselves and prompt you to sign in on first use.
@@ -230,6 +230,6 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 `https://mcp.openbridge.com/mcp` is the hosted endpoint Openbridge operates, and it is the right choice for most integrations. The server is also open source, so you can run your own instance instead — typically to place it inside your own network, to control which tools are exposed, or to point an agent at a local build while developing.
 
-Self-hosting requires a Premium, Business, or Enterprise Openbridge account with API access enabled. A self-hosted instance authenticates against the same Openbridge APIs, so the account behind it needs the same access as any other API integration.
+Self-hosting requires a Premium, Business, or Enterprise Openbridge account. A self-hosted instance authenticates against the same Openbridge APIs as the hosted endpoint.
 
 Client configuration is the same as above with your own URL in place of the hosted one. Setup, deployment topology, and the full environment reference live in the repository: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp).
