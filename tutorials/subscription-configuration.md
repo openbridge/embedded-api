@@ -341,8 +341,7 @@ Valid status values:
 | Status | Effect |
 |---|---|
 | `active` | Subscription is running and collecting data |
-| `cancelled` | Subscription is permanently stopped |
-| `paused` | Subscription is temporarily stopped — can be set back to `active` |
+| `cancelled` | Subscription is stopped |
 | `invalid` | Subscription is marked as deleted (see below) |
 
 ---

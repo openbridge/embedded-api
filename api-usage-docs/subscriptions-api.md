@@ -395,7 +395,7 @@ Example response:
 | Field | Type | Description |
 |---|---|---|
 | `id` | integer | Subscription ID |
-| `status` | enum | One of: `active`, `cancelled`, `paused`, `invalid` |
+| `status` | enum | One of: `active`, `cancelled`, `invalid` |
 | `name` | string \| null | Human-readable label for the subscription |
 | `date_start` | datetime | Subscription start date (ISO 8601) |
 | `created_at` | datetime | Record creation time |
@@ -414,7 +414,7 @@ Example response:
 | `account` | integer | Yes (create) | Account ID (from `GET /account`) |
 | `user` | integer | Yes (create) | User ID (from `GET /user`) |
 | `product` | integer | Yes (create) | Product ID (from `GET /v2/product`) |
-| `status` | enum | Yes (create) | One of: `active`, `cancelled`, `paused`, `invalid` |
+| `status` | enum | Yes (create) | One of: `active`, `cancelled`, `invalid` |
 | `date_start` | datetime | Yes (create) | Subscription start date (ISO 8601) |
 | `date_end` | datetime | No | Accepted on write; never returned |
 | `remote_identity` | integer | No | ID of the connected data source credential (canonical input — see [reconciliation](#remote-identity-reconciliation)) |

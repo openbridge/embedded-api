@@ -245,7 +245,7 @@ GET https://subscriptions.api.openbridge.io/spm?subscription={subscription_id}&d
 | `user` | integer | Yes | User ID (from `GET /user`) |
 | `product` | integer | Yes | Product ID (from `GET /product`) |
 | `name` | string | No | Human-readable label for the subscription |
-| `status` | enum | Yes | One of: `active`, `cancelled`, `paused`, `invalid` |
+| `status` | enum | Yes | One of: `active`, `cancelled`, `invalid` |
 | `date_start` | datetime | Yes | Subscription start date (ISO 8601) |
 | `date_end` | datetime | Yes | Subscription end date (ISO 8601) |
 | `remote_identity` | integer | No | ID of the connected data source credential |
