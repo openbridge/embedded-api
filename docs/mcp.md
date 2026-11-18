@@ -203,9 +203,8 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 ---
 
-## Related
+## Self-Hosting
 
-- [Getting Started](api-usage-docs/getting-started.md) — the underlying subscription workflow
-- [Authentication API](api-usage-docs/authentication-api.md) — refresh tokens and JWTs for direct API access
-- [obcmd CLI](embed-cli/README.md) — the same operations from a terminal
-- [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp) — server source, self-hosting, and environment reference
+`https://mcp.openbridge.com/mcp` is the hosted endpoint Openbridge operates, and it is the right choice for most integrations. The server is also open source, so you can run your own instance instead — typically to place it inside your own network, to control which tools are exposed, or to point an agent at a local build while developing.
+
+Client configuration is the same as above with your own URL in place of the hosted one. Setup, deployment topology, and the full environment reference live in the repository: [openbridge/openbridge-mcp](https://github.com/openbridge/openbridge-mcp).
