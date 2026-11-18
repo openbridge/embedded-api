@@ -1,66 +1,40 @@
 # Amazon Advertising Marketing Stream S3 Pipeline
 
-Marketing Stream S3 uses **`/service/amzadv/stream-s3`** in the Service API. The managed S3 delivery flow uses this endpoint prefix; `/stream-v2` belongs to the [legacy tutorial](./amazon-advertising-marketing-stream-pipeline-legacy.md).
-
-Amazon delivers dataset files to S3, with queue notifications used by Openbridge to process the files into your configured storage destination. Openbridge provisions and manages these delivery resources in its own AWS account. **Customers do not need an AWS account, an IAM role ARN, or a CloudFormation template.**
+Marketing Stream S3 (product `110`) delivers Amazon dataset files through shared, regional S3 and SQS resources managed by Openbridge. Setup requires an Amazon Advertising connection and an Openbridge storage destination. For the customer-managed AWS workflow, see the [legacy Marketing Stream tutorial](./amazon-advertising-marketing-stream-pipeline-legacy.md).
 
 ## Prerequisites
 
-- A [JWT access token](../api-usage-docs/authentication-api.md).
-- Your [account and user IDs](./identity-configuration.md#step-1--look-up-your-account-and-user-ids).
-- An Amazon Advertising remote identity (type `14`) with access to the advertiser account.
+- An [Openbridge JWT access token](../api-usage-docs/authentication-api.md).
+- Your [Openbridge account and user IDs](./identity-configuration.md#step-1--look-up-your-account-and-user-ids).
+- An Amazon Advertising [remote identity](./identity-configuration.md) (type `14`) with access to the advertiser.
 - A configured [storage destination](./subscription-configuration.md#step-3--identify-your-storage-destination).
 
-## Step 1 — Choose or create a remote identity
-
-Follow the [Identity Configuration tutorial](./identity-configuration.md) to connect an Amazon Advertising account through OAuth, or list existing valid identities:
-
-```http
-GET https://remote-identity.api.openbridge.io/ri?remote_identity_type=14&invalid_identity=0
-Authorization: Bearer <jwt>
-```
-
-Record the identity's `id`. The service uses its `region` (`na`, `eu`, or `fe`) to select the Amazon API and AWS delivery region; you do not send a region in the create request.
-
-## Step 2 — Select an advertiser account
-
-Use the new advertiser-account lookup, which does not require a profile ID:
+## Step 1 — Find your advertiser and datasets
 
 ```http
 GET https://service.api.openbridge.io/service/amzadv/list-adv-v2/112
 Authorization: Bearer <jwt>
 ```
 
-Replace `112` with your remote identity ID. The service returns a flat array of Amazon `advertiserAccounts` records and collects all pages from Amazon. Record the selected record's `advertiserAccountId` as `advertiser_id`. To filter the lookup, append `?advertiser_id={advertiserAccountId}`.
+Replace `112` with your remote identity ID. The response is an array of advertiser accounts. Use the selected account's `advertiserAccountId` as the string `advertiser_id`. To look up a known ID, append `?advertiser_id={advertiserAccountId}`.
 
-## Step 3 — Select datasets
-
-Marketing Stream S3 uses **product ID `110`** with stage ID **`1000`** for every dataset selection. Retrieve the valid dataset IDs:
+Before registering datasets, verify that the ID matches a seller or vendor profile's top-level `id` from `GET /service/amzadv/profiles-only/112?profile_types=seller,vendor&is_manager=false`. The Subscriptions API checks this match when you save product `110`. For a manager identity, query with `is_manager=true` and include `"is_manager": "true"` in the pipeline's `product_parameters`. [Amazon Advertising profile lookup](../api-usage-docs/service-amazon-advertising-api.md#list-profiles)
 
 ```http
 GET https://service.api.openbridge.io/service/amzadv/stream-s3/list-datasets
 Authorization: Bearer <jwt>
 ```
 
-The endpoint returns a JSON array:
-
 ```json
 {
-  "data": {
-    "type": "AMSDatasets",
-    "attributes": {
-      "datasets": [
-        "ads-performance-v1",
-        "ads-converted-product-v1"
-      ]
-    }
+  "type": "AMSDatasets",
+  "attributes": {
+    "datasets": ["ads-performance-v1", "ads-converted-product-v1"]
   }
 }
 ```
 
-The stage ID remains `1000` whether you select one dataset or both. All selected datasets use the shared notification queue and bucket returned in Step 4.
-
-## Step 4 — Provision managed delivery resources
+## Step 2 — Register the datasets with Amazon
 
 ```http
 POST https://service.api.openbridge.io/service/amzadv/stream-s3/112
@@ -73,86 +47,38 @@ Content-Type: application/json
   "data": {
     "type": "Service",
     "attributes": {
-      "advertiser_id": "ADVERTISER_ACCOUNT_ID",
-      "datasets": ["ads-performance-v1", "ads-converted-product-v1"]
+      "advertiser_id": "589711999947333868",
+      "datasets": ["ads-performance-v1"]
     }
   }
 }
 ```
 
-Use the advertiser account ID from Step 2. These are the two setup fields consumed by the new implementation; omit `role_arn`, `aws_account_id` and `profile_id`.
-
-### Poll the asynchronous operation
-
-The service returns `202 Accepted` and a `Location` header:
-
-```http
-Location: https://service.api.openbridge.io/service/amzadv/stream/poll-async/{request_id}
-```
+Send at least one supported dataset. The Service API selects the shared S3 bucket and notification queue based on the remote identity's region. Successful registration returns `200 OK` in the same request.
 
 ```json
 {
-  "data": {
-    "type": "AmazonAdvertisingBrandMetricsStream",
-    "id": "ADVERTISER_ACCOUNT_ID",
-    "attributes": {"status": "CREATING"}
-  }
-}
-```
-
-Send authenticated `GET` requests to the returned `Location` using the same user token. Poll while the HTTP status is `202`, for example every two seconds with an application timeout. Continue only after `200 OK`; handle terminal errors before creating the pipeline subscription. The shared polling path remains `/stream/poll-async`, for managed S3 delivery operations.
-
-The completed response uses the following `data` envelope:
-
-```json
-{
-  "data": {
-    "type": "ServiceAmzAdvBrandMetricsStream",
-    "advertiser_id": "589711999947333868",
-    "attributes": {
-      "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/699059249070/ams-dev-ri6073-589711999947333868-s3-notifications",
-      "bucket": "openbridge-ams-us-east-1-589711999947333868",
-      "amz_subscription_ids": {
-        "ads-performance-v1": "amzn1.ads-stream.sub1.4VzvRZFtnSqGFKLhHomypB",
-        "ads-converted-product-v1": "amzn1.ads-stream.sub1.6sGplvMSZ73EW51WDlnM6w"
-      }
+  "type": "ServiceAmzAdvBrandMetricsStream",
+  "advertiser_id": "589711999947333868",
+  "attributes": {
+    "amz_subscription_ids": {
+      "ads-performance-v1": "AMAZON_STREAM_SUBSCRIPTION_ID"
     }
   }
 }
 ```
 
-All selected datasets share `sqs_notification_url` and `bucket`. Save those values and the complete `amz_subscription_ids` map, preserving the hyphenated dataset keys. The service no longer returns `queue_urls`, `dataset_params`, or a per-dataset queue ARN.
+Save the complete map at `attributes.amz_subscription_ids`. Keep each dataset key exactly as returned. Registrations are made one dataset at a time, so a failed multi-dataset request can leave Amazon subscriptions that need cleanup before retrying.
 
-The service worker and shared polling handler currently store and return the completed object without the outer `data` wrapper. Clients supporting that implementation should also accept the unwrapped object (`response.attributes` instead of `response.data.attributes`).
+## Step 3 — Create the Openbridge pipeline
 
-## Step 5 — Create the pipeline subscription
-
-Create the pipeline through the [Subscriptions API (v2)](../api-usage-docs/subscriptions-api.md):
+Send the advertiser ID and the JSON-stringified dataset-to-subscription-ID map as `product_parameters`. Use the remote identity from Step 1 and your Openbridge storage group. The two required product parameters are `advertiser_id` and `amz_subscription_ids`. The Subscriptions API stores the map as a string, and the Service API reads it back for updates and deletes. [Subscriptions API](../api-usage-docs/subscriptions-api.md)
 
 ```http
 POST https://subscriptions.api.openbridge.io/v2/sub
 Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
-
-Prepare `product_parameters` for product `110`:
-
-| Key | Value |
-|---|---|
-| `advertiser_id` | Required nonempty alphanumeric string from Step 2 |
-| `selected_tables` | Required JSON-stringified nonempty array of unique dataset ID strings |
-| `stage_ids` | Optional; when supplied, use `"[1000]"` for this product |
-| `sqs_notification_url` | Required nonempty string: the shared notification queue URL from Step 4 |
-| `bucket` | Save the shared bucket name from Step 4 |
-| `amz_subscription_ids` | Save the complete map from Step 4 as a JSON string; required by the service update/delete handlers |
-
-Set `remote_identity` at the top level. An AWS IAM role parameter is not part of this setup. The product schema allows additional properties, so retain `bucket` and `amz_subscription_ids` alongside its required fields. `queue_urls` and `dataset_params` are no longer required by the schema.
-
-The schema defines `selected_tables` and `stage_ids` as arrays, but the v2 subscription validator requires JSON-encoded strings in the request and decodes them before validation. `sqs_notification_url` is a plain URL string, copied directly from the service response. Although its schema description still refers to a stringified dataset map, the service returns one shared URL.
-
-**Integration limitation:** the product `110` resource validator still reads the removed `queue_urls` and `dataset_params` fields. The template below satisfies the corrected schema after selection-array decoding, but that validator must also be aligned with the new fields for end-to-end subscription creation.
-
-The following is a request **template** for one dataset. Replace all account, destination, advertiser, and resource examples with your values:
 
 ```json
 {
@@ -162,64 +88,42 @@ The following is a request **template** for one dataset. Replace all account, de
       "account": 1,
       "user": 1,
       "product": 110,
-      "name": "My Marketing Stream v2",
+      "name": "My Marketing Stream",
       "status": "active",
-      "date_start": "2026-10-13T00:00:00Z",
+      "date_start": "2026-11-18T00:00:00Z",
       "remote_identity": 112,
       "storage_group": 1,
       "product_parameters": {
         "advertiser_id": "589711999947333868",
-        "sqs_notification_url": "https://sqs.us-east-1.amazonaws.com/123456789012/example-queue",
-        "bucket": "example-openbridge-managed-bucket",
-        "amz_subscription_ids": "{\"ads-performance-v1\":\"AMAZON_STREAM_SUBSCRIPTION_ID\"}",
-        "selected_tables": "[\"ads-performance-v1\"]",
-        "stage_ids": "[1000]"
+        "amz_subscription_ids": "{\"ads-performance-v1\":\"AMAZON_STREAM_SUBSCRIPTION_ID\"}"
       }
     }
   }
 }
 ```
 
-For multiple datasets, include every selected dataset in `amz_subscription_ids` and `selected_tables`, and keep `stage_ids` as `"[1000]"`. Keep the single shared `sqs_notification_url` and `bucket`.
+Replace the example IDs and start date with your values. Save the Openbridge subscription ID from the `201 Created` response.
 
-## Updating a marketing stream subscription
-
-The current service URL configuration exposes only the update worker route:
+## Update the dataset selection
 
 ```http
-PATCH https://service.api.openbridge.io/service/amzadv/stream-s3/update/{remote_identity_id}/{co_id}/{subscription_id}
-```
-
-This route calls `update_stack` and requires an existing ConsoleOps request ID (`co_id`). It is not the customer-facing async entry point. The `update` handler that creates that request and returns a polling `Location` is currently not routed. A customer-facing dataset update cannot be started through the documented public endpoints until that route is restored; do not create a `co_id` or call the worker directly.
-
-When the customer-facing update entry point is available, its handler expects the stored `advertiser_id` and the **full desired dataset list**, not just additions, using the same body as Step 4. The implementation archives **all existing Amazon stream subscriptions** and registers the requested datasets again, including retained datasets. Allow for a delivery interruption.
-
-After a successful managed resource update, update the pipeline:
-
-```http
-PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
+PATCH https://service.api.openbridge.io/service/amzadv/stream-s3/update/{remote_identity_id}/{subscription_id}
 Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
 
-Send `data.type: "Subscription"`, `data.id` equal to the subscription ID, and `data.attributes.product_parameters` containing the refreshed `sqs_notification_url`, `bucket`, and JSON-stringified `amz_subscription_ids`, plus JSON-stringified `selected_tables` and optional `stage_ids`. Preserve the required `advertiser_id`. Replace the complete Amazon subscription ID map, because IDs can change. The product validation limitation in Step 5 also applies to updates. Omitted product parameter keys keep their stored values.
+Use the Openbridge subscription ID and send the same body as in Step 2 with the existing advertiser ID and the **full desired dataset list**. Check the list against the supported IDs before sending it. The service archives every Amazon subscription in the stored map before registering the requested datasets, including datasets you keep. This can interrupt delivery, and a failed update can leave the previous streams archived.
 
-## Deleting a marketing stream subscription
+After `200 OK`, send `PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}` with `data.type` set to `Subscription`, `data.id` set to the Openbridge subscription ID, and the new JSON-stringified map in `data.attributes.product_parameters.amz_subscription_ids`. Replace the entire map so subsequent updates and deletes use the current Amazon IDs.
 
-First archive the registered Amazon streams while their metadata is still available:
+## Delete the pipeline
 
 ```http
 DELETE https://service.api.openbridge.io/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}
 Authorization: Bearer <jwt>
 ```
 
-After `204 No Content`, mark the pipeline subscription invalid:
-
-```http
-PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}
-Authorization: Bearer <jwt>
-Content-Type: application/json
-```
+The Service API archives the Amazon streams using the pipeline's stored metadata. After `204 No Content`, mark the Openbridge subscription invalid with `PATCH https://subscriptions.api.openbridge.io/v2/sub/{subscription_id}` and this body. [Subscription status management](./subscription-configuration.md#deleting-a-subscription)
 
 ```json
 {
@@ -231,4 +135,13 @@ Content-Type: application/json
 }
 ```
 
-The reviewed delete handler archives Amazon stream subscriptions; it does not delete the managed S3 bucket or SQS queues. See [subscription status management](./subscription-configuration.md#deleting-a-subscription) for pipeline behavior.
+## Clean up orphaned Amazon streams
+
+Use the cleanup endpoint if a registration left Amazon streams without an active Openbridge pipeline.
+
+```http
+DELETE https://service.api.openbridge.io/service/amzadv/stream-s3/delete-orphaned/{remote_identity_id}/{advertiser_id}
+Authorization: Bearer <jwt>
+```
+
+This endpoint archives **all** streams returned for the advertiser except those already archived or suspended. It returns `204 No Content` on success and `400 Bad Request` if any active product `110` subscription exists for the remote identity.

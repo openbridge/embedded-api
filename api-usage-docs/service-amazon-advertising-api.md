@@ -245,23 +245,21 @@ Authorization: Bearer <jwt>
 
 ---
 
-### Marketing Stream v2
+### Marketing Stream S3
 
-Marketing Stream v2 (product ID `110`) uses `/service/amzadv/stream-s3` and Openbridge-managed delivery resources. No customer AWS account, IAM role, or CloudFormation template is required. Follow the [Marketing Stream v2 pipeline tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline.md) for requests, async response handling, and subscription metadata.
+Product `110` registers Amazon Marketing Stream datasets for delivery through shared, regional S3 and SQS resources managed by Openbridge. Authenticate each request with an Openbridge bearer token.
 
-| Method | Path | Purpose |
+| Method | Endpoint | Success |
 |---|---|---|
-| GET | `/service/amzadv/list-adv-v2/{remote_identity_id}` | List advertiser accounts; optional `advertiser_id` filter |
-| GET | `/service/amzadv/stream-s3/list-datasets` | List valid dataset IDs as a JSON array |
-| POST | `/service/amzadv/stream-s3/{remote_identity_id}` | Provision resources and register selected datasets |
-| GET | `/service/amzadv/stream/poll-async/{request_id}` | Poll the `Location` returned by create or update |
-| PATCH | `/service/amzadv/stream-s3/update/{remote_identity_id}/{co_id}/{subscription_id}` | Internal update worker; requires an existing ConsoleOps request |
-| DELETE | `/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}` | Archive registered Amazon streams |
+| GET | `/service/amzadv/list-adv-v2/{remote_identity_id}` | `200 OK` with an array of advertiser accounts. Supports the optional `advertiser_id` query filter. |
+| GET | `/service/amzadv/stream-s3/list-datasets` | `200 OK` with the dataset list at `attributes.datasets`. |
+| POST | `/service/amzadv/stream-s3/{remote_identity_id}` | `200 OK` with the Amazon subscription IDs. |
+| PATCH | `/service/amzadv/stream-s3/update/{remote_identity_id}/{subscription_id}` | `200 OK` with replacement Amazon subscription IDs. |
+| DELETE | `/service/amzadv/stream-s3/delete/{remote_identity_id}/{subscription_id}` | `204 No Content` after archiving the Amazon streams stored on the Openbridge subscription. |
+| DELETE | `/service/amzadv/stream-s3/delete-orphaned/{remote_identity_id}/{advertiser_id}` | `204 No Content` after archiving the advertiser's streams eligible for cleanup. Requires that the remote identity have no active product `110` subscriptions. |
 
-Create and the update handler accept `data.attributes.advertiser_id` and a nonempty `data.attributes.datasets` array containing `ads-performance-v1` and/or `ads-converted-product-v1`. Retrieve the valid IDs with `GET /service/amzadv/stream-s3/list-datasets`. Product `110` uses stage ID `1000` for every dataset selection (`stage_ids: "[1000]"` when supplied).
+Create and update run synchronously. Send the advertiser ID and full dataset list in `data.attributes.advertiser_id` and `data.attributes.datasets`. Both operations return a top-level `advertiser_id` and a dataset-to-ID map at `attributes.amz_subscription_ids`. Update archives the old Amazon streams before registering the requested datasets.
 
-Completed operations return a shared `sqs_notification_url` and `bucket`, plus `amz_subscription_ids` keyed by dataset ID. They no longer return per-dataset `queue_urls` or `dataset_params`. Product `110` requires `advertiser_id`, `sqs_notification_url`, `selected_tables`, and `profile_type`; see the tutorial for wire encoding, additional lifecycle metadata, and the current resource validation limitation.
+Store `advertiser_id` and the JSON-stringified `amz_subscription_ids` map in the product `110` pipeline's `product_parameters`. See the [Marketing Stream S3 tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline.md) for request examples and the full pipeline lifecycle.
 
-For the older `/stream-v2` customer-managed AWS flow, see the [legacy tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline-legacy.md).
-
-The customer-facing async update handler is currently not routed. The update worker listed above is not a customer entry point; see the tutorial for this limitation.
+For the `/stream-v2` customer-managed AWS workflow, see the [legacy tutorial](../tutorials/amazon-advertising-marketing-stream-pipeline-legacy.md).
