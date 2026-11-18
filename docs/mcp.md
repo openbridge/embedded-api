@@ -153,15 +153,9 @@ codex mcp list
 
 ## Antigravity
 
-Antigravity reads MCP servers from `mcp_config.json`, not from the Gemini CLI settings file. Global config lives at `~/.gemini/config/mcp_config.json`; per-workspace config at `<workspace>/.agents/mcp_config.json`.
+All three Antigravity surfaces — the desktop app, the IDE, and the CLI — read MCP servers from `mcp_config.json`, not from the Gemini CLI settings file. The global file is `~/.gemini/config/mcp_config.json`; the CLI also reads `<workspace>/.agents/mcp_config.json` for a single workspace.
 
-From Antigravity CLI:
-
-```bash
-agy mcp add openbridge https://mcp.openbridge.com/mcp
-```
-
-Or add the entry by hand:
+The Openbridge entry looks the same everywhere:
 
 ```json
 {
@@ -174,12 +168,38 @@ Or add the entry by hand:
 }
 ```
 
-Restart Antigravity after a manual edit. No credentials go in the file — Antigravity registers itself with the server and opens the browser sign-in on first use.
-
-Check the connection with `agy mcp list`, or `/mcp` inside a session. In the IDE, the MCP server manager's **Open MCP Config** / **View raw config** shows which file your version is actually reading.
+No credentials go in the file. Antigravity registers itself with the server and sends you to the browser to sign in.
 
 !!! note "Use `serverUrl`"
     Antigravity does not accept Gemini CLI's `httpUrl` key, and its timeout is in seconds rather than milliseconds. Copying a Gemini CLI block across will load nothing.
+
+### Antigravity app (desktop)
+
+The **Add MCP Server** button lists servers Antigravity already knows about, and Openbridge is not one of them, so add it through the config file:
+
+1. Click **Customizations** in the sidebar, click **Installed**, and scroll to **MCP Servers**.
+2. Open the raw config and add the `openbridge` entry above to `~/.gemini/config/mcp_config.json`.
+3. Back in **MCP Servers**, click **Refresh**. Openbridge appears in the list.
+4. Click **Authenticate** next to it, sign in to Openbridge in the browser, copy the authorization code it gives you, paste it into **Enter authorization code**, and click **Submit**.
+
+The server reconnects on its own once the code is accepted.
+
+### Antigravity IDE
+
+1. Click **…** at the top of the agent side panel and choose **MCP Servers**.
+2. Click **Manage MCP Servers**, then **View raw config**.
+3. Add the `openbridge` entry, save, and reload the server list.
+4. Sign in when prompted.
+
+**View raw config** also tells you which file your build is actually reading, which is worth checking if an entry seems to be ignored.
+
+### Antigravity CLI
+
+```bash
+agy mcp add openbridge https://mcp.openbridge.com/mcp
+```
+
+Or edit the config file by hand and restart the CLI. Confirm with `agy mcp list`, or `/mcp` inside a session.
 
 ---
 
