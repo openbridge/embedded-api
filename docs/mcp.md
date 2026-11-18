@@ -151,7 +151,42 @@ codex mcp list
 
 ---
 
+## Antigravity
+
+Antigravity reads MCP servers from `mcp_config.json`, not from the Gemini CLI settings file. Global config lives at `~/.gemini/config/mcp_config.json`; per-workspace config at `<workspace>/.agents/mcp_config.json`.
+
+From Antigravity CLI:
+
+```bash
+agy mcp add openbridge https://mcp.openbridge.com/mcp
+```
+
+Or add the entry by hand:
+
+```json
+{
+  "mcpServers": {
+    "openbridge": {
+      "serverUrl": "https://mcp.openbridge.com/mcp",
+      "timeoutSeconds": 180
+    }
+  }
+}
+```
+
+Restart Antigravity after a manual edit. No credentials go in the file — Antigravity registers itself with the server and opens the browser sign-in on first use.
+
+Check the connection with `agy mcp list`, or `/mcp` inside a session. In the IDE, the MCP server manager's **Open MCP Config** / **View raw config** shows which file your version is actually reading.
+
+!!! note "Use `serverUrl`"
+    Antigravity does not accept Gemini CLI's `httpUrl` key, and its timeout is in seconds rather than milliseconds. Copying a Gemini CLI block across will load nothing.
+
+---
+
 ## Gemini CLI
+
+!!! warning "Being retired"
+    Google is retiring Gemini CLI and the Gemini Code Assist IDE extensions: they stop serving requests on **June 18, 2026** for free and consumer tiers. Enterprise customers on Gemini Code Assist Standard or Enterprise licenses keep access. New setups should use [Antigravity](#antigravity) instead.
 
 Gemini CLI uses `httpUrl` for streamable HTTP servers (`url` means SSE). Add it with:
 
@@ -187,7 +222,7 @@ Authenticate and inspect from inside a session:
 
 ## Verify the Connection
 
-Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex CLI. In claude.ai, Claude Desktop, and ChatGPT, open the connector or plugin entry and check that it lists tools. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
+Ask the agent to list the Openbridge tools it can see, or use the client's own command — `/mcp` in Claude Code and Gemini CLI, `codex mcp list` in Codex CLI, `agy mcp list` in Antigravity. In claude.ai, Claude Desktop, and ChatGPT, open the connector or plugin entry and check that it lists tools. A connected server reports its tools; a server stuck at authentication reports a connection or auth error instead.
 
 A good first prompt once connected:
 
@@ -214,11 +249,11 @@ Credential-returning and mutating operations — creating or cancelling subscrip
 
 ## Troubleshooting
 
-**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI), or reconnect the connector in claude.ai, Claude Desktop, or ChatGPT, and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
+**Client reports `401 Unauthorized`.** Authentication has not completed. Run the client's auth command (`/mcp` in Claude Code or Antigravity, `codex mcp login openbridge`, `/mcp auth openbridge` in Gemini CLI), or reconnect the connector in claude.ai, Claude Desktop, or ChatGPT, and finish the browser flow. The endpoint returns `401` with a `WWW-Authenticate` header to every unauthenticated request — that is the handshake, not an outage.
 
 **Browser flow finishes but a CLI client still fails.** The redirect must reach the client's local callback listener. Complete the flow on the same machine as the client; an SSH session or container without browser access to the host loopback will not work.
 
-**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex CLI needs a fresh session after a `config.toml` change. In claude.ai, Claude Desktop, and ChatGPT the connector is per conversation — enable it in a new chat (**+ → Connectors** in Claude, `@` in ChatGPT) rather than expecting it in an existing one.
+**Tools never appear after adding the server.** Restart the client. Claude Code and Gemini CLI discover tools on session start; Codex CLI needs a fresh session after a `config.toml` change, and Antigravity needs one after an `mcp_config.json` edit. In claude.ai, Claude Desktop, and ChatGPT the connector is per conversation — enable it in a new chat (**+ → Connectors** in Claude, `@` in ChatGPT) rather than expecting it in an existing one.
 
 **`403 Forbidden` on specific operations.** The authenticated account lacks access to that resource, or the operation is in the privileged profile. Confirm you authenticated as the intended account.
 
